@@ -15,6 +15,16 @@ serde_json = "1.0"
 anyhow = "1.0"
 thiserror = "1.0"
 
+# Utilities
+chrono = "0.4"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+log = "0.4"
+env_logger = "0.11"
+directories = "5.0"
+hex = "0.4"
+toml = "0.8"
+rand = "0.8"
+
 # Async runtime
 async-trait = "0.1"
 futures = "0.3"
@@ -53,11 +63,7 @@ image = "0.25"
 font-kit = "0.13"
 unicode-segmentation = "1.11"
 
-# Utils
-chrono = "0.4"
-uuid = { version = "1.6", features = ["v4", "serde"] }
-log = "0.4"
-env_logger = "0.11"
+# Tracing
 tracing = "0.1"
 tracing-subscriber = "0.3"
 

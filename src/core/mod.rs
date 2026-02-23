@@ -10,8 +10,14 @@ pub mod kernel;
 pub mod scheduler;
 pub mod storage;
 pub mod config;
+pub mod history;
+pub mod bookmarks;
+pub mod downloads;
 
 pub use kernel::VantisKernel;
 pub use scheduler::MicroScheduler;
 pub use storage::StorageManager;
 pub use config::VantisConfig;
+pub use history::HistoryManager;
+pub use bookmarks::BookmarkManager;
+pub use downloads::DownloadManager;
