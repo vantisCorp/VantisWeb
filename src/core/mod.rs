@@ -13,6 +13,8 @@ pub mod config;
 pub mod history;
 pub mod bookmarks;
 pub mod downloads;
+pub mod settings;
+pub mod private_mode;
 
 pub use kernel::VantisKernel;
 pub use scheduler::MicroScheduler;
@@ -21,3 +23,5 @@ pub use config::VantisConfig;
 pub use history::HistoryManager;
 pub use bookmarks::BookmarkManager;
 pub use downloads::DownloadManager;
+pub use settings::SettingsManager;
+pub use private_mode::PrivateModeManager;

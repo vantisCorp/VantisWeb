@@ -17,6 +17,9 @@ use anyhow::Result;
 use log::{info, error};
 use tokio::runtime::Runtime;
 
+use core::settings::SettingsManager;
+use core::private_mode::PrivateModeManager;
+
 fn main() -> Result<()> {
     // Initialize logger
     env_logger::builder()
@@ -44,6 +47,16 @@ async fn run_browser() -> Result<()> {
     let kernel = core::kernel::VantisKernel::new().await?;
     info!("✓ Vantis Kernel initialized");
     
+    // Initialize Settings Manager
+    let config_dir = kernel.get_config().await.get_config_dir();
+    let settings_file = config_dir.join("settings.toml");
+    let mut settings_manager = SettingsManager::new(settings_file.to_string_lossy().to_string())?;
+    info!("✓ Settings Manager initialized");
+    
+    // Initialize Private Mode Manager
+    let mut private_mode = PrivateModeManager::new();
+    info!("✓ Private Mode Manager initialized");
+    
     // Initialize Security Module
     let security = security::SecurityManager::new().await?;
     info!("✓ Security Manager initialized");
@@ -55,6 +68,10 @@ async fn run_browser() -> Result<()> {
     // Main event loop
     info!("Starting main event loop...");
     ui.run().await?;
+    
+    // Cleanup
+    info!("Cleaning up...");
+    settings_manager.save()?;
     
     Ok(())
 }
