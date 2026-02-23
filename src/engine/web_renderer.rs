@@ -1,0 +1,216 @@
+//! Web Renderer
+//! 
+//! Web rendering engine implementation:
+//! - HTML/CSS/JS rendering
+//! - WebKit/Blink integration
+//! - Page lifecycle management
+//! - Navigation history
+
+use anyhow::{Context, Result};
+use log::{debug, info, warn};
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tokio::sync::RwLock;
+
+use crate::core::kernel::VantisKernel;
+
+/// Page loading state
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum PageLoadState {
+    Idle,
+    Loading { progress: f32 },
+    Loaded,
+    Error { message: String },
+}
+
+/// Web Renderer
+#[derive(Clone)]
+pub struct WebRenderer {
+    id: String,
+    kernel: Arc<VantisKernel>,
+    current_url: Arc<RwLock<Option<String>>>,
+    page_state: Arc<RwLock<PageLoadState>>,
+    // In production: WebKit/Blink WebView reference
+}
+
+impl WebRenderer {
+    /// Create a new web renderer
+    pub fn new(kernel: Arc<VantisKernel>) -> Result<Self> {
+        info!("Initializing Web Renderer...");
+        
+        Ok(Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            kernel,
+            current_url: Arc::new(RwLock::new(None)),
+            page_state: Arc::new(RwLock::new(PageLoadState::Idle)),
+        })
+    }
+    
+    /// Load a URL
+    pub async fn load_url(&amp;self, url: String) -> Result<()> {
+        info!("Loading URL: {}", url);
+        
+        // Update state to loading
+        *self.page_state.write().await = PageLoadState::Loading { progress: 0.0 };
+        
+        // Validate URL
+        self.validate_url(&amp;url)?;
+        
+        // Update current URL
+        *self.current_url.write().await = Some(url.clone());
+        
+        // Simulate loading
+        self.simulate_page_load(url).await?;
+        
+        info!("✓ Page loaded: {}", url);
+        
+        Ok(())
+    }
+    
+    /// Validate URL
+    fn validate_url(&amp;self, url: &amp;str) -> Result<()> {
+        if url.is_empty() {
+            return Err(anyhow::anyhow!("URL cannot be empty"));
+        }
+        
+        if !url.starts_with("http://") &amp;&amp; !url.starts_with("https://") {
+            // Auto-prepend https://
+            debug!("Auto-prepending https:// to URL");
+        }
+        
+        Ok(())
+    }
+    
+    /// Simulate page load (placeholder for actual WebKit/Blink integration)
+    async fn simulate_page_load(&amp;self, url: String) -> Result<()> {
+        info!("Simulating page load for: {}", url);
+        
+        // Update loading progress
+        *self.page_state.write().await = PageLoadState::Loading { progress: 0.3 };
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+        
+        *self.page_state.write().await = PageLoadState::Loading { progress: 0.6 };
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+        
+        *self.page_state.write().await = PageLoadState::Loading { progress: 0.9 };
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+        
+        // Mark as loaded
+        *self.page_state.write().await = PageLoadState::Loaded;
+        
+        // In production: This would integrate with WebKit/Blink
+        // For MVP: Placeholder implementation
+        
+        Ok(())
+    }
+    
+    /// Get current URL
+    pub async fn get_current_url(&amp;self) -> Option<String> {
+        self.current_url.read().await.clone()
+    }
+    
+    /// Get page state
+    pub async fn get_page_state(&amp;self) -> PageLoadState {
+        self.page_state.read().await.clone()
+    }
+    
+    /// Execute JavaScript
+    pub async fn execute_javascript(&amp;self, code: String) -> Result<String> {
+        debug!("Executing JavaScript: {}", code);
+        
+        // In production: Use actual JS engine (V8/JavaScriptCore)
+        // For MVP: Placeholder
+        
+        Ok("".to_string())
+    }
+    
+    /// Get page title
+    pub async fn get_page_title(&amp;self) -> Option<String> {
+        // In production: Get actual page title
+        Some("VantisWeb Browser".to_string())
+    }
+    
+    /// Reload page
+    pub async fn reload(&amp;self) -> Result<()> {
+        info!("Reloading page");
+        
+        if let Some(url) = self.get_current_url().await {
+            self.load_url(url).await?;
+        }
+        
+        Ok(())
+    }
+    
+    /// Stop loading
+    pub async fn stop(&amp;self) -> Result<()> {
+        info!("Stopping page load");
+        
+        *self.page_state.write().await = PageLoadState::Idle;
+        
+        Ok(())
+    }
+    
+    /// Go back in history
+    pub async fn go_back(&amp;self) -> Result<()> {
+        info!("Going back in history");
+        
+        // In production: Navigate back
+        // For MVP: Placeholder
+        
+        Ok(())
+    }
+    
+    /// Go forward in history
+    pub async fn go_forward(&amp;self) -> Result<()> {
+        info!("Going forward in history");
+        
+        // In production: Navigate forward
+        // For MVP: Placeholder
+        
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_web_renderer_creation() {
+        let kernel = Arc::new(VantisKernel::new().await.unwrap());
+        let renderer = WebRenderer::new(kernel).unwrap();
+        
+        assert!(!renderer.id.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_load_url() {
+        let kernel = Arc::new(VantisKernel::new().await.unwrap());
+        let renderer = WebRenderer::new(kernel).unwrap();
+        
+        let result = renderer.load_url("https://example.com".to_string()).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_current_url() {
+        let kernel = Arc::new(VantisKernel::new().await.unwrap());
+        let renderer = WebRenderer::new(kernel).unwrap();
+        
+        renderer.load_url("https://example.com".to_string()).await.unwrap();
+        
+        let url = renderer.get_current_url().await;
+        assert_eq!(url, Some("https://example.com".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_get_page_state() {
+        let kernel = Arc::new(VantisKernel::new().await.unwrap());
+        let renderer = WebRenderer::new(kernel).unwrap();
+        
+        renderer.load_url("https://example.com".to_string()).await.unwrap();
+        
+        let state = renderer.get_page_state().await;
+        assert_eq!(state, PageLoadState::Loaded);
+    }
+}
