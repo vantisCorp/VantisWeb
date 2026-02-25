@@ -5,6 +5,11 @@
 //! - HTML/CSS/JS support
 //! - WebAssembly support
 //! - DOM manipulation
+//! - Navigation system
+//! - Event loop
+//! - Fetch API
+//! - Storage API
+//! - Console API
 
 pub mod renderer;
 pub mod web_renderer;
@@ -12,6 +17,16 @@ pub mod dom;
 pub mod parser;
 pub mod js_runtime;
 pub mod wasm;
+pub mod navigation;
+pub mod event_loop;
+pub mod fetch;
+pub mod storage;
+pub mod console;
 
 pub use renderer::WebRenderer;
 pub use web_renderer::WebRenderer as VantisWebRenderer;
+pub use navigation::{NavigationManager, NavigationEntry, NavigationState, NavigationEvent};
+pub use event_loop::{EventLoop, Event, EventHandler};
+pub use fetch::{FetchClient, FetchRequest, FetchResponse};
+pub use storage::{StorageManager, StorageType};
+pub use console::{Console, LogLevel, ConsoleMessage};
