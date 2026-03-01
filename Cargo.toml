@@ -85,6 +85,7 @@ objc = "0.2"
 [dev-dependencies]
 criterion = "0.5"
 mockall = "0.12"
+tempfile = "3.8"
 
 [features]
 default = ["web-engine"]

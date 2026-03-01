@@ -5,6 +5,7 @@
 pub mod core;
 pub mod ui;
 pub mod engine;
+pub mod extensions;
 pub mod security;
 pub mod modules;
 pub mod profiles;

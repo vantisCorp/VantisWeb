@@ -1,0 +1,32 @@
+{
+  "name": "Example Extension",
+  "version": "1.0.0",
+  "description": "An example extension for VantisWeb",
+  "author": "Vantis Corp",
+  "manifest_version": 2,
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "background": {
+    "script": "background.js",
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_end"
+    }
+  ],
+  "popup": {
+    "html": "popup.html",
+    "default_title": "Example Extension"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
