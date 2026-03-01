@@ -44,8 +44,8 @@
 
 ## Faza 7: Rozszerzenia i Profile
 - [x] System profili (praca, gaming, prywatny - placeholder)
+- [x] Menadżer profili (pełna implementacja)
 - [ ] Podstawowe rozszerzenia
-- [ ] Menadżer profili
 
 ## Faza 8: Testowanie i Dokumentacja
 - [x] Testy jednostkowe
