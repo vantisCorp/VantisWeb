@@ -14,7 +14,7 @@ mod ai;
 mod utils;
 
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use tokio::runtime::Runtime;
 use std::sync::Arc;
 
@@ -51,15 +51,15 @@ async fn run_browser() -> Result<()> {
     // Initialize Settings Manager
     let config_dir = kernel.get_config().await.get_config_dir();
     let settings_file = config_dir.join("settings.toml");
-    let mut settings_manager = SettingsManager::new(settings_file.to_string_lossy().to_string())?;
+    let settings_manager = SettingsManager::new(settings_file.to_string_lossy().to_string())?;
     info!("✓ Settings Manager initialized");
     
     // Initialize Private Mode Manager
-    let mut private_mode = PrivateModeManager::new();
+    let _private_mode = PrivateModeManager::new();
     info!("✓ Private Mode Manager initialized");
     
     // Initialize Security Module
-    let security = security::SecurityManager::new().await?;
+    let _security = security::SecurityManager::new().await?;
     info!("✓ Security Manager initialized");
     
     // Initialize UI
