@@ -20,6 +20,7 @@
 - [x] Podstawowe renderowanie stron (placeholder)
 - [x] Omni-Glyph Renderer (prosta wersja - placeholder)
 - [x] System motywów (Ambient Chameleon - podstawowy)
+- [x] Integration z WebRenderer (WebKitGTK)
 
 ## Faza 4: Web Engine
 - [x] Integration z WebKit/Blink (placeholder)
