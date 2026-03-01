@@ -1,0 +1,34 @@
+{
+  "name": "Gaming",
+  "description": "Optimized for gaming and streaming",
+  "category": "Gaming",
+  "settings": {
+    "search_engine": "https://www.google.com/search?q=",
+    "homepage": "https://www.twitch.tv",
+    "start_pages": [
+      "https://www.twitch.tv",
+      "https://www.youtube.com",
+      "https://discord.com"
+    ],
+    "keyboard_shortcuts": {},
+    "privacy": {
+      "block_trackers": false,
+      "block_ads": false,
+      "clear_cookies_on_exit": false,
+      "clear_history_on_exit": false,
+      "private_mode_by_default": false,
+      "disable_javascript": false
+    },
+    "performance": {
+      "hardware_acceleration": true,
+      "memory_limit": 4096,
+      "cpu_priority": "High",
+      "cache_size": 1024
+    }
+  },
+  "extensions": [
+    "twitch-enhancer",
+    "discord-rpc"
+  ],
+  "theme": "dark"
+}

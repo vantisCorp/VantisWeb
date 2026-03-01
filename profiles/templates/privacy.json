@@ -1,0 +1,33 @@
+{
+  "name": "Privacy",
+  "description": "Maximum privacy and security",
+  "category": "Privacy",
+  "settings": {
+    "search_engine": "https://duckduckgo.com/?q=",
+    "homepage": "https://duckduckgo.com",
+    "start_pages": [
+      "https://duckduckgo.com"
+    ],
+    "keyboard_shortcuts": {},
+    "privacy": {
+      "block_trackers": true,
+      "block_ads": true,
+      "clear_cookies_on_exit": true,
+      "clear_history_on_exit": true,
+      "private_mode_by_default": true,
+      "disable_javascript": false
+    },
+    "performance": {
+      "hardware_acceleration": true,
+      "memory_limit": null,
+      "cpu_priority": "Normal",
+      "cache_size": 256
+    }
+  },
+  "extensions": [
+    "privacy-badger",
+    "https-everywhere",
+    "ublock-origin"
+  ],
+  "theme": "dark"
+}

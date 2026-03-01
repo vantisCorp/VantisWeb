@@ -1,0 +1,34 @@
+{
+  "name": "Work",
+  "description": "Optimized for productivity and work-related tasks",
+  "category": "Work",
+  "settings": {
+    "search_engine": "https://www.google.com/search?q=",
+    "homepage": "https://www.google.com",
+    "start_pages": [
+      "https://www.google.com",
+      "https://github.com",
+      "https://stackoverflow.com"
+    ],
+    "keyboard_shortcuts": {},
+    "privacy": {
+      "block_trackers": true,
+      "block_ads": true,
+      "clear_cookies_on_exit": false,
+      "clear_history_on_exit": false,
+      "private_mode_by_default": false,
+      "disable_javascript": false
+    },
+    "performance": {
+      "hardware_acceleration": true,
+      "memory_limit": null,
+      "cpu_priority": "Normal",
+      "cache_size": 512
+    }
+  },
+  "extensions": [
+    "password-manager",
+    "productivity-tracker"
+  ],
+  "theme": "light"
+}

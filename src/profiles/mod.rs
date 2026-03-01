@@ -14,7 +14,17 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
+pub mod templates;
+pub mod sync;
+pub mod analytics;
+pub mod security;
+
 use crate::core::kernel::VantisKernel;
+
+pub use templates::{TemplateManager, ProfileTemplate, TemplateCategory, TemplateSettings, PrivacySettings, PerformanceSettings, CPUPriority};
+pub use sync::{ProfileSyncManager, SyncConfig, SyncProvider, SyncStatus, SyncedProfile, SyncConflict, SyncResult};
+pub use analytics::{AnalyticsManager, ProfileAnalytics, DailyUsage, WebsiteUsage, TabStatistics, PerformanceMetrics, UsageSummary};
+pub use security::{ProfileSecurityManager, ProfileSecurity, SecurityLevel, AuthMethod};
 
 /// Profile type
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

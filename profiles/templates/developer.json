@@ -1,0 +1,39 @@
+{
+  "name": "Developer",
+  "description": "Optimized for web development and debugging",
+  "category": "Developer",
+  "settings": {
+    "search_engine": "https://www.google.com/search?q=",
+    "homepage": "https://github.com",
+    "start_pages": [
+      "https://github.com",
+      "https://stackoverflow.com",
+      "https://developer.mozilla.org"
+    ],
+    "keyboard_shortcuts": {
+      "F12": "toggle-devtools",
+      "Ctrl+Shift+I": "toggle-devtools"
+    },
+    "privacy": {
+      "block_trackers": false,
+      "block_ads": false,
+      "clear_cookies_on_exit": false,
+      "clear_history_on_exit": false,
+      "private_mode_by_default": false,
+      "disable_javascript": false
+    },
+    "performance": {
+      "hardware_acceleration": true,
+      "memory_limit": 8192,
+      "cpu_priority": "High",
+      "cache_size": 2048
+    }
+  },
+  "extensions": [
+    "react-devtools",
+    "vue-devtools",
+    "redux-devtools",
+    "lighthouse"
+  ],
+  "theme": "dark"
+}
