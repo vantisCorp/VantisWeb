@@ -97,7 +97,7 @@ impl SecurityManager {
     }
     
     /// Initialize sandbox
-    pub async fn init_sandbox(&self) -> Result<()> {
+    pub async fn init_sandbox(&mut self) -> Result<()> {
         info!("Initializing sandbox...");
         
         self.sandbox.initialize()

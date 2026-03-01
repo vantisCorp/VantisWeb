@@ -16,7 +16,7 @@ anyhow = "1.0"
 thiserror = "1.0"
 
 # Utilities
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.6", features = ["v4", "serde"] }
 log = "0.4"
 env_logger = "0.11"
@@ -34,7 +34,7 @@ wgpu = { version = "0.19", features = ["webgl"] }
 winit = "0.29"
 
 # Web Engine
-webkit2gtk = { version = "2.0", optional = true }
+webkit2gtk = "2.0"
 webview2-com = { version = "0.30", optional = true }
 
 # Security & Crypto
@@ -84,7 +84,7 @@ mockall = "0.12"
 
 [features]
 default = ["web-engine"]
-web-engine = ["webkit2gtk", "webview2-com"]
+web-engine = ["webview2-com"]
 ai-features = ["tch"]
 full = ["web-engine", "ai-features"]
 

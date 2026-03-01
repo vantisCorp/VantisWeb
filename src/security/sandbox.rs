@@ -59,7 +59,7 @@ impl Sandbox {
         // - Network restrictions
         // - System call filtering
         
-        self.isolated_processes.push(process_id);
+        self.isolated_processes.push(process_id.clone());
         
         debug!("Process isolated: {} (total: {})", 
                process_id, 
