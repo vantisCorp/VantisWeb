@@ -6,10 +6,12 @@
 //! - Event listeners
 //! - Style manipulation
 //! - Mutation observers
+//! - WebKitGTK DOM integration
 
 use anyhow::{Context, Result};
 use log::{debug, info};
 use std::collections::HashMap;
+use webkit2gtk::{WebView, WebViewExt};
 
 /// DOM Element
 #[derive(Debug, Clone)]
@@ -26,16 +28,18 @@ pub struct DOMElement {
 pub struct DOMManager {
     root: Option<DOMElement>,
     elements: HashMap<String, DOMElement>,
+    webview: WebView,
 }
 
 impl DOMManager {
     /// Create a new DOM manager
-    pub fn new() -> Self {
-        info!("Initializing DOM Manager...");
+    pub fn new(webview: WebView) -> Self {
+        info!("Initializing DOM Manager with WebKitGTK...");
         
         Self {
             root: None,
             elements: HashMap::new(),
+            webview,
         }
     }
     
@@ -78,7 +82,9 @@ impl DOMManager {
 
 impl Default for DOMManager {
     fn default() -> Self {
-        Self::new()
+        // Create a temporary WebView for default initialization
+        let webview = WebView::new();
+        Self::new(webview)
     }
 }
 
