@@ -114,6 +114,10 @@
 
 ## Co Następnie?
 1. **Web Engine** - implementacja HTML/CSS/JS rendering (kluczowe dla MVP)
+   - [x] WebKitGTK integration
+   - [ ] JavaScript execution integration
+   - [ ] DOM manipulation
+   - [ ] Web APIs implementation
 2. **Dokumentacja API** - szczegółowy opis dla deweloperów
 3. **Profile Management** - pełna implementacja systemu profili
 4. **Extensions** - system wtyczek
