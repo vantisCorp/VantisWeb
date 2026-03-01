@@ -121,9 +121,13 @@
    - [x] WebKitGTK integration
    - [x] JavaScript execution integration (JSRuntime)
    - [x] DOM manipulation (DOMManager)
-   - [ ] Web APIs implementation (Fetch, Storage, Console)
-   - [ ] Event Loop integration
+   - [x] Web APIs implementation (Fetch, Storage, Console, Event Loop)
+   - [x] JavaScript Bridge implementation
+   - [x] Integration testing
+   - [ ] WebAssembly support
 2. **Dokumentacja API** - szczegółowy opis dla deweloperów
+   - [x] JavaScript Bridge documentation
+   - [ ] API reference documentation
 3. **Profile Management** - pełna implementacja systemu profili
 4. **Extensions** - system wtyczek
 5. **Polishing** - optymalizacja i poprawki błędów
