@@ -25,3 +25,5 @@ pub mod fetch;
 pub mod storage;
 pub mod console;
 
+pub use wasm::{WasmRuntime, WasmModule, WasmFunction, WasmMemory, WasmRuntimeStats};
+

@@ -28,7 +28,7 @@
 - [x] Obsługa HTML/CSS/JS (podstawowa)
 - [x] Web APIs integration (Fetch, Storage, Console, Event Loop)
 - [x] JavaScript bridge implementation
-- [ ] WebAssembly support
+- [x] WebAssembly support (wasmi runtime)
 
 ## Faza 5: Podstawowe Funkcje
 - [x] Pasek adresu i nawigacji
@@ -124,9 +124,10 @@
    - [x] Web APIs implementation (Fetch, Storage, Console, Event Loop)
    - [x] JavaScript Bridge implementation
    - [x] Integration testing
-   - [ ] WebAssembly support
+   - [x] WebAssembly support (wasmi runtime)
 2. **Dokumentacja API** - szczegółowy opis dla deweloperów
    - [x] JavaScript Bridge documentation
+   - [x] WebAssembly documentation
    - [ ] API reference documentation
 3. **Profile Management** - pełna implementacja systemu profili
 4. **Extensions** - system wtyczek

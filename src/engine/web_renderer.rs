@@ -19,6 +19,7 @@ use super::storage::StorageApi;
 use super::console::ConsoleApi;
 use super::event_loop::EventLoop;
 use super::js_bridge::JsBridge;
+use super::wasm::WasmRuntime;
 
 /// Page loading state
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -46,6 +47,8 @@ pub struct WebRenderer {
     event_loop: Arc<EventLoop>,
     /// JavaScript Bridge
     js_bridge: Arc<JsBridge>,
+    /// WebAssembly Runtime
+    wasm_runtime: Arc<WasmRuntime>,
 }
 
 impl WebRenderer {
@@ -88,6 +91,9 @@ impl WebRenderer {
             event_loop.clone(),
         ));
         
+        // Initialize WebAssembly Runtime
+        let wasm_runtime = Arc::new(WasmRuntime::new()?);
+        
         Ok(Self {
             id: uuid::Uuid::new_v4().to_string(),
             kernel,
@@ -99,6 +105,7 @@ impl WebRenderer {
             console_api,
             event_loop,
             js_bridge,
+            wasm_runtime,
         })
     }
     
@@ -245,6 +252,11 @@ impl WebRenderer {
     /// Get the JavaScript Bridge
     pub fn get_js_bridge(&self) -> Arc<JsBridge> {
         self.js_bridge.clone()
+    }
+    
+    /// Get the WebAssembly Runtime
+    pub fn get_wasm_runtime(&self) -> Arc<WasmRuntime> {
+        self.wasm_runtime.clone()
     }
 }
 

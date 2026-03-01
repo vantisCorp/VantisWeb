@@ -37,6 +37,10 @@ winit = "0.29"
 webkit2gtk = "2.0"
 webview2-com = { version = "0.30", optional = true }
 
+# WebAssembly
+wasmi = "0.31"
+wasmi_wasi = "0.31"
+
 # Security & Crypto
 rust-crypto = "0.2"
 blake3 = "1.5"
