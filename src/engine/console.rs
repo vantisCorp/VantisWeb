@@ -138,7 +138,7 @@ impl ConsoleApi {
     }
 
     /// Log a message
-    pub async fn log(&amp;self, level: LogLevel, message: String, args: Vec<String>) {
+    pub async fn log(&self, level: LogLevel, message: String, args: Vec<String>) {
         let entry = ConsoleEntry::new(level, message.clone());
         
         // Add arguments
@@ -167,43 +167,43 @@ impl ConsoleApi {
     }
 
     /// Log a standard log message
-    pub async fn console_log(&amp;self, message: String) {
+    pub async fn console_log(&self, message: String) {
         self.log(LogLevel::Log, message, Vec::new()).await;
     }
 
     /// Log an info message
-    pub async fn console_info(&amp;self, message: String) {
+    pub async fn console_info(&self, message: String) {
         self.log(LogLevel::Info, message, Vec::new()).await;
     }
 
     /// Log a warning message
-    pub async fn console_warn(&amp;self, message: String) {
+    pub async fn console_warn(&self, message: String) {
         self.log(LogLevel::Warn, message, Vec::new()).await;
     }
 
     /// Log an error message
-    pub async fn console_error(&amp;self, message: String) {
+    pub async fn console_error(&self, message: String) {
         self.log(LogLevel::Error, message, Vec::new()).await;
     }
 
     /// Log a debug message
-    pub async fn console_debug(&amp;self, message: String) {
+    pub async fn console_debug(&self, message: String) {
         self.log(LogLevel::Debug, message, Vec::new()).await;
     }
 
     /// Clear all console entries
-    pub async fn clear(&amp;self) {
+    pub async fn clear(&self) {
         info!("Clearing console");
         self.entries.write().await.clear();
     }
 
     /// Get all console entries
-    pub async fn get_entries(&amp;self) -> Vec<ConsoleEntry> {
+    pub async fn get_entries(&self) -> Vec<ConsoleEntry> {
         self.entries.read().await.clone()
     }
 
     /// Get entries by log level
-    pub async fn get_entries_by_level(&amp;self, level: LogLevel) -> Vec<ConsoleEntry> {
+    pub async fn get_entries_by_level(&self, level: LogLevel) -> Vec<ConsoleEntry> {
         self.entries
             .read()
             .await
@@ -214,22 +214,22 @@ impl ConsoleApi {
     }
 
     /// Get entry count
-    pub async fn count(&amp;self) -> usize {
+    pub async fn count(&self) -> usize {
         self.entries.read().await.len()
     }
 
     /// Start a performance timer
-    pub async fn time(&amp;self, name: String) {
+    pub async fn time(&self, name: String) {
         let start_time = chrono::Utc::now().timestamp_millis();
         self.timers.write().await.insert(name.clone(), start_time);
         debug!("Timer started: {}", name);
     }
 
     /// End a performance timer
-    pub async fn time_end(&amp;self, name: String) -> Result<f64> {
+    pub async fn time_end(&self, name: String) -> Result<f64> {
         let end_time = chrono::Utc::now().timestamp_millis();
         
-        if let Some(start_time) = self.timers.write().await.remove(&amp;name) {
+        if let Some(start_time) = self.timers.write().await.remove(&name) {
             let duration = (end_time - start_time) as f64;
             
             let metric = PerformanceMetric::new(name.clone(), duration)
@@ -250,29 +250,29 @@ impl ConsoleApi {
     }
 
     /// Record a performance metric
-    pub async fn record_metric(&amp;self, metric: PerformanceMetric) {
+    pub async fn record_metric(&self, metric: PerformanceMetric) {
         self.metrics.write().await.insert(metric.name.clone(), metric);
     }
 
     /// Get a performance metric
-    pub async fn get_metric(&amp;self, name: String) -> Option<PerformanceMetric> {
-        self.metrics.read().await.get(&amp;name).cloned()
+    pub async fn get_metric(&self, name: String) -> Option<PerformanceMetric> {
+        self.metrics.read().await.get(&name).cloned()
     }
 
     /// Get all performance metrics
-    pub async fn get_metrics(&amp;self) -> Vec<PerformanceMetric> {
+    pub async fn get_metrics(&self) -> Vec<PerformanceMetric> {
         self.metrics.read().await.values().cloned().collect()
     }
 
     /// Clear all performance metrics
-    pub async fn clear_metrics(&amp;self) {
+    pub async fn clear_metrics(&self) {
         info!("Clearing performance metrics");
         self.metrics.write().await.clear();
         self.timers.write().await.clear();
     }
 
     /// Assert that a condition is true
-    pub async fn assert(&amp;self, condition: bool, message: Option<String>) -> bool {
+    pub async fn assert(&self, condition: bool, message: Option<String>) -> bool {
         if condition {
             self.console_log("Assertion passed".to_string()).await;
             true
@@ -284,7 +284,7 @@ impl ConsoleApi {
     }
 
     /// Count entries by level
-    pub async fn count_by_level(&amp;self, level: LogLevel) -> usize {
+    pub async fn count_by_level(&self, level: LogLevel) -> usize {
         self.entries
             .read()
             .await
@@ -294,7 +294,7 @@ impl ConsoleApi {
     }
 
     /// Get the last N entries
-    pub async fn get_last_entries(&amp;self, n: usize) -> Vec<ConsoleEntry> {
+    pub async fn get_last_entries(&self, n: usize) -> Vec<ConsoleEntry> {
         let entries = self.entries.read().await;
         let start = if entries.len() > n { entries.len() - n } else { 0 };
         entries[start..].to_vec()

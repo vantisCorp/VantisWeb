@@ -46,7 +46,7 @@ impl Parser {
     }
     
     /// Parse HTML
-    pub fn parse_html(&amp;self, html: String) -> Result<HTMLElement> {
+    pub fn parse_html(&self, html: String) -> Result<HTMLElement> {
         debug!("Parsing HTML");
         
         // In production: Use actual HTML5 parser
@@ -73,7 +73,7 @@ impl Parser {
     }
     
     /// Parse CSS
-    pub fn parse_css(&amp;self, css: String) -> Result<Vec<CSSRule>> {
+    pub fn parse_css(&self, css: String) -> Result<Vec<CSSRule>> {
         debug!("Parsing CSS");
         
         // In production: Use actual CSS3 parser
@@ -105,7 +105,7 @@ impl Parser {
     }
     
     /// Parse a complete document
-    pub fn parse_document(&amp;self, html: String, css: Option<String>) -> Result<ParsedDocument> {
+    pub fn parse_document(&self, html: String, css: Option<String>) -> Result<ParsedDocument> {
         info!("Parsing document");
         
         let html_element = self.parse_html(html)?;

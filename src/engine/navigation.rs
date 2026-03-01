@@ -172,8 +172,9 @@ impl NavigationManager {
         *self.current_index.write().await = current_index - 1;
         
         let to_entry = self.get_current_entry().await;
+        let to_entry_clone = to_entry.clone();
 
-        if let (Some(from), Some(ref to)) = (from_url, to_entry) {
+        if let (Some(from), Some(ref to)) = (from_url, to_entry_clone) {
             self.emit_event(NavigationEvent::Back {
                 from_url: from,
                 to_url: to.url.clone(),
@@ -200,8 +201,9 @@ impl NavigationManager {
         *self.current_index.write().await = current_index + 1;
         
         let to_entry = self.get_current_entry().await;
+        let to_entry_clone = to_entry.clone();
 
-        if let (Some(from), Some(ref to)) = (from_url, to_entry) {
+        if let (Some(from), Some(ref to)) = (from_url, to_entry_clone) {
             self.emit_event(NavigationEvent::Forward {
                 from_url: from,
                 to_url: to.url.clone(),

@@ -128,7 +128,7 @@ pub struct EventLoop {
     /// Macrotask queue (normal priority)
     macrotask_queue: Arc<Mutex<VecDeque<Task>>>,
     /// Timer queue
-    timer_queue: Arc<Mutex<Vec<TimerEntry>>>,
+    timer_queue: Arc<Mutex<VecDeque<TimerEntry>>>,
     /// Running state
     running: Arc<RwLock<bool>>,
     /// Statistics
@@ -149,7 +149,7 @@ impl EventLoop {
             kernel,
             microtask_queue: Arc::new(Mutex::new(VecDeque::new())),
             macrotask_queue: Arc::new(Mutex::new(VecDeque::new())),
-            timer_queue: Arc::new(Mutex::new(Vec::new())),
+            timer_queue: Arc::new(Mutex::new(VecDeque::new())),
             running: Arc::new(RwLock::new(false)),
             stats: Arc::new(RwLock::new(EventLoopStats {
                 microtasks_processed: 0,
@@ -264,7 +264,7 @@ impl EventLoop {
             canceled: false,
         };
 
-        self.timer_queue.lock().await.push(entry);
+        self.timer_queue.lock().await.push_back(entry);
 
         Ok(task_id)
     }
@@ -283,7 +283,7 @@ impl EventLoop {
             canceled: false,
         };
 
-        self.timer_queue.lock().await.push(entry);
+        self.timer_queue.lock().await.push_back(entry);
 
         Ok(task_id)
     }

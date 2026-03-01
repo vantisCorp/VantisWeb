@@ -104,7 +104,7 @@ impl VantisKernel {
         info!("Configuration loaded: {}", config.version);
         
         // Initialize storage
-        let storage = self.storage.read().await;
+        let mut storage = self.storage.write().await;
         storage.initialize().await?;
         info!("Storage system initialized");
         

@@ -26,7 +26,7 @@ pub enum TaskPriority {
 }
 
 /// Scheduled task
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 struct ScheduledTask {
     id: String,
     name: String,
@@ -64,7 +64,7 @@ enum TaskMessage {
         task_id: String,
         name: String,
         priority: TaskPriority,
-        func: Box<dyn Fn() + Send + 'static>,
+        func: Box<dyn Fn() + Send + Sync + 'static>,
     },
 }
 
@@ -159,7 +159,7 @@ impl MicroScheduler {
     /// Schedule a task
     pub async fn schedule_task<F>(&self, name: String, priority: TaskPriority, func: F) -> Result<()>
     where
-        F: Fn() + Send + 'static,
+        F: Fn() + Send + Sync + 'static,
     {
         let task_id = format!("task_{}{}", 
             chrono::Utc::now().timestamp_millis(),
@@ -180,7 +180,7 @@ impl MicroScheduler {
         // Send to worker
         self.task_sender.send(TaskMessage::Execute {
             task_id,
-            name,
+            name: name.clone(),
             priority,
             func: Box::new(func),
         })?;

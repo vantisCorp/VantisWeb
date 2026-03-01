@@ -47,7 +47,7 @@ impl DownloadManager {
     pub fn new(download_dir: PathBuf) -> Result<Self> {
         info!("Initializing Download Manager...");
         
-        std::fs::create_dir_all(&amp;download_dir)?;
+        std::fs::create_dir_all(&download_dir)?;
         
         Ok(Self {
             downloads: Vec::new(),
@@ -56,12 +56,12 @@ impl DownloadManager {
     }
     
     /// Start a download
-    pub async fn start_download(&amp;mut self, url: String) -> Result<String> {
+    pub async fn start_download(&mut self, url: String) -> Result<String> {
         info!("Starting download: {}", url);
         
         // Extract filename from URL
-        let filename = self.extract_filename(&amp;url)?;
-        let save_path = self.download_dir.join(&amp;filename);
+        let filename = self.extract_filename(&url)?;
+        let save_path = self.download_dir.join(&filename);
         
         let download = Download {
             id: uuid::Uuid::new_v4().to_string(),
@@ -87,9 +87,9 @@ impl DownloadManager {
     }
     
     /// Extract filename from URL
-    fn extract_filename(&amp;self, url: &amp;str) -> Result<String> {
-        let url_parts: Vec<&amp;str> = url.split('/').collect();
-        let filename = url_parts.last().unwrap_or("download");
+    fn extract_filename(&self, url: &str) -> Result<String> {
+        let url_parts: Vec<&str> = url.split('/').collect();
+        let filename = url_parts.last().copied().unwrap_or("download");
         
         if filename.is_empty() {
             Ok("download".to_string())
@@ -99,7 +99,7 @@ impl DownloadManager {
     }
     
     /// Download file
-    async fn download_file(&amp;mut self, download_id: String) -> Result<()> {
+    async fn download_file(&mut self, download_id: String) -> Result<()> {
         // Update status
         if let Some(download) = self.downloads.iter_mut().find(|d| d.id == download_id) {
             download.status = DownloadStatus::Downloading { progress: 0.0 };
@@ -122,7 +122,7 @@ impl DownloadManager {
     }
     
     /// Pause download
-    pub async fn pause_download(&amp;mut self, download_id: String) -> Result<()> {
+    pub async fn pause_download(&mut self, download_id: String) -> Result<()> {
         info!("Pausing download: {}", download_id);
         
         if let Some(download) = self.downloads.iter_mut().find(|d| d.id == download_id) {
@@ -133,7 +133,7 @@ impl DownloadManager {
     }
     
     /// Resume download
-    pub async fn resume_download(&amp;mut self, download_id: String) -> Result<()> {
+    pub async fn resume_download(&mut self, download_id: String) -> Result<()> {
         info!("Resuming download: {}", download_id);
         
         if let Some(download) = self.downloads.iter_mut().find(|d| d.id == download_id) {
@@ -145,7 +145,7 @@ impl DownloadManager {
     }
     
     /// Cancel download
-    pub async fn cancel_download(&amp;mut self, download_id: String) -> Result<()> {
+    pub async fn cancel_download(&mut self, download_id: String) -> Result<()> {
         info!("Cancelling download: {}", download_id);
         
         self.downloads.retain(|d| d.id != download_id);
@@ -154,17 +154,17 @@ impl DownloadManager {
     }
     
     /// Get all downloads
-    pub fn get_all(&amp;self) -> &amp;[Download] {
-        &amp;self.downloads
+    pub fn get_all(&self) -> &[Download] {
+        &self.downloads
     }
     
     /// Get download by ID
-    pub fn get(&amp;self, download_id: &amp;str) -> Option<&amp;Download> {
+    pub fn get(&self, download_id: &str) -> Option<&Download> {
         self.downloads.iter().find(|d| d.id == download_id)
     }
     
     /// Clear completed downloads
-    pub async fn clear_completed(&amp;mut self) {
+    pub async fn clear_completed(&mut self) {
         info!("Clearing completed downloads");
         self.downloads.retain(|d| !matches!(d.status, DownloadStatus::Completed));
     }

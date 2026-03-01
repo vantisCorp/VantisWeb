@@ -47,20 +47,20 @@ impl WebRenderer {
     }
     
     /// Load a URL
-    pub async fn load_url(&amp;self, url: String) -> Result<()> {
+    pub async fn load_url(&self, url: String) -> Result<()> {
         info!("Loading URL: {}", url);
         
         // Update state to loading
         *self.page_state.write().await = PageLoadState::Loading { progress: 0.0 };
         
         // Validate URL
-        self.validate_url(&amp;url)?;
+        self.validate_url(&url)?;
         
         // Update current URL
         *self.current_url.write().await = Some(url.clone());
         
         // Simulate loading
-        self.simulate_page_load(url).await?;
+        self.simulate_page_load(url.clone()).await?;
         
         info!("✓ Page loaded: {}", url);
         
@@ -68,12 +68,12 @@ impl WebRenderer {
     }
     
     /// Validate URL
-    fn validate_url(&amp;self, url: &amp;str) -> Result<()> {
+    fn validate_url(&self, url: &str) -> Result<()> {
         if url.is_empty() {
             return Err(anyhow::anyhow!("URL cannot be empty"));
         }
         
-        if !url.starts_with("http://") &amp;&amp; !url.starts_with("https://") {
+        if !url.starts_with("http://") && !url.starts_with("https://") {
             // Auto-prepend https://
             debug!("Auto-prepending https:// to URL");
         }
@@ -82,7 +82,7 @@ impl WebRenderer {
     }
     
     /// Simulate page load (placeholder for actual WebKit/Blink integration)
-    async fn simulate_page_load(&amp;self, url: String) -> Result<()> {
+    async fn simulate_page_load(&self, url: String) -> Result<()> {
         info!("Simulating page load for: {}", url);
         
         // Update loading progress
@@ -105,17 +105,17 @@ impl WebRenderer {
     }
     
     /// Get current URL
-    pub async fn get_current_url(&amp;self) -> Option<String> {
+    pub async fn get_current_url(&self) -> Option<String> {
         self.current_url.read().await.clone()
     }
     
     /// Get page state
-    pub async fn get_page_state(&amp;self) -> PageLoadState {
+    pub async fn get_page_state(&self) -> PageLoadState {
         self.page_state.read().await.clone()
     }
     
     /// Execute JavaScript
-    pub async fn execute_javascript(&amp;self, code: String) -> Result<String> {
+    pub async fn execute_javascript(&self, code: String) -> Result<String> {
         debug!("Executing JavaScript: {}", code);
         
         // In production: Use actual JS engine (V8/JavaScriptCore)
@@ -125,13 +125,13 @@ impl WebRenderer {
     }
     
     /// Get page title
-    pub async fn get_page_title(&amp;self) -> Option<String> {
+    pub async fn get_page_title(&self) -> Option<String> {
         // In production: Get actual page title
         Some("VantisWeb Browser".to_string())
     }
     
     /// Reload page
-    pub async fn reload(&amp;self) -> Result<()> {
+    pub async fn reload(&self) -> Result<()> {
         info!("Reloading page");
         
         if let Some(url) = self.get_current_url().await {
@@ -142,7 +142,7 @@ impl WebRenderer {
     }
     
     /// Stop loading
-    pub async fn stop(&amp;self) -> Result<()> {
+    pub async fn stop(&self) -> Result<()> {
         info!("Stopping page load");
         
         *self.page_state.write().await = PageLoadState::Idle;
@@ -151,7 +151,7 @@ impl WebRenderer {
     }
     
     /// Go back in history
-    pub async fn go_back(&amp;self) -> Result<()> {
+    pub async fn go_back(&self) -> Result<()> {
         info!("Going back in history");
         
         // In production: Navigate back
@@ -161,7 +161,7 @@ impl WebRenderer {
     }
     
     /// Go forward in history
-    pub async fn go_forward(&amp;self) -> Result<()> {
+    pub async fn go_forward(&self) -> Result<()> {
         info!("Going forward in history");
         
         // In production: Navigate forward

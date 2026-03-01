@@ -114,8 +114,8 @@ impl SecurityManager {
             crypto_enabled: true,
             immune_system_active: self.immune_system.is_active(),
             sandbox_active: self.sandbox.is_active(),
-            threats_detected: self.immune_system.get_threats_detected(),
-            last_scan: self.immune_system.get_last_scan(),
+            threats_detected: self.immune_system.get_threats_detected().await,
+            last_scan: self.immune_system.get_last_scan().await,
         }
     }
 }

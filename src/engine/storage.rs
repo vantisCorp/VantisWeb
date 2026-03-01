@@ -16,6 +16,8 @@ use tokio::sync::RwLock;
 
 use crate::core::kernel::VantisKernel;
 
+type StorageMap = Arc<RwLock<HashMap<String, StorageEntry>>>;
+
 /// Storage type
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum StorageType {
@@ -74,9 +76,9 @@ impl StorageEntry {
 pub struct StorageApi {
     kernel: Arc<VantisKernel>,
     /// Local storage
-    local_storage: Arc<RwLock<HashMap<String, StorageEntry>>>,
+    local_storage: StorageMap,
     /// Session storage
-    session_storage: Arc<RwLock<HashMap<String, StorageEntry>>>,
+    session_storage: StorageMap,
     /// Storage event listeners
     listeners: Arc<RwLock<Vec<Box<dyn Fn(StorageEvent) + Send + Sync>>>,
     /// Maximum storage size (in bytes)
@@ -110,16 +112,16 @@ impl StorageApi {
         self.check_storage_size(storage_type, &key, &value).await?;
 
         // Get storage
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         // Get old value
         let old_value = storage.read().await.get(&key).map(|e| e.value.clone());
 
         // Set new value
-        let mut storage_write = storage.write().await;
+        let mut storage_write: tokio::sync::RwLockWriteGuard<'_, std::collections::HashMap<String, StorageEntry>> = storage.write().await;
         if let Some(entry) = storage_write.get_mut(&key) {
             entry.update(value.clone());
             self.emit_event(StorageEvent::Updated {
@@ -140,9 +142,9 @@ impl StorageApi {
     pub async fn get_item(&self, storage_type: StorageType, key: String) -> Option<String> {
         debug!("Getting item: {} ({:?})", key, storage_type);
 
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         storage.read().await.get(&key).map(|entry| entry.value.clone())
@@ -152,9 +154,9 @@ impl StorageApi {
     pub async fn remove_item(&self, storage_type: StorageType, key: String) -> Result<bool> {
         debug!("Removing item: {} ({:?})", key, storage_type);
 
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         let removed = storage.write().await.remove(&key).is_some();
@@ -170,9 +172,9 @@ impl StorageApi {
     pub async fn clear(&self, storage_type: StorageType) -> Result<()> {
         debug!("Clearing storage: {:?}", storage_type);
 
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         storage.write().await.clear();
@@ -184,9 +186,9 @@ impl StorageApi {
 
     /// Get all keys from storage
     pub async fn keys(&self, storage_type: StorageType) -> Vec<String> {
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         storage.read().await.keys().cloned().collect()
@@ -194,9 +196,9 @@ impl StorageApi {
 
     /// Get number of items in storage
     pub async fn length(&self, storage_type: StorageType) -> usize {
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         storage.read().await.len()
@@ -204,9 +206,9 @@ impl StorageApi {
 
     /// Check if key exists in storage
     pub async fn has_item(&self, storage_type: StorageType, key: String) -> bool {
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         storage.read().await.contains_key(&key)
@@ -214,9 +216,9 @@ impl StorageApi {
 
     /// Get storage size in bytes
     pub async fn size(&self, storage_type: StorageType) -> usize {
-        let storage = match storage_type {
-            StorageType::Local => &self.local_storage,
-            StorageType::Session => &self.session_storage,
+        let storage: StorageMap = match storage_type {
+            StorageType::Local => self.local_storage.clone(),
+            StorageType::Session => self.session_storage.clone(),
         };
 
         storage

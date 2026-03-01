@@ -40,7 +40,7 @@ impl DOMManager {
     }
     
     /// Create element
-    pub fn create_element(&amp;mut self, tag_name: String) -> Result<DOMElement> {
+    pub fn create_element(&mut self, tag_name: String) -> Result<DOMElement> {
         let element = DOMElement {
             id: uuid::Uuid::new_v4().to_string(),
             tag_name,
@@ -54,10 +54,10 @@ impl DOMManager {
     }
     
     /// Set attribute
-    pub fn set_attribute(&amp;mut self, element_id: String, name: String, value: String) -> Result<()> {
+    pub fn set_attribute(&mut self, element_id: String, name: String, value: String) -> Result<()> {
         debug!("Setting attribute: {} = {}", name, value);
         
-        if let Some(element) = self.elements.get_mut(&amp;element_id) {
+        if let Some(element) = self.elements.get_mut(&element_id) {
             element.attributes.insert(name, value);
         }
         
@@ -65,10 +65,10 @@ impl DOMManager {
     }
     
     /// Set text content
-    pub fn set_text_content(&amp;mut self, element_id: String, text: String) -> Result<()> {
+    pub fn set_text_content(&mut self, element_id: String, text: String) -> Result<()> {
         debug!("Setting text content: {}", text);
         
-        if let Some(element) = self.elements.get_mut(&amp;element_id) {
+        if let Some(element) = self.elements.get_mut(&element_id) {
             element.text_content = Some(text);
         }
         
