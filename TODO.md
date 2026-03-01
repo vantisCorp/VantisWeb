@@ -52,7 +52,7 @@
 
 ## Faza 8: Testowanie i Dokumentacja
 - [x] Testy jednostkowe
-- [ ] Dokumentacja API
+- [x] Dokumentacja API
 - [x] README i setup instrukcje
 - [x] Release notes
 - [x] Optymalizacja kodu (redukcja ostrzeżeń z 206 do 120)
