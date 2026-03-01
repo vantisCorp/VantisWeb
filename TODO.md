@@ -25,7 +25,9 @@
 ## Faza 4: Web Engine
 - [x] Integration z WebKit/Blink (placeholder)
 - [x] Integration z WebKitGTK (pełna implementacja)
-- [ ] Obsługa HTML/CSS/JS
+- [x] Obsługa HTML/CSS/JS (podstawowa)
+- [x] Web APIs integration (Fetch, Storage, Console, Event Loop)
+- [ ] JavaScript bridge implementation
 - [ ] WebAssembly support
 
 ## Faza 5: Podstawowe Funkcje

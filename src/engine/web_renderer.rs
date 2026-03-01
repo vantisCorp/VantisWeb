@@ -18,6 +18,7 @@ use super::fetch::FetchApi;
 use super::storage::StorageApi;
 use super::console::ConsoleApi;
 use super::event_loop::EventLoop;
+use super::js_bridge::JsBridge;
 
 /// Page loading state
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -43,6 +44,8 @@ pub struct WebRenderer {
     console_api: Arc<ConsoleApi>,
     /// Event Loop
     event_loop: Arc<EventLoop>,
+    /// JavaScript Bridge
+    js_bridge: Arc<JsBridge>,
 }
 
 impl WebRenderer {
@@ -76,6 +79,15 @@ impl WebRenderer {
         let console_api = Arc::new(ConsoleApi::new(kernel.clone()));
         let event_loop = Arc::new(EventLoop::new(kernel.clone()));
         
+        // Initialize JavaScript Bridge
+        let js_bridge = Arc::new(JsBridge::new(
+            kernel.clone(),
+            fetch_api.clone(),
+            storage_api.clone(),
+            console_api.clone(),
+            event_loop.clone(),
+        ));
+        
         Ok(Self {
             id: uuid::Uuid::new_v4().to_string(),
             kernel,
@@ -86,6 +98,7 @@ impl WebRenderer {
             storage_api,
             console_api,
             event_loop,
+            js_bridge,
         })
     }
     
@@ -227,6 +240,11 @@ impl WebRenderer {
     /// Get the Event Loop
     pub fn get_event_loop(&self) -> Arc<EventLoop> {
         self.event_loop.clone()
+    }
+    
+    /// Get the JavaScript Bridge
+    pub fn get_js_bridge(&self) -> Arc<JsBridge> {
+        self.js_bridge.clone()
     }
 }
 
