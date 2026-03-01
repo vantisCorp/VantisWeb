@@ -5,6 +5,7 @@
 //! - Navigation
 //! - Address bar
 //! - Bookmarks
+//! - WebRenderer integration
 
 use anyhow::{Context, Result};
 use log::{debug, info};
@@ -12,9 +13,9 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use crate::core::kernel::VantisKernel;
+use crate::engine::web_renderer::WebRenderer;
 
 /// Browser window
-#[derive(Clone)]
 pub struct BrowserWindow {
     id: String,
     title: String,
@@ -26,12 +27,13 @@ pub struct BrowserWindow {
 }
 
 /// Browser tab
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Tab {
     id: String,
     title: String,
     url: String,
     is_loading: bool,
+    web_renderer: Option<Arc<WebRenderer>>,
 }
 
 impl BrowserWindow {
@@ -39,7 +41,7 @@ impl BrowserWindow {
     pub async fn new(title: String, width: u32, height: u32, kernel: Arc<VantisKernel>) -> Result<Self> {
         info!("Creating browser window: {} ({}x{})", title, width, height);
         
-        let window = Self {
+        let mut window = Self {
             id: uuid::Uuid::new_v4().to_string(),
             title,
             width,
@@ -50,28 +52,35 @@ impl BrowserWindow {
         };
         
         // Create initial tab with home page
-        let mut window_clone = window.clone();
-        window_clone.create_tab("https://vantis.ai/home".to_string()).await?;
+        window.create_tab("https://vantis.ai/home".to_string()).await?;
         
-        Ok(window_clone)
+        Ok(window)
     }
     
     /// Create a new tab
     pub async fn create_tab(&mut self, url: String) -> Result<()> {
         info!("Creating new tab: {}", url);
         
+        // Create WebRenderer for this tab
+        let web_renderer = Arc::new(WebRenderer::new(self.kernel.clone())?);
+        
         let tab = Tab {
             id: uuid::Uuid::new_v4().to_string(),
             title: "New Tab".to_string(),
             url: url.clone(),
             is_loading: true,
+            web_renderer: Some(web_renderer),
         };
         
         self.tabs.push(tab);
         self.active_tab = Some(self.tabs.len() - 1);
         
-        // Navigate to URL (placeholder)
-        debug!("Navigating to: {}", url);
+        // Navigate to URL using WebRenderer
+        if let Some(active_tab) = self.active_tab() {
+            if let Some(renderer) = &active_tab.web_renderer {
+                renderer.load_url(url.clone()).await?;
+            }
+        }
         
         info!("✓ Tab created (total: {})", self.tabs.len());
         
@@ -105,8 +114,15 @@ impl BrowserWindow {
             self.tabs[active].url = url.clone();
             self.tabs[active].is_loading = true;
             
-            // In production: Load page in web engine
-            debug!("Loading page: {}", url);
+            // Load page in WebRenderer
+            if let Some(renderer) = &self.tabs[active].web_renderer {
+                renderer.load_url(url.clone()).await?;
+                
+                // Update tab title
+                if let Some(page_title) = renderer.get_page_title().await {
+                    self.tabs[active].title = page_title;
+                }
+            }
             
             self.tabs[active].is_loading = false;
         }
@@ -119,7 +135,9 @@ impl BrowserWindow {
         info!("Going back");
         
         if let Some(active) = self.active_tab {
-            // In production: Navigate back in history
+            if let Some(renderer) = &self.tabs[active].web_renderer {
+                renderer.go_back().await?;
+            }
             debug!("Navigating back in tab: {}", self.tabs[active].title);
         }
         
@@ -131,7 +149,9 @@ impl BrowserWindow {
         info!("Going forward");
         
         if let Some(active) = self.active_tab {
-            // In production: Navigate forward in history
+            if let Some(renderer) = &self.tabs[active].web_renderer {
+                renderer.go_forward().await?;
+            }
             debug!("Navigating forward in tab: {}", self.tabs[active].title);
         }
         
@@ -145,8 +165,10 @@ impl BrowserWindow {
         if let Some(active) = self.active_tab {
             self.tabs[active].is_loading = true;
             
-            // In production: Reload page
-            debug!("Reloading: {}", self.tabs[active].url);
+            // Reload page in WebRenderer
+            if let Some(renderer) = &self.tabs[active].web_renderer {
+                renderer.reload().await?;
+            }
             
             self.tabs[active].is_loading = false;
         }
@@ -172,6 +194,11 @@ impl BrowserWindow {
     /// Get active tab
     pub fn active_tab(&self) -> Option<&Tab> {
         self.active_tab.and_then(|idx| self.tabs.get(idx))
+    }
+    
+    /// Get WebRenderer for active tab
+    pub fn active_web_renderer(&self) -> Option<Arc<WebRenderer>> {
+        self.active_tab().and_then(|tab| tab.web_renderer.clone())
     }
     
     /// Close window
