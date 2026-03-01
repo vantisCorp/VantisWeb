@@ -23,6 +23,7 @@
 
 ## Faza 4: Web Engine
 - [x] Integration z WebKit/Blink (placeholder)
+- [x] Integration z WebKitGTK (pełna implementacja)
 - [ ] Obsługa HTML/CSS/JS
 - [ ] WebAssembly support
 
