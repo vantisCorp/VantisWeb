@@ -6,9 +6,9 @@
 //! - Progress tracking
 //! - Resume support
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use chrono::{DateTime, Utc};
-use log::{debug, info};
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 

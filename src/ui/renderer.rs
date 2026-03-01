@@ -6,7 +6,7 @@
 //! - Hardware acceleration
 //! - Direct GPU communication
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 
 /// GPU Renderer - WebGPU-based rendering

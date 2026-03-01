@@ -6,7 +6,7 @@
 //! - Threat isolation
 //! - Continuous monitoring
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use chrono::Utc;
 use log::{debug, info, warn};
 use std::sync::Arc;
@@ -56,7 +56,7 @@ impl DigitalImmuneSystem {
         // In production: Integrate with multiple AV engines
         // For MVP: Placeholder implementation
         
-        let mut threats_found = 0;
+        let threats_found = 0;
         
         // Check if path exists
         if std::path::Path::new(path).exists() {

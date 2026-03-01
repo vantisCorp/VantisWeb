@@ -7,7 +7,7 @@
 //! - Debug integration
 //! - Performance metrics
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

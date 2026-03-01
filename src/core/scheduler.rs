@@ -6,7 +6,7 @@
 //! - Stutter-free execution (no micro-stutters)
 //! - Automatic load detection and adaptation
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use chrono::Utc;
 use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
@@ -75,11 +75,11 @@ impl MicroScheduler {
         let (task_sender, mut task_receiver) = mpsc::unbounded_channel::<TaskMessage>();
         
         // Start task receiver
-        let config_clone = config.clone();
+        let _config_clone = config.clone();
         tokio::spawn(async move {
             while let Some(message) = task_receiver.recv().await {
                 match message {
-                    TaskMessage::Execute { task_id, name, priority, func } => {
+                    TaskMessage::Execute { task_id: _, name, priority, func } => {
                         debug!("Executing task: {} (priority: {:?})", name, priority);
                         func();
                     }
@@ -117,7 +117,7 @@ impl MicroScheduler {
         info!("Starting worker threads...");
         
         // UI Worker (Critical priority)
-        let sender = self.task_sender.clone();
+        let _sender = self.task_sender.clone();
         self.workers.insert(
             "ui_worker".to_string(),
             tokio::spawn(async move {
@@ -129,7 +129,7 @@ impl MicroScheduler {
         );
         
         // Network Worker (High priority)
-        let sender = self.task_sender.clone();
+        let _sender = self.task_sender.clone();
         self.workers.insert(
             "network_worker".to_string(),
             tokio::spawn(async move {
@@ -140,7 +140,7 @@ impl MicroScheduler {
         );
         
         // Background Worker (Normal priority)
-        let sender = self.task_sender.clone();
+        let _sender = self.task_sender.clone();
         self.workers.insert(
             "background_worker".to_string(),
             tokio::spawn(async move {

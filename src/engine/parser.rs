@@ -6,7 +6,7 @@
 //! - Style computation
 //! - DOM tree construction
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
 

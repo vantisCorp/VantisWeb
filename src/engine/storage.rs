@@ -7,8 +7,8 @@
 //! - Cookie management
 //! - Storage events
 
-use anyhow::{Context, Result};
-use log::{debug, info, warn};
+use anyhow::Result;
+use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;

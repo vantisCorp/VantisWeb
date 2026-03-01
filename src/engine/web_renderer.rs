@@ -6,7 +6,7 @@
 //! - Page lifecycle management
 //! - Navigation history
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -43,10 +43,10 @@ impl WebRenderer {
         
         // Set up load event handler
         let page_state = Arc::new(RwLock::new(PageLoadState::Idle));
-        let page_state_clone = page_state.clone();
+        let _page_state_clone = page_state.clone();
         
         webview.connect_load_changed(move |_webview, event| {
-            let state = match event {
+            let _state = match event {
                 LoadEvent::Started => PageLoadState::Loading { progress: 0.0 },
                 LoadEvent::Committed => PageLoadState::Loading { progress: 0.5 },
                 LoadEvent::Finished => PageLoadState::Loaded,

@@ -9,7 +9,6 @@
 
 use anyhow::{Context, Result};
 use log::{debug, info, warn};
-use serde::{Deserialize, Serialize};
 use sled::Db;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -145,10 +144,10 @@ impl StorageManager {
         
         // Use export to get iterator and write to file
         let export = db.export();
-        let mut file = std::fs::File::create(&backup_path)
+        let _file = std::fs::File::create(&backup_path)
             .context("Failed to create backup file")?;
         
-        for item in export {
+        for _item in export {
             // Write each item to file
             // This is a simplified backup - in production you'd want proper serialization
         }

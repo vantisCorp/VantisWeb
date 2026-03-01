@@ -6,10 +6,9 @@
 //! - Resource coordination
 //! - State synchronization (Vantis Continuum)
 
-use anyhow::{Context, Result};
-use async_trait::async_trait;
+use anyhow::Result;
 use chrono::{DateTime, Utc};
-use log::{debug, info, warn};
+use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;

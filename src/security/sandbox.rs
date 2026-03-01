@@ -6,7 +6,7 @@
 //! - Memory protection
 //! - Resource limits
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 
 /// Sandbox - Process isolation system

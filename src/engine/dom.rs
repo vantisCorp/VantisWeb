@@ -8,10 +8,10 @@
 //! - Mutation observers
 //! - WebKitGTK DOM integration
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 use std::collections::HashMap;
-use webkit2gtk::{WebView, WebViewExt};
+use webkit2gtk::WebView;
 
 /// DOM Element
 #[derive(Debug, Clone)]

@@ -6,7 +6,7 @@
 //! - SHA-256/BLAKE3 hashing
 //! - Zero-knowledge proofs
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::debug;
 
 /// Crypto Engine - Post-quantum cryptography
@@ -85,12 +85,12 @@ impl PostQuantumCrypto {
     }
     
     /// Sign data with quantum-resistant signature
-    pub fn sign(&self, data: &[u8]) -> Result<Vec<u8>> {
+    pub fn sign(&self, _data: &[u8]) -> Result<Vec<u8>> {
         todo!("Implement post-quantum signing")
     }
     
     /// Verify quantum-resistant signature
-    pub fn verify(&self, data: &[u8], signature: &[u8]) -> Result<bool> {
+    pub fn verify(&self, _data: &[u8], _signature: &[u8]) -> Result<bool> {
         todo!("Implement post-quantum verification")
     }
 }

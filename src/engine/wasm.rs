@@ -7,7 +7,7 @@
 //! - Module loading
 //! - Performance optimization
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 
 /// WebAssembly module
@@ -54,7 +54,7 @@ impl WasmRuntime {
     }
     
     /// Execute function in WebAssembly module
-    pub fn execute_function(&self, module_id: &str, function_name: &str, args: Vec<u8>) -> Result<Vec<u8>> {
+    pub fn execute_function(&self, module_id: &str, function_name: &str, _args: Vec<u8>) -> Result<Vec<u8>> {
         debug!("Executing WASM function: {}::{}", module_id, function_name);
         
         // In production: Use actual WASM runtime

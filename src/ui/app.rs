@@ -6,10 +6,9 @@
 //! - Theme management
 //! - Rendering coordination
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info, warn};
 use std::sync::Arc;
-use tokio::sync::RwLock;
 
 use crate::core::kernel::VantisKernel;
 use super::browser::BrowserWindow;
@@ -92,7 +91,7 @@ impl VantisUI {
         // For MVP: Simulate render loop
         let mut frame_count = 0u64;
         
-        let loop_handle = tokio::spawn(async move {
+        let _loop_handle = tokio::spawn(async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_millis(7));
             
             loop {

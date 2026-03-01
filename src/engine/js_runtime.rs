@@ -7,10 +7,10 @@
 //! - Promise support
 //! - Async/await
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
-use webkit2gtk::{WebView, WebViewExt};
+use webkit2gtk::WebView;
 
 /// JavaScript value
 #[derive(Debug, Clone, Serialize, Deserialize)]

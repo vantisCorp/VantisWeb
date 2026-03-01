@@ -7,11 +7,10 @@
 //! - Profile management
 
 use anyhow::{Context, Result};
-use directories::{ProjectDirs, UserDirs};
+use directories::ProjectDirs;
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use std::sync::Arc;
 
 /// Vantis Configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -37,7 +36,7 @@ impl VantisConfig {
     pub fn new() -> Result<Self> {
         info!("Creating Vantis configuration...");
         
-        let project_dirs = ProjectDirs::from("com", "vantis", "vantisweb")
+        let _project_dirs = ProjectDirs::from("com", "vantis", "vantisweb")
             .context("Failed to get project directories")?;
         
         let general = GeneralConfig {

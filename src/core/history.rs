@@ -6,7 +6,7 @@
 //! - Import/export
 //! - Privacy mode support
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use chrono::{DateTime, Utc};
 use log::{debug, info};
 use serde::{Deserialize, Serialize};

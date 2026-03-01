@@ -7,7 +7,7 @@
 //! - Threat detection
 
 use anyhow::{Context, Result};
-use log::{debug, info, warn};
+use log::{debug, info};
 use serde::{Deserialize, Serialize};
 
 use super::crypto::CryptoEngine;

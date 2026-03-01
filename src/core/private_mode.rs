@@ -7,7 +7,7 @@
 //! - No form data saving
 //! - Temporary storage
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info, warn};
 
 /// Private mode manager

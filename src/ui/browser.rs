@@ -7,10 +7,9 @@
 //! - Bookmarks
 //! - WebRenderer integration
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use log::{debug, info};
 use std::sync::Arc;
-use tokio::sync::RwLock;
 
 use crate::core::kernel::VantisKernel;
 use crate::engine::web_renderer::WebRenderer;

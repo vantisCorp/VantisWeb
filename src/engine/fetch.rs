@@ -7,7 +7,7 @@
 //! - CORS handling
 
 use anyhow::{Context, Result};
-use log::{debug, info, warn};
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -395,7 +395,7 @@ impl FetchApi {
     }
 
     /// Check CORS
-    async fn check_cors(&self, url: &str) -> Result<()> {
+    async fn check_cors(&self, _url: &str) -> Result<()> {
         let cors_mode = *self.cors_mode.read().await;
 
         match cors_mode {

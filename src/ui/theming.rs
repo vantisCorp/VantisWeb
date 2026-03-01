@@ -6,8 +6,8 @@
 //! - Custom themes
 //! - User preferences
 
-use anyhow::{Context, Result};
-use log::{debug, info};
+use anyhow::Result;
+use log::info;
 use serde::{Deserialize, Serialize};
 
 /// Theme Manager

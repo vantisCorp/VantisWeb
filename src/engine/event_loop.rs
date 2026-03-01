@@ -7,8 +7,8 @@
 //! - Event handling logic
 //! - Timer management
 
-use anyhow::{Context, Result};
-use log::{debug, info, warn};
+use anyhow::Result;
+use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::sync::Arc;
