@@ -14,6 +14,10 @@ use tokio::sync::RwLock;
 use webkit2gtk::{WebView, WebViewExt, LoadEvent};
 
 use crate::core::kernel::VantisKernel;
+use super::fetch::FetchApi;
+use super::storage::StorageApi;
+use super::console::ConsoleApi;
+use super::event_loop::EventLoop;
 
 /// Page loading state
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -31,6 +35,14 @@ pub struct WebRenderer {
     current_url: Arc<RwLock<Option<String>>>,
     page_state: Arc<RwLock<PageLoadState>>,
     webview: WebView,
+    /// Fetch API
+    fetch_api: Arc<FetchApi>,
+    /// Storage API
+    storage_api: Arc<StorageApi>,
+    /// Console API
+    console_api: Arc<ConsoleApi>,
+    /// Event Loop
+    event_loop: Arc<EventLoop>,
 }
 
 impl WebRenderer {
@@ -58,12 +70,22 @@ impl WebRenderer {
             debug!("Load event: {:?}", event);
         });
         
+        // Initialize Web APIs
+        let fetch_api = Arc::new(FetchApi::new(kernel.clone()));
+        let storage_api = Arc::new(StorageApi::new(kernel.clone()));
+        let console_api = Arc::new(ConsoleApi::new(kernel.clone()));
+        let event_loop = Arc::new(EventLoop::new(kernel.clone()));
+        
         Ok(Self {
             id: uuid::Uuid::new_v4().to_string(),
             kernel,
             current_url: Arc::new(RwLock::new(None)),
             page_state,
             webview,
+            fetch_api,
+            storage_api,
+            console_api,
+            event_loop,
         })
     }
     
@@ -185,6 +207,26 @@ impl WebRenderer {
     /// Get the WebView widget for embedding in UI
     pub fn get_webview(&self) -> &WebView {
         &self.webview
+    }
+    
+    /// Get the Fetch API
+    pub fn get_fetch_api(&self) -> Arc<FetchApi> {
+        self.fetch_api.clone()
+    }
+    
+    /// Get the Storage API
+    pub fn get_storage_api(&self) -> Arc<StorageApi> {
+        self.storage_api.clone()
+    }
+    
+    /// Get the Console API
+    pub fn get_console_api(&self) -> Arc<ConsoleApi> {
+        self.console_api.clone()
+    }
+    
+    /// Get the Event Loop
+    pub fn get_event_loop(&self) -> Arc<EventLoop> {
+        self.event_loop.clone()
     }
 }
 
