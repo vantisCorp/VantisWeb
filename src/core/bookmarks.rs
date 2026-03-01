@@ -108,7 +108,7 @@ impl BookmarkManager {
             return Err(anyhow::anyhow!("Folder already exists: {}", name));
         }
         
-        self.folders.push(name);
+        self.folders.push(name.clone());
         info!("Created folder: {}", name);
         
         Ok(())

@@ -7,6 +7,7 @@
 //! - Modals
 //! - Dropdowns
 
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 /// UI Component base trait

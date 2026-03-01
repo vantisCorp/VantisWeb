@@ -8,7 +8,7 @@
 
 use anyhow::{Context, Result};
 use chrono::Utc;
-use log::{debug, info};
+use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::{BinaryHeap, HashMap};
 use std::sync::Arc;
@@ -58,7 +58,6 @@ pub struct MicroScheduler {
 }
 
 /// Task messages
-#[derive(Debug)]
 enum TaskMessage {
     Execute {
         task_id: String,

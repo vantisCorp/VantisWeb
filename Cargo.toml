@@ -16,7 +16,7 @@ anyhow = "1.0"
 thiserror = "1.0"
 
 # Utilities
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.6", features = ["v4", "serde"] }
 log = "0.4"
 env_logger = "0.11"

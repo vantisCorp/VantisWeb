@@ -139,7 +139,7 @@ impl ConsoleApi {
 
     /// Log a message
     pub async fn log(&self, level: LogLevel, message: String, args: Vec<String>) {
-        let entry = ConsoleEntry::new(level, message.clone());
+        let entry = ConsoleEntry::new(level.clone(), message.clone());
         
         // Add arguments
         let mut entry_with_args = entry;
@@ -161,8 +161,9 @@ impl ConsoleApi {
         entries.push(entry_with_args);
 
         // Trim if too many entries
-        if entries.len() > self.max_entries {
-            entries.drain(0..entries.len() - self.max_entries);
+        let len = entries.len();
+        if len > self.max_entries {
+            entries.drain(0..len - self.max_entries);
         }
     }
 

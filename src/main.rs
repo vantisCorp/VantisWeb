@@ -16,6 +16,7 @@ mod utils;
 use anyhow::Result;
 use log::{info, error};
 use tokio::runtime::Runtime;
+use std::sync::Arc;
 
 use core::settings::SettingsManager;
 use core::private_mode::PrivateModeManager;
@@ -44,7 +45,7 @@ async fn run_browser() -> Result<()> {
     info!("Initializing VantisWeb Core...");
     
     // Initialize Vantis Kernel
-    let kernel = core::kernel::VantisKernel::new().await?;
+    let kernel = Arc::new(core::kernel::VantisKernel::new().await?);
     info!("✓ Vantis Kernel initialized");
     
     // Initialize Settings Manager
@@ -62,7 +63,7 @@ async fn run_browser() -> Result<()> {
     info!("✓ Security Manager initialized");
     
     // Initialize UI
-    let ui = ui::VantisUI::new(kernel.clone()).await?;
+    let mut ui = ui::VantisUI::new(kernel.clone()).await?;
     info!("✓ VantisUI initialized");
     
     // Main event loop
