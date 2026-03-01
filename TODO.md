@@ -53,6 +53,7 @@
 - [ ] Dokumentacja API
 - [x] README i setup instrukcje
 - [x] Release notes
+- [x] Optymalizacja kodu (redukcja ostrzeżeń z 206 do 120)
 
 ## Faza 9: GitHub Deployment
 - [x] Push do repozytorium
