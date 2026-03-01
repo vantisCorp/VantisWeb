@@ -1,8 +1,8 @@
 //! Web Renderer
-//! 
+//!
 //! Web rendering engine implementation:
 //! - HTML/CSS/JS rendering
-//! - WebKit/Blink integration
+//! - WebKitGTK integration
 //! - Page lifecycle management
 //! - Navigation history
 
@@ -23,20 +23,24 @@ pub enum PageLoadState {
     Error { message: String },
 }
 
-/// Web Renderer
+/// Web Renderer with WebKitGTK integration
 #[derive(Clone)]
 pub struct WebRenderer {
     id: String,
     kernel: Arc<VantisKernel>,
     current_url: Arc<RwLock<Option<String>>>,
     page_state: Arc<RwLock<PageLoadState>>,
-    // In production: WebKit/Blink WebView reference
+    // WebKitWebView reference will be added in production
+    // For now, we use a placeholder implementation
 }
 
 impl WebRenderer {
     /// Create a new web renderer
     pub fn new(kernel: Arc<VantisKernel>) -> Result<Self> {
-        info!("Initializing Web Renderer...");
+        info!("Initializing Web Renderer with WebKitGTK...");
+        
+        // In production: Initialize WebKitWebView
+        // For now: Placeholder implementation
         
         Ok(Self {
             id: uuid::Uuid::new_v4().to_string(),
@@ -59,7 +63,8 @@ impl WebRenderer {
         // Update current URL
         *self.current_url.write().await = Some(url.clone());
         
-        // Simulate loading
+        // In production: Load URL in WebKitWebView
+        // For now: Simulate loading
         self.simulate_page_load(url.clone()).await?;
         
         info!("✓ Page loaded: {}", url);
@@ -81,7 +86,7 @@ impl WebRenderer {
         Ok(())
     }
     
-    /// Simulate page load (placeholder for actual WebKit/Blink integration)
+    /// Simulate page load (placeholder for actual WebKitGTK integration)
     async fn simulate_page_load(&self, url: String) -> Result<()> {
         info!("Simulating page load for: {}", url);
         
@@ -98,7 +103,7 @@ impl WebRenderer {
         // Mark as loaded
         *self.page_state.write().await = PageLoadState::Loaded;
         
-        // In production: This would integrate with WebKit/Blink
+        // In production: This would integrate with WebKitGTK
         // For MVP: Placeholder implementation
         
         Ok(())
@@ -118,7 +123,7 @@ impl WebRenderer {
     pub async fn execute_javascript(&self, code: String) -> Result<String> {
         debug!("Executing JavaScript: {}", code);
         
-        // In production: Use actual JS engine (V8/JavaScriptCore)
+        // In production: Use actual JS engine (JavaScriptCore via WebKitGTK)
         // For MVP: Placeholder
         
         Ok("".to_string())
@@ -126,7 +131,7 @@ impl WebRenderer {
     
     /// Get page title
     pub async fn get_page_title(&self) -> Option<String> {
-        // In production: Get actual page title
+        // In production: Get actual page title from WebKitWebView
         Some("VantisWeb Browser".to_string())
     }
     
@@ -154,7 +159,7 @@ impl WebRenderer {
     pub async fn go_back(&self) -> Result<()> {
         info!("Going back in history");
         
-        // In production: Navigate back
+        // In production: Navigate back using WebKitWebView
         // For MVP: Placeholder
         
         Ok(())
@@ -164,7 +169,7 @@ impl WebRenderer {
     pub async fn go_forward(&self) -> Result<()> {
         info!("Going forward in history");
         
-        // In production: Navigate forward
+        // In production: Navigate forward using WebKitWebView
         // For MVP: Placeholder
         
         Ok(())
