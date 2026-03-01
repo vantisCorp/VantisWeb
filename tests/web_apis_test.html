@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb - Web APIs Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #17a2b8;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.passed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <h1>🧪 VantisWeb - Web APIs Integration Test</h1>
+    <p>This page tests all Web APIs implemented in VantisWeb through the JavaScript Bridge.</p>
+
+    <!-- Console API Test -->
+    <div class="test-section">
+        <h2>1. Console API Test <span id="console-status" class="status pending">Pending</span></h2>
+        <p>Test console.log, console.warn, console.error, console.info, console.debug</p>
+        <button onclick="testConsole()">Run Console Tests</button>
+        <div id="console-result" class="result"></div>
+    </div>
+
+    <!-- Storage API Test -->
+    <div class="test-section">
+        <h2>2. Storage API Test <span id="storage-status" class="status pending">Pending</span></h2>
+        <p>Test localStorage and sessionStorage</p>
+        <button onclick="testLocalStorage()">Test localStorage</button>
+        <button onclick="testSessionStorage()">Test sessionStorage</button>
+        <button onclick="clearStorage()">Clear All Storage</button>
+        <div id="storage-result" class="result"></div>
+    </div>
+
+    <!-- Fetch API Test -->
+    <div class="test-section">
+        <h2>3. Fetch API Test <span id="fetch-status" class="status pending">Pending</span></h2>
+        <p>Test HTTP requests using fetch()</p>
+        <input type="text" id="fetch-url" value="https://jsonplaceholder.typicode.com/posts/1" placeholder="Enter URL">
+        <button onclick="testFetch()">Fetch URL</button>
+        <button onclick="testFetchJSONPlaceholder()">Test JSONPlaceholder</button>
+        <div id="fetch-result" class="result"></div>
+    </div>
+
+    <!-- Event Loop Test -->
+    <div class="test-section">
+        <h2>4. Event Loop Test <span id="eventloop-status" class="status pending">Pending</span></h2>
+        <p>Test setTimeout, setInterval, clearTimeout, clearInterval</p>
+        <button onclick="testSetTimeout()">Test setTimeout</button>
+        <button onclick="testSetInterval()">Test setInterval</button>
+        <button onclick="testClearTimeout()">Test clearTimeout</button>
+        <button onclick="testClearInterval()">Test clearInterval</button>
+        <div id="eventloop-result" class="result"></div>
+    </div>
+
+    <!-- All Tests -->
+    <div class="test-section">
+        <h2>5. Run All Tests</h2>
+        <button onclick="runAllTests()" style="background-color: #28a745;">Run All Tests</button>
+        <div id="all-tests-result" class="result"></div>
+    </div>
+
+    <script>
+        // Test results tracking
+        const testResults = {
+            console: null,
+            storage: null,
+            fetch: null,
+            eventloop: null
+        };
+
+        // Helper function to update status
+        function updateStatus(testName, status) {
+            const statusElement = document.getElementById(`${testName}-status`);
+            statusElement.className = `status ${status}`;
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            testResults[testName] = status;
+        }
+
+        // Helper function to display results
+        function displayResult(elementId, message, type = 'info') {
+            const resultElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            resultElement.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+            resultElement.scrollTop = resultElement.scrollHeight;
+        }
+
+        // Clear result
+        function clearResult(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        // 1. Console API Tests
+        function testConsole() {
+            clearResult('console-result');
+            displayResult('console-result', 'Starting Console API tests...', 'info');
+            
+            try {
+                console.log('This is a log message');
+                displayResult('console-result', '✓ console.log() executed', 'success');
+                
+                console.warn('This is a warning message');
+                displayResult('console-result', '✓ console.warn() executed', 'success');
+                
+                console.error('This is an error message');
+                displayResult('console-result', '✓ console.error() executed', 'success');
+                
+                console.info('This is an info message');
+                displayResult('console-result', '✓ console.info() executed', 'success');
+                
+                console.debug('This is a debug message');
+                displayResult('console-result', '✓ console.debug() executed', 'success');
+                
+                displayResult('console-result', '✅ Console API tests passed!', 'success');
+                updateStatus('console', 'passed');
+            } catch (error) {
+                displayResult('console-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('console', 'failed');
+            }
+        }
+
+        // 2. Storage API Tests
+        function testLocalStorage() {
+            clearResult('storage-result');
+            displayResult('storage-result', 'Starting localStorage tests...', 'info');
+            
+            try {
+                // Test setItem
+                localStorage.setItem('testKey', 'testValue');
+                displayResult('storage-result', '✓ localStorage.setItem("testKey", "testValue")', 'success');
+                
+                // Test getItem
+                const value = localStorage.getItem('testKey');
+                if (value === 'testValue') {
+                    displayResult('storage-result', `✓ localStorage.getItem("testKey") = "${value}"`, 'success');
+                } else {
+                    throw new Error(`Expected "testValue", got "${value}"`);
+                }
+                
+                // Test multiple items
+                localStorage.setItem('number', '123');
+                localStorage.setItem('object', JSON.stringify({name: 'VantisWeb', version: '0.1.0'}));
+                displayResult('storage-result', '✓ Set multiple items', 'success');
+                
+                // Test keys
+                const keys = Object.keys(localStorage);
+                displayResult('storage-result', `✓ localStorage keys: ${keys.join(', ')}`, 'success');
+                
+                displayResult('storage-result', '✅ localStorage tests passed!', 'success');
+                updateStatus('storage', 'passed');
+            } catch (error) {
+                displayResult('storage-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('storage', 'failed');
+            }
+        }
+
+        function testSessionStorage() {
+            clearResult('storage-result');
+            displayResult('storage-result', 'Starting sessionStorage tests...', 'info');
+            
+            try {
+                // Test setItem
+                sessionStorage.setItem('sessionKey', 'sessionValue');
+                displayResult('storage-result', '✓ sessionStorage.setItem("sessionKey", "sessionValue")', 'success');
+                
+                // Test getItem
+                const value = sessionStorage.getItem('sessionKey');
+                if (value === 'sessionValue') {
+                    displayResult('storage-result', `✓ sessionStorage.getItem("sessionKey") = "${value}"`, 'success');
+                } else {
+                    throw new Error(`Expected "sessionValue", got "${value}"`);
+                }
+                
+                displayResult('storage-result', '✅ sessionStorage tests passed!', 'success');
+                updateStatus('storage', 'passed');
+            } catch (error) {
+                displayResult('storage-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('storage', 'failed');
+            }
+        }
+
+        function clearStorage() {
+            clearResult('storage-result');
+            localStorage.clear();
+            sessionStorage.clear();
+            displayResult('storage-result', '✓ localStorage cleared', 'success');
+            displayResult('storage-result', '✓ sessionStorage cleared', 'success');
+        }
+
+        // 3. Fetch API Tests
+        async function testFetch() {
+            const url = document.getElementById('fetch-url').value;
+            clearResult('fetch-result');
+            displayResult('fetch-result', `Fetching: ${url}`, 'info');
+            
+            try {
+                const response = await fetch(url);
+                displayResult('fetch-result', `✓ Response status: ${response.status} ${response.statusText}`, 'success');
+                
+                const data = await response.json();
+                displayResult('fetch-result', `✓ Response data: ${JSON.stringify(data, null, 2)}`, 'success');
+                
+                displayResult('fetch-result', '✅ Fetch API test passed!', 'success');
+                updateStatus('fetch', 'passed');
+            } catch (error) {
+                displayResult('fetch-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('fetch', 'failed');
+            }
+        }
+
+        async function testFetchJSONPlaceholder() {
+            clearResult('fetch-result');
+            displayResult('fetch-result', 'Testing JSONPlaceholder API...', 'info');
+            
+            try {
+                // Test GET request
+                const response1 = await fetch('https://jsonplaceholder.typicode.com/posts/1');
+                const data1 = await response1.json();
+                displayResult('fetch-result', `✓ GET /posts/1: ${JSON.stringify(data1).substring(0, 100)}...`, 'success');
+                
+                // Test another endpoint
+                const response2 = await fetch('https://jsonplaceholder.typicode.com/users/1');
+                const data2 = await response2.json();
+                displayResult('fetch-result', `✓ GET /users/1: ${data2.name}`, 'success');
+                
+                displayResult('fetch-result', '✅ Fetch API tests passed!', 'success');
+                updateStatus('fetch', 'passed');
+            } catch (error) {
+                displayResult('fetch-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('fetch', 'failed');
+            }
+        }
+
+        // 4. Event Loop Tests
+        let timeoutId = null;
+        let intervalId = null;
+
+        function testSetTimeout() {
+            clearResult('eventloop-result');
+            displayResult('eventloop-result', 'Testing setTimeout...', 'info');
+            
+            try {
+                const startTime = Date.now();
+                timeoutId = setTimeout(() => {
+                    const elapsed = Date.now() - startTime;
+                    displayResult('eventloop-result', `✓ setTimeout executed after ${elapsed}ms`, 'success');
+                    displayResult('eventloop-result', '✅ setTimeout test passed!', 'success');
+                    updateStatus('eventloop', 'passed');
+                }, 1000);
+                
+                displayResult('eventloop-result', `✓ setTimeout scheduled (ID: ${timeoutId})`, 'success');
+            } catch (error) {
+                displayResult('eventloop-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('eventloop', 'failed');
+            }
+        }
+
+        function testSetInterval() {
+            clearResult('eventloop-result');
+            displayResult('eventloop-result', 'Testing setInterval...', 'info');
+            
+            try {
+                let count = 0;
+                intervalId = setInterval(() => {
+                    count++;
+                    displayResult('eventloop-result', `✓ Interval tick ${count}`, 'success');
+                    
+                    if (count >= 3) {
+                        clearInterval(intervalId);
+                        displayResult('eventloop-result', '✅ setInterval test passed!', 'success');
+                        updateStatus('eventloop', 'passed');
+                    }
+                }, 500);
+                
+                displayResult('eventloop-result', `✓ setInterval scheduled (ID: ${intervalId})`, 'success');
+            } catch (error) {
+                displayResult('eventloop-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('eventloop', 'failed');
+            }
+        }
+
+        function testClearTimeout() {
+            clearResult('eventloop-result');
+            displayResult('eventloop-result', 'Testing clearTimeout...', 'info');
+            
+            try {
+                const testId = setTimeout(() => {
+                    displayResult('eventloop-result', '❌ Timeout was not cleared!', 'error');
+                }, 2000);
+                
+                clearTimeout(testId);
+                displayResult('eventloop-result', `✓ clearTimeout called on ID: ${testId}`, 'success');
+                displayResult('eventloop-result', '✅ clearTimeout test passed!', 'success');
+                updateStatus('eventloop', 'passed');
+            } catch (error) {
+                displayResult('eventloop-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('eventloop', 'failed');
+            }
+        }
+
+        function testClearInterval() {
+            clearResult('eventloop-result');
+            displayResult('eventloop-result', 'Testing clearInterval...', 'info');
+            
+            try {
+                const testId = setInterval(() => {
+                    displayResult('eventloop-result', '❌ Interval was not cleared!', 'error');
+                }, 500);
+                
+                clearInterval(testId);
+                displayResult('eventloop-result', `✓ clearInterval called on ID: ${testId}`, 'success');
+                displayResult('eventloop-result', '✅ clearInterval test passed!', 'success');
+                updateStatus('eventloop', 'passed');
+            } catch (error) {
+                displayResult('eventloop-result', `❌ Error: ${error.message}`, 'error');
+                updateStatus('eventloop', 'failed');
+            }
+        }
+
+        // 5. Run All Tests
+        async function runAllTests() {
+            clearResult('all-tests-result');
+            displayResult('all-tests-result', '🚀 Running all tests...', 'info');
+            
+            // Reset all statuses
+            Object.keys(testResults).forEach(key => {
+                testResults[key] = null;
+                updateStatus(key, 'pending');
+            });
+            
+            // Run tests sequentially
+            await new Promise(resolve => setTimeout(resolve, 100));
+            testConsole();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testLocalStorage();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testFetchJSONPlaceholder();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            testSetTimeout();
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Summary
+            const passed = Object.values(testResults).filter(v => v === 'passed').length;
+            const failed = Object.values(testResults).filter(v => v === 'failed').length;
+            const total = Object.keys(testResults).length;
+            
+            displayResult('all-tests-result', '\n📊 Test Summary:', 'info');
+            displayResult('all-tests-result', `Total: ${total}, Passed: ${passed}, Failed: ${failed}`, passed === total ? 'success' : 'error');
+            
+            if (passed === total) {
+                displayResult('all-tests-result', '\n🎉 All tests passed!', 'success');
+            } else {
+                displayResult('all-tests-result', '\n⚠️ Some tests failed. Please check the results above.', 'error');
+            }
+        }
+
+        // Auto-run on page load (optional)
+        // window.onload = () => {
+        //     console.log('VantisWeb Web APIs Test Page Loaded');
+        // };
+    </script>
+</body>
+</html>

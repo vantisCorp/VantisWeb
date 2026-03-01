@@ -27,7 +27,7 @@
 - [x] Integration z WebKitGTK (pełna implementacja)
 - [x] Obsługa HTML/CSS/JS (podstawowa)
 - [x] Web APIs integration (Fetch, Storage, Console, Event Loop)
-- [ ] JavaScript bridge implementation
+- [x] JavaScript bridge implementation
 - [ ] WebAssembly support
 
 ## Faza 5: Podstawowe Funkcje
