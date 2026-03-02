@@ -1,5 +1,5 @@
 //! VantisUI - User Interface Module
-//! 
+//!
 //! Next-generation UI system:
 //! - WebGPU rendering
 //! - Hybrid-GPU acceleration
@@ -12,5 +12,10 @@ pub mod browser;
 pub mod components;
 pub mod theming;
 pub mod renderer;
+pub mod profile_ui;
 
 pub use app::VantisUI;
+pub use profile_ui::{
+    ProfileManagerUI, ProfileTemplateUI, ProfileSyncUI,
+    ProfileAnalyticsUI, ProfileSecurityUI
+};
