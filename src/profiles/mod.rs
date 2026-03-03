@@ -63,6 +63,8 @@ pub struct ProfileConfig {
     pub color: Option<String>,
     /// Is profile active
     pub active: bool,
+    /// Profile order position (for drag and drop reordering)
+    pub order: i32,
     /// Profile settings
     pub settings: HashMap<String, serde_json::Value>,
     /// Profile bookmarks
@@ -90,6 +92,7 @@ impl ProfileConfig {
             icon: None,
             color: None,
             active: false,
+            order: 0,
             settings: HashMap::new(),
             bookmarks: Vec::new(),
             history: Vec::new(),
@@ -376,6 +379,112 @@ impl ProfileManager {
             .context("Failed to validate import file")?;
         
         Ok(validate_import_file(path, password)?)
+    }
+
+    /// Reorder profiles - move a profile to a new position
+    pub async fn reorder_profile(&self, profile_id: &str, new_position: i32) -> Result<()> {
+        info!("Reordering profile {} to position {}", profile_id, new_position);
+        
+        let mut profiles = self.profiles.write().await;
+        let total_profiles = profiles.len() as i32;
+        
+        // Validate new position
+        if new_position < 0 || new_position >= total_profiles {
+            return Err(anyhow::anyhow!("Invalid position: {}", new_position));
+        }
+        
+        // Find the profile and its current position
+        let current_index = profiles.iter().position(|p| p.id == profile_id)
+            .ok_or_else(|| anyhow::anyhow!("Profile not found: {}", profile_id))?;
+        
+        let current_position = profiles[current_index].order;
+        
+        // If already at the target position, nothing to do
+        if current_position == new_position {
+            return Ok(());
+        }
+        
+        // Update order values for affected profiles
+        if new_position < current_position {
+            // Moving up: shift profiles between new_position and current_position down
+            for profile in profiles.iter_mut() {
+                if profile.order >= new_position && profile.order < current_position {
+                    profile.order += 1;
+                }
+            }
+        } else {
+            // Moving down: shift profiles between current_position and new_position up
+            for profile in profiles.iter_mut() {
+                if profile.order > current_position && profile.order <= new_position {
+                    profile.order -= 1;
+                }
+            }
+        }
+        
+        // Set the new position for the moved profile
+        profiles[current_index].order = new_position;
+        
+        // Persist changes
+        drop(profiles);
+        self.save_profiles().await?;
+        
+        info!("Profile {} reordered to position {}", profile_id, new_position);
+        Ok(())
+    }
+
+    /// Swap two profiles' positions
+    pub async fn swap_profiles(&self, profile_id_1: &str, profile_id_2: &str) -> Result<()> {
+        info!("Swapping profiles {} and {}", profile_id_1, profile_id_2);
+        
+        let mut profiles = self.profiles.write().await;
+        
+        // Find both profiles
+        let index1 = profiles.iter().position(|p| p.id == profile_id_1)
+            .ok_or_else(|| anyhow::anyhow!("Profile not found: {}", profile_id_1))?;
+        let index2 = profiles.iter().position(|p| p.id == profile_id_2)
+            .ok_or_else(|| anyhow::anyhow!("Profile not found: {}", profile_id_2))?;
+        
+        // Swap their order values
+        let order1 = profiles[index1].order;
+        let order2 = profiles[index2].order;
+        profiles[index1].order = order2;
+        profiles[index2].order = order1;
+        
+        // Persist changes
+        drop(profiles);
+        self.save_profiles().await?;
+        
+        info!("Profiles {} and {} swapped", profile_id_1, profile_id_2);
+        Ok(())
+    }
+
+    /// Get profiles sorted by their order
+    pub async fn get_ordered_profiles(&self) -> Vec<ProfileConfig> {
+        let profiles = self.profiles.read().await;
+        let mut sorted: Vec<ProfileConfig> = profiles.values().cloned().collect();
+        sorted.sort_by_key(|p| p.order);
+        sorted
+    }
+
+    /// Reorder all profiles to ensure consecutive order values
+    pub async fn normalize_order(&self) -> Result<()> {
+        info!("Normalizing profile order");
+        
+        let mut profiles = self.profiles.write().await;
+        let mut sorted: Vec<&mut ProfileConfig> = profiles.values_mut().collect();
+        sorted.sort_by_key(|p| p.order);
+        
+        // Assign consecutive order values
+        for (index, profile) in sorted.iter_mut().enumerate() {
+            profile.order = index as i32;
+        }
+        
+        // Persist changes
+        drop(profiles);
+        self.save_profiles().await?;
+        
+        info!("Profile order normalized");
+        Ok(())
     }
 }
 

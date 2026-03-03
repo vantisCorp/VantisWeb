@@ -29,6 +29,10 @@ pub struct ProfileManagerUI {
     show_export_dialog: bool,
     show_import_dialog: bool,
     export_selected_profile: Option<String>,
+    // Drag and drop state
+    dragged_profile_id: Option<String>,
+    drop_target_id: Option<String>,
+    drag_over: bool,
 }
 
 impl ProfileManagerUI {
@@ -44,6 +48,9 @@ impl ProfileManagerUI {
             show_export_dialog: false,
             show_import_dialog: false,
             export_selected_profile: None,
+            dragged_profile_id: None,
+            drop_target_id: None,
+            drag_over: false,
         }
     }
 
@@ -111,6 +118,50 @@ impl ProfileManagerUI {
         self.show_import_dialog = false;
     }
 
+    /// Start dragging a profile
+    pub fn start_drag(&mut self, profile_id: String) {
+        self.dragged_profile_id = Some(profile_id);
+        self.drag_over = false;
+    }
+
+    /// End dragging
+    pub fn end_drag(&mut self) {
+        self.dragged_profile_id = None;
+        self.drop_target_id = None;
+        self.drag_over = false;
+    }
+
+    /// Set drop target
+    pub fn set_drop_target(&mut self, target_id: Option<String>) {
+        self.drop_target_id = target_id;
+        self.drag_over = target_id.is_some();
+    }
+
+    /// Get dragged profile
+    pub fn get_dragged_profile(&self) -> Option<&String> {
+        self.dragged_profile_id.as_ref()
+    }
+
+    /// Get drop target
+    pub fn get_drop_target(&self) -> Option<&String> {
+        self.drop_target_id.as_ref()
+    }
+
+    /// Check if a profile is being dragged
+    pub fn is_dragging(&self) -> bool {
+        self.dragged_profile_id.is_some()
+    }
+
+    /// Check if a specific profile is being dragged
+    pub fn is_dragging_profile(&self, profile_id: &str) -> bool {
+        self.dragged_profile_id.as_ref().map_or(false, |id| id == profile_id)
+    }
+
+    /// Check if dragging over a specific profile
+    pub fn is_dragging_over(&self, profile_id: &str) -> bool {
+        self.drag_over && self.drop_target_id.as_ref().map_or(false, |id| id == profile_id)
+    }
+
     /// Render profile manager UI
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(5000);
@@ -129,10 +180,18 @@ impl ProfileManagerUI {
 
         for profile in &self.profiles {
             let is_active = self.active_profile_id.as_ref().map_or(false, |id| id == &profile.id);
-            let active_class = if is_active { "active" } else { "" };
+            let is_dragging = self.is_dragging_profile(&profile.id);
+            let is_drop_target = self.is_dragging_over(&profile.id);
+            
+            let mut classes = Vec::new();
+            if is_active { classes.push("active"); }
+            if is_dragging { classes.push("dragging"); }
+            if is_drop_target { classes.push("drop-target"); }
+            let class_str = classes.join(" ");
 
             html.push_str(&format!(r#"
-        <div class="profile-card {}" data-profile-id="{}">
+        <div class="profile-card {}" data-profile-id="{}" data-profile-order="{}" draggable="true">
+            <div class="profile-drag-handle" title="Drag to reorder">⋮⋮</div>
             <div class="profile-icon" style="background-color: {};">
                 {}
             </div>
@@ -149,8 +208,9 @@ impl ProfileManagerUI {
             </div>
         </div>
 "#,
-                active_class,
+                class_str,
                 profile.id,
+                profile.order,
                 profile.color.as_ref().unwrap_or(&"#6366f1".to_string()),
                 profile.icon.as_ref().unwrap_or(&"👤".to_string()),
                 profile.name,
