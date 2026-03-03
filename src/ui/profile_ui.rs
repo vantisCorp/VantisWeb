@@ -26,6 +26,9 @@ pub struct ProfileManagerUI {
     show_create_dialog: bool,
     show_delete_dialog: bool,
     show_template_dialog: bool,
+    show_export_dialog: bool,
+    show_import_dialog: bool,
+    export_selected_profile: Option<String>,
 }
 
 impl ProfileManagerUI {
@@ -38,6 +41,9 @@ impl ProfileManagerUI {
             show_create_dialog: false,
             show_delete_dialog: false,
             show_template_dialog: false,
+            show_export_dialog: false,
+            show_import_dialog: false,
+            export_selected_profile: None,
         }
     }
 
@@ -83,6 +89,28 @@ impl ProfileManagerUI {
         self.show_template_dialog = false;
     }
 
+    /// Show export dialog
+    pub fn show_export_dialog(&mut self, profile_id: Option<String>) {
+        self.export_selected_profile = profile_id;
+        self.show_export_dialog = true;
+    }
+
+    /// Hide export dialog
+    pub fn hide_export_dialog(&mut self) {
+        self.show_export_dialog = false;
+        self.export_selected_profile = None;
+    }
+
+    /// Show import dialog
+    pub fn show_import_dialog(&mut self) {
+        self.show_import_dialog = true;
+    }
+
+    /// Hide import dialog
+    pub fn hide_import_dialog(&mut self) {
+        self.show_import_dialog = false;
+    }
+
     /// Render profile manager UI
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(5000);
@@ -116,6 +144,7 @@ impl ProfileManagerUI {
             <div class="profile-actions">
                 {}
                 <button class="button button-secondary profile-settings-btn" data-profile-id="{}">Settings</button>
+                <button class="button button-secondary profile-export-btn" data-profile-id="{}">Export</button>
                 <button class="button button-danger profile-delete-btn" data-profile-id="{}">Delete</button>
             </div>
         </div>
@@ -128,6 +157,7 @@ impl ProfileManagerUI {
                 profile.profile_type,
                 format_timestamp(profile.last_used_at),
                 if is_active { r#"<span class="active-badge">Active</span>"# } else { r#"<button class="button button-success profile-activate-btn" data-profile-id="{}">Activate</button>"# },
+                profile.id,
                 profile.id,
                 profile.id
             ));
@@ -149,6 +179,14 @@ impl ProfileManagerUI {
 
         if self.show_template_dialog {
             html.push_str(&self.render_template_dialog());
+        }
+
+        if self.show_export_dialog {
+            html.push_str(&self.render_export_dialog());
+        }
+
+        if self.show_import_dialog {
+            html.push_str(&self.render_import_dialog());
         }
 
         html
@@ -263,6 +301,106 @@ impl ProfileManagerUI {
         <div class="modal-footer">
             <button id="cancel-template-btn" class="button button-secondary">Cancel</button>
             <button id="confirm-template-btn" class="button button-primary" disabled>Apply Template</button>
+        </div>
+    </div>
+</div>
+"#)
+    }
+
+    /// Render export dialog
+    fn render_export_dialog(&self) -> String {
+        let is_all_profiles = self.export_selected_profile.is_none();
+        let export_title = if is_all_profiles { "Export All Profiles" } else { "Export Profile" };
+        let profile_name = self.export_selected_profile.as_ref()
+            .and_then(|id| self.profiles.iter().find(|p| &p.id == id))
+            .map(|p| p.name.clone())
+            .unwrap_or_else(|| "".to_string());
+
+        format!(r#"
+<div class="modal-overlay" id="export-profile-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>{}</h3>
+            <button class="modal-close" id="close-export-dialog">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Export Name</label>
+                <input type="text" id="export-name" value="{}" placeholder="Export name">
+            </div>
+            <div class="form-group">
+                <label>Export Options</label>
+                <label>
+                    <input type="checkbox" id="export-bookmarks" checked>
+                    Include bookmarks
+                </label>
+                <label>
+                    <input type="checkbox" id="export-history" checked>
+                    Include browsing history
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Encryption</label>
+                <label>
+                    <input type="checkbox" id="export-encrypt">
+                    Encrypt exported file
+                </label>
+                <div id="encryption-password-group" class="hidden">
+                    <label for="export-password">Password</label>
+                    <input type="password" id="export-password" placeholder="Enter encryption password">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-export-btn" class="button button-secondary">Cancel</button>
+            <button id="confirm-export-btn" class="button button-primary">Export</button>
+        </div>
+    </div>
+</div>
+"#, export_title, profile_name)
+    }
+
+    /// Render import dialog
+    fn render_import_dialog(&self) -> String {
+        format!(r#"
+<div class="modal-overlay" id="import-profile-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Import Profile</h3>
+            <button class="modal-close" id="close-import-dialog">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="import-file">Select Export File</label>
+                <input type="file" id="import-file" accept=".json,.vantis">
+            </div>
+            <div class="form-group">
+                <label for="import-password" id="import-password-label" class="hidden">Password</label>
+                <input type="password" id="import-password" placeholder="Enter decryption password" class="hidden">
+            </div>
+            <div class="form-group">
+                <label>Import Options</label>
+                <label>
+                    <input type="checkbox" id="import-overwrite" checked>
+                    Overwrite existing profiles
+                </label>
+                <label>
+                    <input type="checkbox" id="import-bookmarks" checked>
+                    Import bookmarks
+                </label>
+                <label>
+                    <input type="checkbox" id="import-history" checked>
+                    Import history
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="import-new-name">New Profile Name (optional)</label>
+                <input type="text" id="import-new-name" placeholder="Rename imported profile">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-import-btn" class="button button-secondary">Cancel</button>
+            <button id="confirm-import-btn" class="button button-primary">Import</button>
         </div>
     </div>
 </div>
