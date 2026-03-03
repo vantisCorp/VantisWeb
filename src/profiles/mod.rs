@@ -5,6 +5,7 @@
 //! - Profile isolation (Vantis Shifter)
 //! - Vantis ID management
 //! - Profile synchronization
+//! - Profile import/export
 
 use anyhow::Result;
 use log::{debug, info};
@@ -18,6 +19,7 @@ pub mod templates;
 pub mod sync;
 pub mod analytics;
 pub mod security;
+pub mod import_export;
 
 use crate::core::kernel::VantisKernel;
 
@@ -25,6 +27,11 @@ pub use templates::{TemplateManager, ProfileTemplate, TemplateCategory, Template
 pub use sync::{ProfileSyncManager, SyncConfig, SyncProvider, SyncStatus, SyncedProfile, SyncConflict, SyncResult};
 pub use analytics::{AnalyticsManager, ProfileAnalytics, DailyUsage, WebsiteUsage, TabStatistics, PerformanceMetrics, UsageSummary};
 pub use security::{ProfileSecurityManager, ProfileSecurity, SecurityLevel, AuthMethod};
+pub use import_export::{
+    ProfileExport, ProfilesExport, ImportOptions, ExportOptions,
+    ImportResult, export_profile_to_file, export_profiles_to_file,
+    import_profile_from_file, import_profiles_from_file, validate_import_file
+};
 
 /// Profile type
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -275,6 +282,100 @@ impl ProfileManager {
         }
 
         Ok(())
+    }
+
+    /// Export a single profile to a file
+    pub fn export_profile(&self, profile_id: &str, path: &Path, options: &ExportOptions) -> Result<()> {
+        let profile = self.profiles.blocking_read()
+            .get(profile_id)
+            .context("Profile not found")?
+            .clone();
+        
+        export_profile_to_file(&profile, path, options)
+            .context("Failed to export profile")?;
+        
+        Ok(())
+    }
+
+    /// Export all profiles to a file
+    pub fn export_all_profiles(&self, path: &Path, options: &ExportOptions) -> Result<()> {
+        let profiles: Vec<ProfileConfig> = self.profiles.blocking_read()
+            .values()
+            .cloned()
+            .collect();
+        
+        export_profiles_to_file(&profiles, path, options)
+            .context("Failed to export profiles")?;
+        
+        Ok(())
+    }
+
+    /// Import a single profile from a file
+    pub async fn import_profile(&self, path: &Path, password: Option<&str>, options: &ImportOptions) -> Result<ImportResult> {
+        let (profile, mut result) = import_profile_from_file(path, password, options)
+            .context("Failed to import profile")?;
+        
+        // Check if profile with same name exists
+        let existing_profile = self.profiles.read().await
+            .values()
+            .find(|p| p.name == profile.name);
+        
+        if let Some(existing) = existing_profile {
+            if options.overwrite {
+                // Delete existing profile
+                self.delete_profile(&existing.id).await?;
+                debug!("Deleted existing profile: {}", existing.name);
+            } else {
+                warn!("Profile '{}' already exists, skipping", profile.name);
+                result.skipped_count += 1;
+                return Ok(result);
+            }
+        }
+        
+        // Add imported profile
+        self.add_profile(profile).await?;
+        
+        Ok(result)
+    }
+
+    /// Import multiple profiles from a file
+    pub async fn import_profiles(&self, path: &Path, password: Option<&str>, options: &ImportOptions) -> Result<ImportResult> {
+        let (profiles, mut result) = import_profiles_from_file(path, password, options)
+            .context("Failed to import profiles")?;
+        
+        let mut imported_count = 0;
+        for profile in profiles {
+            // Check if profile with same name exists
+            let existing_profile = self.profiles.read().await
+                .values()
+                .find(|p| p.name == profile.name);
+            
+            if let Some(existing) = existing_profile {
+                if options.overwrite {
+                    // Delete existing profile
+                    self.delete_profile(&existing.id).await?;
+                    debug!("Deleted existing profile: {}", existing.name);
+                } else {
+                    warn!("Profile '{}' already exists, skipping", profile.name);
+                    result.skipped_count += 1;
+                    continue;
+                }
+            }
+            
+            // Add imported profile
+            self.add_profile(profile).await?;
+            imported_count += 1;
+        }
+        
+        Ok(result)
+    }
+
+    /// Validate import file without importing
+    pub fn validate_import(&self, path: &Path, password: Option<&str>) -> Result<ProfilesExport> {
+        validate_import_file(path, password)
+            .context("Failed to validate import file")?;
+        
+        Ok(validate_import_file(path, password)?)
     }
 }
 
