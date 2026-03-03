@@ -33,6 +33,12 @@ pub struct ProfileManagerUI {
     dragged_profile_id: Option<String>,
     drop_target_id: Option<String>,
     drag_over: bool,
+    // Clone state
+    show_clone_dialog: bool,
+    clone_source_profile: Option<String>,
+    clone_new_name: String,
+    clone_include_bookmarks: bool,
+    clone_include_history: bool,
 }
 
 impl ProfileManagerUI {
@@ -51,6 +57,11 @@ impl ProfileManagerUI {
             dragged_profile_id: None,
             drop_target_id: None,
             drag_over: false,
+            show_clone_dialog: false,
+            clone_source_profile: None,
+            clone_new_name: String::new(),
+            clone_include_bookmarks: true,
+            clone_include_history: false,
         }
     }
 
@@ -162,6 +173,28 @@ impl ProfileManagerUI {
         self.drag_over && self.drop_target_id.as_ref().map_or(false, |id| id == profile_id)
     }
 
+    /// Show clone dialog
+    pub fn show_clone_dialog(&mut self, profile_id: String) {
+        // Find the profile and set default clone name
+        let profile_name = self.profiles.iter()
+            .find(|p| p.id == profile_id)
+            .map(|p| p.name.clone())
+            .unwrap_or_else(|| "Profile".to_string());
+        
+        self.clone_source_profile = Some(profile_id);
+        self.clone_new_name = format!("{} (Copy)", profile_name);
+        self.clone_include_bookmarks = true;
+        self.clone_include_history = false;
+        self.show_clone_dialog = true;
+    }
+
+    /// Hide clone dialog
+    pub fn hide_clone_dialog(&mut self) {
+        self.show_clone_dialog = false;
+        self.clone_source_profile = None;
+        self.clone_new_name.clear();
+    }
+
     /// Render profile manager UI
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(5000);
@@ -203,6 +236,7 @@ impl ProfileManagerUI {
             <div class="profile-actions">
                 {}
                 <button class="button button-secondary profile-settings-btn" data-profile-id="{}">Settings</button>
+                <button class="button button-secondary profile-clone-btn" data-profile-id="{}">Clone</button>
                 <button class="button button-secondary profile-export-btn" data-profile-id="{}">Export</button>
                 <button class="button button-danger profile-delete-btn" data-profile-id="{}">Delete</button>
             </div>
@@ -217,6 +251,7 @@ impl ProfileManagerUI {
                 profile.profile_type,
                 format_timestamp(profile.last_used_at),
                 if is_active { r#"<span class="active-badge">Active</span>"# } else { r#"<button class="button button-success profile-activate-btn" data-profile-id="{}">Activate</button>"# },
+                profile.id,
                 profile.id,
                 profile.id,
                 profile.id
@@ -247,6 +282,10 @@ impl ProfileManagerUI {
 
         if self.show_import_dialog {
             html.push_str(&self.render_import_dialog());
+        }
+
+        if self.show_clone_dialog {
+            html.push_str(&self.render_clone_dialog());
         }
 
         html
@@ -465,6 +504,56 @@ impl ProfileManagerUI {
     </div>
 </div>
 "#)
+    }
+}
+
+/// Render clone dialog
+    fn render_clone_dialog(&self) -> String {
+        let profile_name = self.clone_source_profile.as_ref()
+            .and_then(|id| self.profiles.iter().find(|p| &p.id == id))
+            .map(|p| p.name.clone())
+            .unwrap_or_else(|| "Profile".to_string());
+
+        format!(r#"
+<div class="modal-overlay" id="clone-profile-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Clone Profile</h3>
+            <button class="modal-close" id="close-clone-dialog">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="clone-source">Source Profile</label>
+                <p class="clone-source-name">{}</p>
+            </div>
+            <div class="form-group">
+                <label for="clone-name">New Profile Name</label>
+                <input type="text" id="clone-name" value="{}" placeholder="Enter new profile name">
+            </div>
+            <div class="form-group">
+                <label>Clone Options</label>
+                <label>
+                    <input type="checkbox" id="clone-bookmarks" {}>
+                    Include bookmarks
+                </label>
+                <label>
+                    <input type="checkbox" id="clone-history" {}>
+                    Include history
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-clone-btn" class="button button-secondary">Cancel</button>
+            <button id="confirm-clone-btn" class="button button-primary">Clone</button>
+        </div>
+    </div>
+</div>
+"#,
+                profile_name,
+                self.clone_new_name,
+                if self.clone_include_bookmarks { "checked" } else { "" },
+                if self.clone_include_history { "checked" } else { "" }
+            )
     }
 }
 

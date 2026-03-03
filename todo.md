@@ -39,8 +39,23 @@
     - Smooth animation framework
   - Status: Backend complete, UI ready, JS/CSS integration needed
 
-- [ ] **Issue #2: Profile Cloning**
-  - Not started
+- [x] **Issue #5: Profile Cloning/Duplication** - COMPLETED
+  - Implemented clone_profile() method with basic options
+  - Implemented clone_profile_with_options() with detailed CloneOptions
+  - Added CloneOptions structure for granular control
+  - Updated ProfileManagerUI with clone state management
+  - Added Clone button to profile cards
+  - Implemented clone dialog with options (name, bookmarks, history)
+  - Added comprehensive documentation
+  - Features implemented:
+    - Clone/duplicate existing profiles with all settings
+    - Create exact copy of profile with new ID
+    - Append '(Copy)' to cloned profile name by default
+    - Allow cloning active and inactive profiles
+    - Optionally include bookmarks and history
+    - Show confirmation dialog before cloning
+    - Custom clone name support
+  - Status: Backend complete, UI ready, JS integration needed
 
 - [ ] **Issue #5: Enhanced Analytics Dashboard**
   - Not started

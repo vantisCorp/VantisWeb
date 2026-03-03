@@ -486,6 +486,115 @@ impl ProfileManager {
         info!("Profile order normalized");
         Ok(())
     }
+
+    /// Clone a profile with optional data selection
+    pub async fn clone_profile(&self, profile_id: &str, new_name: Option<String>, include_bookmarks: bool, include_history: bool) -> Result<String> {
+        info!("Cloning profile {} with options: bookmarks={}, history={}", 
+              profile_id, include_bookmarks, include_history);
+        
+        let profiles = self.profiles.read().await;
+        let original = profiles.get(profile_id)
+            .ok_or_else(|| anyhow::anyhow!("Profile not found: {}", profile_id))?
+            .clone();
+        drop(profiles);
+        
+        // Create cloned profile with new UUID
+        let now = chrono::Utc::now().timestamp_millis();
+        let cloned_id = uuid::Uuid::new_v4().to_string();
+        let cloned_profile = ProfileConfig {
+            id: cloned_id.clone(),
+            name: new_name.unwrap_or_else(|| format!("{} (Copy)", original.name)),
+            profile_type: original.profile_type.clone(),
+            icon: original.icon.clone(),
+            color: original.color.clone(),
+            active: false, // Cloned profile is never active
+            order: original.order, // Same order initially, can be reordered
+            settings: original.settings.clone(),
+            bookmarks: if include_bookmarks { original.bookmarks.clone() } else { Vec::new() },
+            history: if include_history { original.history.clone() } else { Vec::new() },
+            extensions: original.extensions.clone(),
+            theme: original.theme.clone(),
+            created_at: now,
+            last_used_at: original.created_at, // Keep original last_used_at
+        };
+        
+        // Add cloned profile to manager
+        let mut profiles = self.profiles.write().await;
+        profiles.insert(cloned_profile.id.clone(), cloned_profile);
+        drop(profiles);
+        
+        // Persist changes
+        self.save_profiles().await?;
+        
+        info!("Profile cloned successfully as {}", cloned_id);
+        Ok(cloned_id)
+    }
+
+    /// Clone options structure
+    #[derive(Debug, Clone)]
+    pub struct CloneOptions {
+        pub new_name: Option<String>,
+        pub include_bookmarks: bool,
+        pub include_history: bool,
+        pub clone_settings: bool,
+        pub clone_theme: bool,
+    }
+
+    impl Default for CloneOptions {
+        fn default() -> Self {
+            Self {
+                new_name: None,
+                include_bookmarks: true,
+                include_history: false,
+                clone_settings: true,
+                clone_theme: true,
+            }
+        }
+    }
+
+    /// Clone a profile with detailed options
+    pub async fn clone_profile_with_options(&self, profile_id: &str, options: &CloneOptions) -> Result<String> {
+        info!("Cloning profile {} with detailed options: {:?}", profile_id, options);
+        
+        let profiles = self.profiles.read().await;
+        let original = profiles.get(profile_id)
+            .ok_or_else(|| anyhow::anyhow!("Profile not found: {}", profile_id))?
+            .clone();
+        drop(profiles);
+        
+        // Create cloned profile with new UUID
+        let now = chrono::Utc::now().timestamp_millis();
+        let cloned_profile = ProfileConfig {
+            id: uuid::Uuid::new_v4().to_string(),
+            name: options.new_name.clone()
+                .unwrap_or_else(|| format!("{} (Copy)", original.name)),
+            profile_type: original.profile_type.clone(),
+            icon: original.icon.clone(),
+            color: original.color.clone(),
+            active: false, // Cloned profile is never active
+            order: original.order, // Same order initially, can be reordered
+            settings: if options.clone_settings { original.settings.clone() } else { HashMap::new() },
+            bookmarks: if options.include_bookmarks { original.bookmarks.clone() } else { Vec::new() },
+            history: if options.include_history { original.history.clone() } else { Vec::new() },
+            extensions: original.extensions.clone(),
+            theme: if options.clone_theme { original.theme.clone() } else { None },
+            created_at: now,
+            last_used_at: original.created_at, // Keep original last_used_at
+        };
+        
+        let cloned_id = cloned_profile.id.clone();
+        
+        // Add cloned profile to manager
+        let mut profiles = self.profiles.write().await;
+        profiles.insert(cloned_id.clone(), cloned_profile);
+        drop(profiles);
+        
+        // Persist changes
+        self.save_profiles().await?;
+        
+        info!("Profile cloned successfully as {}", cloned_id);
+        Ok(cloned_id)
+    }
 }
 
 #[cfg(test)]
