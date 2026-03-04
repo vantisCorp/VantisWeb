@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb Template Marketplace</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-red: #dc2626;
+            --dark-red: #991b1b;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --success-green: #22c55e;
+            --warning-yellow: #eab308;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1f1f1f 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--primary-red);
+        }
+
+        /* Search Bar */
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* User Actions */
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Categories */
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .category-item:hover {
+            background: var(--border-color);
+        }
+
+        .category-item.active {
+            background: rgba(220, 38, 38, 0.2);
+            color: var(--primary-red);
+        }
+
+        .category-icon {
+            font-size: 1.2rem;
+        }
+
+        .category-count {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Filters */
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        /* Rating Filter */
+        .rating-filter {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .rating-btn {
+            padding: 0.4rem 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .rating-btn:hover, .rating-btn.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: white;
+        }
+
+        /* Main Content */
+        .content {
+            min-width: 0;
+        }
+
+        /* Stats Banner */
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Featured Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Template Card */
+        .template-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-red);
+        }
+
+        .card-preview {
+            height: 160px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-icon {
+            font-size: 4rem;
+            opacity: 0.8;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-red);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 1.25rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .card-rating .star {
+            color: var(--warning-yellow);
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.6rem;
+            background: var(--border-color);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .creator-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--primary-red));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .creator-name {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .download-count {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-full {
+            flex: 1;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Template Detail */
+        .template-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .detail-preview {
+            background: var(--dark-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .detail-icon {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .detail-stat {
+            text-align: center;
+        }
+
+        .detail-stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-red);
+        }
+
+        .detail-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-info h3 {
+            margin-bottom: 1rem;
+        }
+
+        .detail-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-features li::before {
+            content: "✓";
+            color: var(--success-green);
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .review {
+            background: var(--dark-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .reviewer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-rating {
+            color: var(--warning-yellow);
+        }
+
+        .review-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Submit Template Modal */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .tag-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--primary-red);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .tag-chip button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .stats-banner {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-container {
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .template-detail {
+                grid-template-columns: 1fr;
+            }
+
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🌐</div>
+                <div class="logo-text">Vantis<span>Web</span></div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="Search templates, categories, creators..." id="searchInput">
+                </div>
+            </div>
+            
+            <div class="user-actions">
+                <button class="btn btn-secondary" onclick="openSubmitModal()">
+                    <span>📤</span> Submit Template
+                </button>
+                <button class="btn btn-primary" onclick="openMyTemplates()">
+                    <span>📁</span> My Templates
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Categories -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📁 Categories</h3>
+                <ul class="category-list" id="categoryList">
+                    <li class="category-item active" data-category="all">
+                        <span class="category-icon">🌟</span>
+                        <span>All Templates</span>
+                    </li>
+                    <li class="category-item" data-category="Productivity">
+                        <span class="category-icon">📈</span>
+                        <span>Productivity</span>
+                        <span class="category-count">45</span>
+                    </li>
+                    <li class="category-item" data-category="Development">
+                        <span class="category-icon">👨‍💻</span>
+                        <span>Development</span>
+                        <span class="category-count">38</span>
+                    </li>
+                    <li class="category-item" data-category="Design">
+                        <span class="category-icon">🎨</span>
+                        <span>Design</span>
+                        <span class="category-count">25</span>
+                    </li>
+                    <li class="category-item" data-category="Privacy & Security">
+                        <span class="category-icon">🛡️</span>
+                        <span>Privacy & Security</span>
+                        <span class="category-count">20</span>
+                    </li>
+                    <li class="category-item" data-category="Social Media">
+                        <span class="category-icon">💬</span>
+                        <span>Social Media</span>
+                        <span class="category-count">18</span>
+                    </li>
+                    <li class="category-item" data-category="Entertainment">
+                        <span class="category-icon">🎬</span>
+                        <span>Entertainment</span>
+                        <span class="category-count">15</span>
+                    </li>
+                    <li class="category-item" data-category="Education">
+                        <span class="category-icon">📚</span>
+                        <span>Education</span>
+                        <span class="category-count">12</span>
+                    </li>
+                    <li class="category-item" data-category="Finance">
+                        <span class="category-icon">💰</span>
+                        <span>Finance</span>
+                        <span class="category-count">10</span>
+                    </li>
+                    <li class="category-item" data-category="Minimal">
+                        <span class="category-icon">🎯</span>
+                        <span>Minimal</span>
+                        <span class="category-count">8</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Filters -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">⚙️ Filters</h3>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Sort By</label>
+                    <select class="filter-select" id="sortSelect">
+                        <option value="popularity">Most Popular</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="newest">Newest</option>
+                        <option value="downloads">Most Downloads</option>
+                        <option value="name">Name (A-Z)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Minimum Rating</label>
+                    <div class="rating-filter">
+                        <button class="rating-btn active" data-rating="0">All</button>
+                        <button class="rating-btn" data-rating="4">4+ ⭐</button>
+                        <button class="rating-btn" data-rating="3">3+ ⭐</button>
+                        <button class="rating-btn" data-rating="2">2+ ⭐</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📊 Community Stats</h3>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                    <p style="margin-bottom: 0.5rem;">📦 Total Templates: <strong style="color: var(--primary-red);">150</strong></p>
+                    <p style="margin-bottom: 0.5rem;">⬇️ Total Downloads: <strong style="color: var(--primary-red);">50,000</strong></p>
+                    <p>👥 Active Creators: <strong style="color: var(--primary-red);">75</strong></p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Stats Banner -->
+            <div class="stats-banner">
+                <div class="stat-card">
+                    <div class="stat-value">150</div>
+                    <div class="stat-label">Templates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">50K</div>
+                    <div class="stat-label">Downloads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2.5K</div>
+                    <div class="stat-label">Reviews</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">75</div>
+                    <div class="stat-label">Creators</div>
+                </div>
+            </div>
+
+            <!-- Featured Section -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">🌟 Featured Templates</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshFeatured()">Refresh</button>
+                </div>
+
+                <div class="template-grid" id="templateGrid">
+                    <!-- Templates will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <!-- Pagination buttons will be generated -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Template Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Template Name</h2>
+                <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="template-detail">
+                    <div class="detail-preview">
+                        <div class="detail-icon" id="modalIcon">👨‍💻</div>
+                        <div class="detail-stats">
+                            <div class="detail-stat">
+                                <div class="detail-stat-value" id="modalRating">4.8</div>
+                                <div class="detail-stat-label">Rating</div>
+                            </div>
+                            <div class="detail-stat">
+                                <div class="detail-stat-value" id="modalDownloads">5.4K</div>
+                                <div class="detail-stat-label">Downloads</div>
+                            </div>
+                            <div class="detail-stat">
+                                <div class="detail-stat-value" id="modalReviews">156</div>
+                                <div class="detail-stat-label">Reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-info">
+                        <h3>Description</h3>
+                        <p class="detail-description" id="modalDescription">
+                            Template description goes here...
+                        </p>
+                        
+                        <h3>Features</h3>
+                        <ul class="detail-features" id="modalFeatures">
+                            <li>Feature 1</li>
+                            <li>Feature 2</li>
+                            <li>Feature 3</li>
+                        </ul>
+
+                        <h3>Tags</h3>
+                        <div class="card-tags" id="modalTags">
+                            <span class="tag">Tag 1</span>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button class="btn btn-primary" onclick="downloadTemplate()">
+                                ⬇️ Download Template
+                            </button>
+                            <button class="btn btn-secondary" onclick="previewTemplate()">
+                                👁️ Preview
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h3 style="margin-bottom: 1rem;">📝 Reviews</h3>
+                    
+                    <div id="reviewsList">
+                        <!-- Reviews will be loaded here -->
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--dark-bg); border-radius: 12px;">
+                        <h4 style="margin-bottom: 1rem;">Write a Review</h4>
+                        <div class="form-group">
+                            <label class="form-label">Rating</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="rating-btn" data-rating="1">1 ⭐</button>
+                                <button class="rating-btn" data-rating="2">2 ⭐</button>
+                                <button class="rating-btn" data-rating="3">3 ⭐</button>
+                                <button class="rating-btn" data-rating="4">4 ⭐</button>
+                                <button class="rating-btn" data-rating="5">5 ⭐</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Comment (optional)</label>
+                            <textarea class="form-textarea" placeholder="Share your experience with this template..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Template Modal -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">📤 Submit Your Template</h2>
+                <button class="modal-close" onclick="closeModal('submitModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Template Name *</label>
+                    <input type="text" class="form-input" placeholder="Enter a descriptive name" maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description *</label>
+                    <textarea class="form-textarea" placeholder="Describe what your template does and who it's for..." maxlength="500"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Icon</label>
+                    <input type="text" class="form-input" placeholder="Choose an emoji icon (e.g., 🚀)" maxlength="4">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category Tags (up to 5)</label>
+                    <div class="tag-input-container">
+                        <span class="tag-chip">Productivity <button>&times;</button></span>
+                        <input type="text" placeholder="Add a tag..." style="border: none; background: transparent; color: white; outline: none; flex: 1; min-width: 100px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Select Profile to Share</label>
+                    <select class="filter-select">
+                        <option>Work Profile</option>
+                        <option>Personal Profile</option>
+                        <option>Development Profile</option>
+                        <option>Gaming Profile</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" checked>
+                        Include bookmarks
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox">
+                        Include browsing history
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="closeModal('submitModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitTemplate()">Submit for Review</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample template data
+        const templates = [
+            {
+                id: 'dev-pro-2024',
+                name: 'Developer Pro',
+                description: 'Optimized profile for web developers with dev tools, documentation sites, and productivity extensions.',
+                icon: '👨‍💻',
+                tags: ['Development', 'Productivity'],
+                creator: { name: 'Dev Master', avatar: 'D' },
+                rating: 4.8,
+                reviews: 156,
+                downloads: 5420,
+                featured: true,
+                features: ['Pre-configured dev tools', 'Documentation shortcuts', 'Dark theme optimized', 'GitHub integration']
+            },
+            {
+                id: 'minimal-focus',
+                name: 'Minimal Focus',
+                description: 'Distraction-free browsing with minimal UI, focus mode, and essential tools only.',
+                icon: '🎯',
+                tags: ['Minimal', 'Productivity'],
+                creator: { name: 'Minimalist', avatar: 'M' },
+                rating: 4.6,
+                reviews: 89,
+                downloads: 3200,
+                featured: true,
+                features: ['Distraction-free mode', 'Focus timer', 'Minimal UI', 'Essential bookmarks only']
+            },
+            {
+                id: 'privacy-shield',
+                name: 'Privacy Shield',
+                description: 'Maximum privacy protection with tracker blocking, encrypted connections, and privacy-focused search.',
+                icon: '🛡️',
+                tags: ['Privacy & Security'],
+                creator: { name: 'Privacy Pro', avatar: 'P' },
+                rating: 4.9,
+                reviews: 234,
+                downloads: 8900,
+                featured: true,
+                features: ['Tracker blocking', 'Encrypted connections', 'Privacy search', 'No telemetry']
+            },
+            {
+                id: 'social-butterfly',
+                name: 'Social Butterfly',
+                description: 'Stay connected with quick access to all major social media platforms and messaging apps.',
+                icon: '🦋',
+                tags: ['Social Media', 'Communication'],
+                creator: { name: 'SocialGuru', avatar: 'S' },
+                rating: 4.5,
+                reviews: 67,
+                downloads: 2100,
+                featured: false,
+                features: ['Social media shortcuts', 'Messenger integration', 'Notification management', 'Theme customization']
+            },
+            {
+                id: 'design-studio',
+                name: 'Design Studio',
+                description: 'Perfect for designers with color tools, inspiration sites, and design resources.',
+                icon: '🎨',
+                tags: ['Design', 'Creative'],
+                creator: { name: 'DesignPro', avatar: 'D' },
+                rating: 4.7,
+                reviews: 112,
+                downloads: 4300,
+                featured: true,
+                features: ['Color palette tools', 'Inspiration gallery', 'Font resources', 'Design system templates']
+            },
+            {
+                id: 'gaming-hub',
+                name: 'Gaming Hub',
+                description: 'Optimized for gamers with streaming sites, gaming news, and community links.',
+                icon: '🎮',
+                tags: ['Gaming', 'Entertainment'],
+                creator: { name: 'GameMaster', avatar: 'G' },
+                rating: 4.4,
+                reviews: 98,
+                downloads: 3800,
+                featured: false,
+                features: ['Streaming shortcuts', 'Gaming news feeds', 'Community links', 'Voice chat integration']
+            },
+            {
+                id: 'finance-tracker',
+                name: 'Finance Tracker',
+                description: 'Manage your finances with banking shortcuts, crypto tracking, and budgeting tools.',
+                icon: '💰',
+                tags: ['Finance', 'Productivity'],
+                creator: { name: 'FinanceWhiz', avatar: 'F' },
+                rating: 4.6,
+                reviews: 45,
+                downloads: 1800,
+                featured: false,
+                features: ['Banking shortcuts', 'Crypto tracker', 'Budget templates', 'Investment resources']
+            },
+            {
+                id: 'learner-pro',
+                name: 'Learner Pro',
+                description: 'Optimized for students and lifelong learners with educational resources and study tools.',
+                icon: '📚',
+                tags: ['Education', 'Productivity'],
+                creator: { name: 'EduExpert', avatar: 'E' },
+                rating: 4.7,
+                reviews: 78,
+                downloads: 2600,
+                featured: false,
+                features: ['Educational bookmarks', 'Note-taking tools', 'Research helpers', 'Study timer']
+            },
+            {
+                id: 'news-junkie',
+                name: 'News Junkie',
+                description: 'Stay informed with quick access to news sites, RSS feeds, and fact-checking tools.',
+                icon: '📰',
+                tags: ['News', 'Productivity'],
+                creator: { name: 'NewsHound', avatar: 'N' },
+                rating: 4.3,
+                reviews: 34,
+                downloads: 1200,
+                featured: false,
+                features: ['News aggregation', 'RSS reader', 'Fact-check tools', 'Customizable feeds']
+            }
+        ];
+
+        let currentCategory = 'all';
+        let currentSort = 'popularity';
+        let currentRating = 0;
+        let currentPage = 1;
+        const pageSize = 6;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTemplates();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Category selection
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    currentCategory = item.dataset.category;
+                    currentPage = 1;
+                    renderTemplates();
+                });
+            });
+
+            // Sort selection
+            document.getElementById('sortSelect').addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                renderTemplates();
+            });
+
+            // Rating filter
+            document.querySelectorAll('.rating-filter .rating-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.rating-filter .rating-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentRating = parseInt(btn.dataset.rating);
+                    renderTemplates();
+                });
+            });
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                currentPage = 1;
+                renderTemplates(e.target.value);
+            });
+        }
+
+        function getFilteredTemplates(searchQuery = '') {
+            let filtered = [...templates];
+
+            // Category filter
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(t => t.tags.includes(currentCategory));
+            }
+
+            // Rating filter
+            if (currentRating > 0) {
+                filtered = filtered.filter(t => t.rating >= currentRating);
+            }
+
+            // Search filter
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filtered = filtered.filter(t => 
+                    t.name.toLowerCase().includes(query) ||
+                    t.description.toLowerCase().includes(query) ||
+                    t.tags.some(tag => tag.toLowerCase().includes(query))
+                );
+            }
+
+            // Sort
+            switch (currentSort) {
+                case 'popularity':
+                    filtered.sort((a, b) => (b.rating * b.downloads) - (a.rating * a.downloads));
+                    break;
+                case 'rating':
+                    filtered.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'newest':
+                    filtered.sort((a, b) => b.id.localeCompare(a.id));
+                    break;
+                case 'downloads':
+                    filtered.sort((a, b) => b.downloads - a.downloads);
+                    break;
+                case 'name':
+                    filtered.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+            }
+
+            return filtered;
+        }
+
+        function renderTemplates(searchQuery = '') {
+            const filtered = getFilteredTemplates(searchQuery);
+            const start = (currentPage - 1) * pageSize;
+            const paginated = filtered.slice(start, start + pageSize);
+
+            const grid = document.getElementById('templateGrid');
+            grid.innerHTML = paginated.map(t => `
+                <div class="template-card" onclick="openTemplateDetail('${t.id}')">
+                    <div class="card-preview">
+                        <span class="preview-icon">${t.icon}</span>
+                        ${t.featured ? '<span class="card-badge">Featured</span>' : ''}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="card-title">${t.name}</h3>
+                            <div class="card-rating">
+                                <span class="star">★</span>
+                                <span>${t.rating}</span>
+                            </div>
+                        </div>
+                        <p class="card-description">${t.description}</p>
+                        <div class="card-tags">
+                            ${t.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        <div class="card-footer">
+                            <div class="creator-info">
+                                <div class="creator-avatar">${t.creator.avatar}</div>
+                                <span class="creator-name">${t.creator.name}</span>
+                            </div>
+                            <div class="download-count">
+                                <span>⬇️</span>
+                                <span>${formatNumber(t.downloads)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            renderPagination(filtered.length);
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            const pagination = document.getElementById('pagination');
+            
+            let html = '';
+            
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="goToPage(${currentPage - 1})">← Prev</button>`;
+            }
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span style="padding: 0.5rem;">...</span>`;
+                }
+            }
+            
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="goToPage(${currentPage + 1})">Next →</button>`;
+            }
+            
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTemplates();
+        }
+
+        function openTemplateDetail(id) {
+            const template = templates.find(t => t.id === id);
+            if (!template) return;
+
+            document.getElementById('modalTitle').textContent = template.name;
+            document.getElementById('modalIcon').textContent = template.icon;
+            document.getElementById('modalRating').textContent = template.rating;
+            document.getElementById('modalDownloads').textContent = formatNumber(template.downloads);
+            document.getElementById('modalReviews').textContent = template.reviews;
+            document.getElementById('modalDescription').textContent = template.description;
+            
+            document.getElementById('modalFeatures').innerHTML = template.features
+                .map(f => `<li>${f}</li>`).join('');
+            
+            document.getElementById('modalTags').innerHTML = template.tags
+                .map(tag => `<span class="tag">${tag}</span>`).join('');
+
+            // Sample reviews
+            document.getElementById('reviewsList').innerHTML = `
+                <div class="review">
+                    <div class="review-header">
+                        <div class="reviewer">
+                            <div class="creator-avatar">J</div>
+                            <span>John D.</span>
+                        </div>
+                        <div class="review-rating">★★★★★</div>
+                    </div>
+                    <p class="review-text">Amazing template! Exactly what I needed for my daily workflow.</p>
+                </div>
+                <div class="review">
+                    <div class="review-header">
+                        <div class="reviewer">
+                            <div class="creator-avatar">S</div>
+                            <span>Sarah M.</span>
+                        </div>
+                        <div class="review-rating">★★★★☆</div>
+                    </div>
+                    <p class="review-text">Great template, would love more customization options.</p>
+                </div>
+            `;
+
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function openSubmitModal() {
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function downloadTemplate() {
+            alert('Template downloaded successfully!');
+            closeModal('detailModal');
+        }
+
+        function previewTemplate() {
+            alert('Preview mode - opening template preview...');
+        }
+
+        function submitTemplate() {
+            alert('Template submitted for review! It will be available after moderation.');
+            closeModal('submitModal');
+        }
+
+        function submitReview() {
+            alert('Thank you for your review!');
+        }
+
+        function refreshFeatured() {
+            renderTemplates();
+        }
+
+        function openMyTemplates() {
+            alert('Opening your templates...');
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

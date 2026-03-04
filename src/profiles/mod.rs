@@ -21,6 +21,8 @@ pub mod analytics;
 pub mod security;
 pub mod import_export;
 pub mod analytics_visualization;
+pub mod community_templates;
+pub mod template_manager;
 
 use crate::core::kernel::VantisKernel;
 
@@ -49,6 +51,12 @@ pub use import_export::{
     ImportResult, export_profile_to_file, export_profiles_to_file,
     import_profile_from_file, import_profiles_from_file, validate_import_file
 };
+pub use community_templates::{
+    TemplateMetadata, CommunityTemplate, TemplateReview, TemplateFilter,
+    TemplateSortOrder, TemplateSubmission, ModerationReport, ModerationStatus,
+    CreatorInfo, TemplateApiResponse, TemplateListResponse, TemplateStatistics
+};
+pub use template_manager::{TemplateManager, TemplateError};
 
 /// Profile type
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
