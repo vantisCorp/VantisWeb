@@ -1,7 +1,65 @@
-//! Extension Sandbox Module
+//! # Extension Sandbox Module
 //!
-//! Provides a sandboxed execution environment for browser extensions
-//! to ensure security and isolate extension code from the main browser.
+//! Provides a sandboxed execution environment for browser extensions to ensure
+//! security and isolate extension code from the main browser. This module implements
+//! resource limits, code validation, and input sanitization to prevent malicious
+//! extensions from compromising browser security.
+//!
+//! ## Features
+//!
+//! - **Isolated Execution**: Extensions run in isolated sandbox environments
+//! - **Resource Limits**: Configurable memory and CPU time limits
+//! - **Code Validation**: Detects and blocks dangerous code patterns
+//! - **Input Sanitization**: Prevents code injection attacks
+//! - **Resource Tracking**: Monitors memory, CPU, network, and API usage
+//! - **Flexible Configuration**: Fine-grained control over sandbox permissions
+//!
+//! ## Security Model
+//!
+//! The sandbox operates on the principle of least privilege:
+//! - Extensions are isolated from the main browser process
+//! - Resource limits prevent resource exhaustion attacks
+//! - Dangerous code patterns (eval, Function, etc.) are blocked
+//! - Input sanitization prevents XSS and code injection
+//! - Network and file system access are configurable
+//!
+//! ## Example Usage
+//!
+//! ```rust
+//! use vantisweb::extensions::sandbox::{ExtensionSandbox, SandboxConfig, SandboxContext};
+//!
+//! #[tokio::main]
+//! async fn main() -> anyhow::Result<()> {
+//!     let config = SandboxConfig::default();
+//!     let sandbox = ExtensionSandbox::new(config);
+//!
+//!     // Create a sandbox for an extension
+//!     sandbox.create_sandbox("extension-id").await?;
+//!
+//!     // Execute code in the sandbox
+//!     let context = SandboxContext {
+//!         extension_id: "extension-id".to_string(),
+//!         permissions: vec!["storage".to_string()],
+//!         origin: "https://example.com".to_string(),
+//!     };
+//!
+//!     let result = sandbox.execute("extension-id", "console.log('hello')", &context).await?;
+//!     assert!(result.success);
+//!
+//!     // Terminate the sandbox
+//!     sandbox.terminate_sandbox("extension-id").await?;
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ## Security Considerations
+//!
+//! - Always validate code before execution
+//! - Never execute code from untrusted sources
+//! - Monitor resource usage to detect abuse
+//! - Terminate sandboxes that exceed resource limits
+//! - Keep sandbox limits conservative for production use
 
 use anyhow::{Result, Error};
 use std::collections::HashMap;
@@ -10,25 +68,78 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 /// Sandbox for extension execution
+///
+/// The `ExtensionSandbox` manages sandboxed execution environments for browser
+/// extensions. Each extension runs in its own isolated sandbox with configurable
+/// resource limits and security restrictions.
+///
+/// # Examples
+///
+/// ```rust
+/// use vantisweb::extensions::sandbox::{ExtensionSandbox, SandboxConfig};
+///
+/// let config = SandboxConfig::default();
+/// let sandbox = ExtensionSandbox::new(config);
+/// ```
+///
+/// # Thread Safety
+///
+/// The sandbox manager is thread-safe and can be shared across multiple tasks
+/// through `Arc<ExtensionSandbox>`.
 pub struct ExtensionSandbox {
     config: SandboxConfig,
     active_sandboxes: Arc<RwLock<HashMap<String, SandboxInstance>>>,
 }
 
 /// Sandbox configuration
+///
+/// Configuration options for sandbox behavior, including resource limits and
+/// permission settings.
+///
+/// # Examples
+///
+/// ```rust
+/// use vantisweb::extensions::sandbox::SandboxConfig;
+///
+/// let config = SandboxConfig {
+///     enabled: true,
+///     memory_limit_mb: 256,
+///     cpu_limit_seconds: 60,
+///     network_access: false,
+///     file_access: false,
+///     allow_browser_apis: true,
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct SandboxConfig {
     /// Enable sandboxing
+    ///
+    /// When `false`, extensions run without sandboxing (development mode only).
     pub enabled: bool,
+    
     /// Memory limit in MB
+    ///
+    /// Maximum memory allowed per sandbox. Exceeding this limit causes termination.
     pub memory_limit_mb: u64,
+    
     /// CPU time limit in seconds
+    ///
+    /// Maximum CPU time allowed per execution. Exceeding this limit causes termination.
     pub cpu_limit_seconds: u64,
+    
     /// Network access allowed
+    ///
+    /// When `true`, extensions can make network requests.
     pub network_access: bool,
+    
     /// File system access allowed
+    ///
+    /// When `true`, extensions can access the file system (dangerous).
     pub file_access: bool,
+    
     /// Allow access to browser APIs
+    ///
+    /// When `true`, extensions can access browser APIs through the sandbox.
     pub allow_browser_apis: bool,
 }
 
@@ -46,6 +157,8 @@ impl Default for SandboxConfig {
 }
 
 /// Active sandbox instance
+///
+/// Represents an active sandbox instance with metadata and resource usage tracking.
 #[derive(Debug, Clone)]
 struct SandboxInstance {
     extension_id: String,
@@ -55,33 +168,68 @@ struct SandboxInstance {
 }
 
 /// Resource usage tracking
+///
+/// Tracks resource usage for a sandbox instance including memory, CPU, network,
+/// and API call metrics.
 #[derive(Debug, Clone, Default)]
 pub struct ResourceUsage {
+    /// Memory usage in megabytes
     pub memory_mb: f64,
+    /// CPU time used in milliseconds
     pub cpu_time_ms: u64,
+    /// Number of network requests made
     pub network_requests: u32,
+    /// Number of browser API calls made
     pub api_calls: u32,
 }
 
 /// Sandbox execution context
+///
+/// Provides context information for code execution in the sandbox, including
+/// extension ID, permissions, and origin.
 #[derive(Debug, Clone)]
 pub struct SandboxContext {
+    /// Extension ID executing the code
     pub extension_id: String,
+    /// Permissions granted to the extension
     pub permissions: Vec<String>,
+    /// Origin of the code being executed
     pub origin: String,
 }
 
 /// Sandbox execution result
+///
+/// Result of executing code in the sandbox, including success status, output,
+/// error information, and resource usage statistics.
 #[derive(Debug, Clone)]
 pub struct SandboxResult {
+    /// Whether execution was successful
     pub success: bool,
+    /// Output from code execution (if successful)
     pub output: Option<String>,
+    /// Error message (if execution failed)
     pub error: Option<String>,
+    /// Resource usage during execution
     pub resource_usage: ResourceUsage,
 }
 
 impl ExtensionSandbox {
     /// Create a new sandbox manager
+    ///
+    /// Creates a new `ExtensionSandbox` with the specified configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Configuration for sandbox behavior
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use vantisweb::extensions::sandbox::{ExtensionSandbox, SandboxConfig};
+    ///
+    /// let config = SandboxConfig::default();
+    /// let sandbox = ExtensionSandbox::new(config);
+    /// ```
     pub fn new(config: SandboxConfig) -> Self {
         Self {
             config,
@@ -90,6 +238,29 @@ impl ExtensionSandbox {
     }
 
     /// Create a sandbox for an extension
+    ///
+    /// Creates a new sandboxed execution environment for the specified extension.
+    /// The sandbox is initialized with default resource usage and marked as active.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_id` - The ID of the extension to create a sandbox for
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the sandbox cannot be created (currently always succeeds).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// sandbox.create_sandbox("extension-id").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn create_sandbox(&self, extension_id: &str) -> Result<()> {
         if !self.config.enabled {
             return Ok(());
@@ -109,6 +280,45 @@ impl ExtensionSandbox {
     }
 
     /// Execute code in sandbox
+    ///
+    /// Executes JavaScript code in the sandboxed environment for the specified
+    /// extension. The code is validated before execution to prevent dangerous
+    /// operations.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_id` - The ID of the extension executing the code
+    /// * `code` - The JavaScript code to execute
+    /// * `context` - Execution context with permissions and origin
+    ///
+    /// # Returns
+    ///
+    /// A `SandboxResult` containing execution status, output, and resource usage.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Sandbox doesn't exist for the extension
+    /// - Code validation fails
+    /// - Execution encounters an error
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::{ExtensionSandbox, SandboxContext};
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// # sandbox.create_sandbox("ext-id").await?;
+    /// let context = SandboxContext {
+    ///     extension_id: "ext-id".to_string(),
+    ///     permissions: vec!["storage".to_string()],
+    ///     origin: "https://example.com".to_string(),
+    /// };
+    /// let result = sandbox.execute("ext-id", "console.log('hello')", &context).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn execute(
         &self,
         extension_id: &str,
@@ -139,6 +349,26 @@ impl ExtensionSandbox {
     }
 
     /// Terminate a sandbox
+    ///
+    /// Terminates the sandbox for the specified extension, releasing all
+    /// resources. The sandbox is marked as inactive but remains in the registry.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_id` - The ID of the extension whose sandbox to terminate
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// # sandbox.create_sandbox("ext-id").await?;
+    /// sandbox.terminate_sandbox("ext-id").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn terminate_sandbox(&self, extension_id: &str) -> Result<()> {
         let mut sandboxes = self.active_sandboxes.write().await;
         if let Some(mut instance) = sandboxes.get_mut(extension_id) {
@@ -148,12 +378,54 @@ impl ExtensionSandbox {
     }
 
     /// Get resource usage for an extension
+    ///
+    /// Returns the current resource usage statistics for the specified extension's
+    /// sandbox.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_id` - The ID of the extension
+    ///
+    /// # Returns
+    ///
+    /// `Some(ResourceUsage)` if the sandbox exists, `None` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// # sandbox.create_sandbox("ext-id").await?;
+    /// let usage = sandbox.get_resource_usage("ext-id").await;
+    /// if let Some(stats) = usage {
+    ///     println!("Memory: {} MB", stats.memory_mb);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_resource_usage(&self, extension_id: &str) -> Option<ResourceUsage> {
         let sandboxes = self.active_sandboxes.read().await;
         sandboxes.get(extension_id).map(|s| s.resource_usage.clone())
     }
 
     /// Terminate all sandboxes
+    ///
+    /// Terminates all active sandboxes, releasing all resources. This is typically
+    /// called when shutting down the browser or when a major configuration change occurs.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// sandbox.terminate_all().await;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn terminate_all(&self) {
         let mut sandboxes = self.active_sandboxes.write().await;
         for instance in sandboxes.values_mut() {
@@ -162,12 +434,57 @@ impl ExtensionSandbox {
     }
 
     /// Get active sandbox count
+    ///
+    /// Returns the number of currently active sandbox instances.
+    ///
+    /// # Returns
+    ///
+    /// The count of active sandboxes.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// # sandbox.create_sandbox("ext1").await?;
+    /// # sandbox.create_sandbox("ext2").await?;
+    /// let count = sandbox.active_count().await;
+    /// println!("Active sandboxes: {}", count);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn active_count(&self) -> usize {
         let sandboxes = self.active_sandboxes.read().await;
         sandboxes.values().filter(|s| s.is_active).count()
     }
 
     /// Check if sandbox exists and is active
+    ///
+    /// Checks whether a sandbox exists for the specified extension and is currently
+    /// active.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_id` - The ID of the extension to check
+    ///
+    /// # Returns
+    ///
+    /// `true` if the sandbox exists and is active, `false` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// # #[tokio::main]
+    /// # async fn example() -> anyhow::Result<()> {
+    /// # let sandbox = ExtensionSandbox::new(Default::default());
+    /// # sandbox.create_sandbox("ext-id").await?;
+    /// let is_active = sandbox.is_active("ext-id").await;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn is_active(&self, extension_id: &str) -> bool {
         let sandboxes = self.active_sandboxes.read().await;
         sandboxes
@@ -177,6 +494,35 @@ impl ExtensionSandbox {
     }
 
     /// Validate code before execution
+    ///
+    /// Validates JavaScript code for dangerous patterns that could compromise
+    /// security. This includes dynamic code execution functions and other
+    /// potentially harmful constructs.
+    ///
+    /// # Arguments
+    ///
+    /// * `code` - The JavaScript code to validate
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` if the code is safe, `Err(Error)` if dangerous patterns are detected.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any dangerous pattern is found in the code.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// let sandbox = ExtensionSandbox::new(Default::default());
+    ///
+    /// // Safe code
+    /// assert!(sandbox.validate_code("console.log('hello')").is_ok());
+    ///
+    /// // Dangerous code
+    /// assert!(sandbox.validate_code("eval(malicious)").is_err());
+    /// ```
     pub fn validate_code(&self, code: &str) -> Result<()> {
         // Check for dangerous patterns
         let dangerous_patterns = [
@@ -201,6 +547,28 @@ impl ExtensionSandbox {
     }
 
     /// Sanitize input to prevent code injection
+    ///
+    /// Removes potentially dangerous content from input strings to prevent
+    /// XSS and code injection attacks.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - The input string to sanitize
+    ///
+    /// # Returns
+    ///
+    /// A sanitized version of the input string.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use vantisweb::extensions::sandbox::ExtensionSandbox;
+    /// let sandbox = ExtensionSandbox::new(Default::default());
+    ///
+    /// let input = "<script>alert('xss')</script>";
+    /// let sanitized = sandbox.sanitize_input(input);
+    /// assert!(!sanitized.contains("<script>"));
+    /// ```
     pub fn sanitize_input(&self, input: &str) -> String {
         input
             .replace("<script>", "")
