@@ -1,0 +1,56 @@
+# CODEOWNERS - VantisWeb Browser
+# This file defines who is responsible for reviewing code in different parts
+# of the repository.
+
+# Default owners for everything in the repo
+* @vantisCorp
+
+# Documentation
+*.md @vantisCorp
+/docs/ @vantisCorp
+/README.md @vantisCorp
+/CHANGELOG.md @vantisCorp
+/CONTRIBUTING.md @vantisCorp
+/SECURITY.md @vantisCorp
+
+# Core systems
+/src/core/ @vantisCorp
+/src/kernel.rs @vantisCorp
+/src/scheduler.rs @vantisCorp
+
+# Security
+/src/security/ @vantisCorp
+/src/crypto.rs @vantisCorp
+/src/immune_system.rs @vantisCorp
+/src/sandbox.rs @vantisCorp
+
+# UI components
+/src/ui/ @vantisCorp
+/src/app.rs @vantisCorp
+/src/browser.rs @vantisCorp
+/src/renderer.rs @vantisCorp
+
+# Engine
+/src/engine/ @vantisCorp
+/src/web_renderer.rs @vantisCorp
+/src/wasm.rs @vantisCorp
+
+# Extensions
+/src/extensions/ @vantisCorp
+/extensions/ @vantisCorp
+
+# Profiles
+/src/profiles/ @vantisCorp
+/profiles/ @vantisCorp
+
+# Tests
+/tests/ @vantisCorp
+/test_*.rs @vantisCorp
+
+# Build configuration
+/Cargo.toml @vantisCorp
+/Cargo.lock @vantisCorp
+/.github/workflows/ @vantisCorp
+
+# CI/CD
+/.github/ @vantisCorp

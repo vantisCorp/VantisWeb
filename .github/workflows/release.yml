@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: zip
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            archive: tar.gz
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
+        target: ${{ matrix.target }}
+
+    - name: Build release
+      run: cargo build --release --target ${{ matrix.target }}
+
+    - name: Create archive (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        cd target/${{ matrix.target }}/release
+        tar czf ../../../vantisweb-${{ matrix.target }}.tar.gz vantisweb
+
+    - name: Create archive (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd target/${{ matrix.target }}/release
+        Compress-Archive -Path vantisweb.exe -DestinationPath ../../../vantisweb-${{ matrix.target }}.zip
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: vantisweb-${{ matrix.target }}
+        path: vantisweb-*.tar.gz
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: build-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: artifacts/**/*
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-rc') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update CHANGELOG
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        echo "Release $VERSION created"
