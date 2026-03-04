@@ -24,6 +24,7 @@ pub mod analytics_visualization;
 pub mod community_templates;
 pub mod template_manager;
 pub mod profile_comparison;
+pub mod bulk_operations;
 
 use crate::core::kernel::VantisKernel;
 
@@ -62,6 +63,11 @@ pub use profile_comparison::{
     ProfileComparison, ProfileComparisonManager, SettingsDiff, BookmarksDiff,
     ExtensionsDiff, SecurityDiff, HistoryDiff, ComparisonOptions, ComparisonReport,
     MergeOperation, MergeItem, MergeItemType, MergeStrategy
+};
+pub use bulk_operations::{
+    BulkOperationType, BulkOperation, BulkOperationRequest, BulkOperationResult,
+    BulkOperationStatus, BulkOperationParameters, BulkOperationsManager,
+    CloneOptions, ConfirmationDialog, ProgressUpdate
 };
 
 /// Profile type
