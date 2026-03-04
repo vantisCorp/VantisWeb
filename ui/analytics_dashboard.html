@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1.1/dist/chartjs-chart-matrix.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #dc2626;
+            --primary-hover: #ef4444;
+            --bg-dark: #0a0a0a;
+            --bg-card: #141414;
+            --bg-card-hover: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --border-color: #333333;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --info-color: #3b82f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .date-range-selector {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .date-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .date-btn:hover {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--text-primary);
+        }
+
+        .date-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .profile-selector {
+            padding: 10px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary-color);
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15);
+        }
+
+        .summary-card .icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .summary-card .label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .summary-card .trend {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .trend.up {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success-color);
+        }
+
+        .trend.down {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1100px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-body {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Heatmap specific */
+        .heatmap-container {
+            height: 250px;
+        }
+
+        /* Category Distribution */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-item .icon {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .category-item .info {
+            flex: 1;
+        }
+
+        .category-item .name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .category-item .bar-container {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .category-item .bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #ef4444);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .category-item .percentage {
+            width: 50px;
+            text-align: right;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Top Websites Table */
+        .websites-table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .websites-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .websites-table th,
+        .websites-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .websites-table th {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .websites-table tr:hover {
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .websites-table .rank {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .websites-table .url {
+            color: var(--text-primary);
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .websites-table .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(220, 38, 38, 0.15);
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Profile Comparison */
+        .comparison-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .comparison-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .comparison-item .metric-name {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .comparison-item .values {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .comparison-item .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .comparison-item .diff {
+            font-size: 0.85rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .diff.positive {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success-color);
+        }
+
+        .diff.negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Export Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .modal-content {
+            margin-bottom: 20px;
+        }
+
+        .format-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .format-option {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .format-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .format-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .format-option .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .format-option .name {
+            font-weight: 500;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Real-time indicator */
+        .realtime-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(34, 197, 94, 0.15);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--success-color);
+        }
+
+        .realtime-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔥 Analytics Dashboard</h1>
+            <div class="header-actions">
+                <div class="realtime-indicator">
+                    <span class="dot"></span>
+                    <span>Real-time</span>
+                </div>
+                <select class="profile-selector" id="profileSelect">
+                    <option value="all">All Profiles</option>
+                    <option value="work">Work Profile</option>
+                    <option value="gaming">Gaming Profile</option>
+                    <option value="private">Private Profile</option>
+                </select>
+                <button class="btn btn-secondary" onclick="openExportModal()">
+                    📥 Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="date-range-selector">
+                <button class="date-btn active" onclick="setDateRange(7)">7 Days</button>
+                <button class="date-btn" onclick="setDateRange(14)">14 Days</button>
+                <button class="date-btn" onclick="setDateRange(30)">30 Days</button>
+                <button class="date-btn" onclick="setDateRange(90)">90 Days</button>
+                <button class="date-btn" onclick="setDateRange(365)">Year</button>
+            </div>
+            <input type="date" class="profile-selector" id="startDate" placeholder="Start Date">
+            <input type="date" class="profile-selector" id="endDate" placeholder="End Date">
+            <button class="btn btn-primary" onclick="applyCustomRange()">Apply</button>
+            <button class="btn btn-secondary" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid" id="summaryGrid">
+            <div class="summary-card">
+                <div class="icon">⏱️</div>
+                <div class="value" id="totalTime">12h 45m</div>
+                <div class="label">Total Time</div>
+                <div class="trend up">↑ 15% vs last period</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">📊</div>
+                <div class="value" id="totalSessions">127</div>
+                <div class="label">Sessions</div>
+                <div class="trend up">↑ 8% vs last period</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">🌐</div>
+                <div class="value" id="websitesVisited">234</div>
+                <div class="label">Websites Visited</div>
+                <div class="trend down">↓ 3% vs last period</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">📑</div>
+                <div class="value" id="tabsOpened">1,234</div>
+                <div class="label">Tabs Opened</div>
+                <div class="trend up">↑ 12% vs last period</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">⚡</div>
+                <div class="value" id="avgLoadTime">245ms</div>
+                <div class="label">Avg Page Load</div>
+                <div class="trend up">↓ 18ms faster</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">💾</div>
+                <div class="value" id="memoryUsage">512MB</div>
+                <div class="label">Memory Usage</div>
+                <div class="trend down">↑ 23MB more</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Usage Trends -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>📈 Usage Trends</h3>
+                    <select class="profile-selector" onchange="changeTrendView(this.value)">
+                        <option value="time">Time Spent</option>
+                        <option value="sessions">Sessions</option>
+                        <option value="websites">Websites</option>
+                    </select>
+                </div>
+                <div class="chart-body">
+                    <canvas id="trendsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Category Distribution -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>🥧 Category Distribution</h3>
+                </div>
+                <div class="chart-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Activity Heatmap -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>🗓️ Activity Heatmap</h3>
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;">By hour & day</span>
+                </div>
+                <div class="chart-body heatmap-container">
+                    <canvas id="heatmapChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Categories Bar -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>📊 Top Categories</h3>
+                </div>
+                <div class="chart-body">
+                    <canvas id="categoriesBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Comparison -->
+        <div class="comparison-section">
+            <div class="comparison-header">
+                <h3>🔄 Profile Comparison</h3>
+                <div style="display: flex; gap: 10px;">
+                    <select class="profile-selector" id="compareProfile1">
+                        <option value="work">Work Profile</option>
+                        <option value="gaming">Gaming Profile</option>
+                        <option value="private">Private Profile</option>
+                    </select>
+                    <span style="display: flex; align-items: center;">vs</span>
+                    <select class="profile-selector" id="compareProfile2">
+                        <option value="gaming">Gaming Profile</option>
+                        <option value="work">Work Profile</option>
+                        <option value="private">Private Profile</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="compareProfiles()">Compare</button>
+                </div>
+            </div>
+            <div class="comparison-grid" id="comparisonGrid">
+                <div class="comparison-item">
+                    <div class="metric-name">Total Time</div>
+                    <div class="values">
+                        <span class="value">12h</span>
+                        <span class="diff positive">+2h</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Sessions</div>
+                    <div class="values">
+                        <span class="value">45</span>
+                        <span class="diff negative">-5</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Websites</div>
+                    <div class="values">
+                        <span class="value">89</span>
+                        <span class="diff positive">+12</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Avg Session</div>
+                    <div class="values">
+                        <span class="value">16m</span>
+                        <span class="diff positive">+3m</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Tabs Opened</div>
+                    <div class="values">
+                        <span class="value">234</span>
+                        <span class="diff negative">-45</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Performance</div>
+                    <div class="values">
+                        <span class="value">180ms</span>
+                        <span class="diff positive">-20ms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Websites Table -->
+        <div class="websites-table-container">
+            <div class="chart-header">
+                <h3>🌐 Top Websites</h3>
+                <button class="btn btn-secondary" onclick="exportWebsites()">📥 Export</button>
+            </div>
+            <table class="websites-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Website</th>
+                        <th>Category</th>
+                        <th>Visits</th>
+                        <th>Time</th>
+                        <th>Last Visit</th>
+                    </tr>
+                </thead>
+                <tbody id="websitesTableBody">
+                    <tr>
+                        <td class="rank">1</td>
+                        <td class="url">github.com</td>
+                        <td><span class="category-badge">💻 Development</span></td>
+                        <td>234</td>
+                        <td>5h 23m</td>
+                        <td>2 min ago</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">2</td>
+                        <td class="url">youtube.com</td>
+                        <td><span class="category-badge">🎬 Entertainment</span></td>
+                        <td>156</td>
+                        <td>4h 12m</td>
+                        <td>15 min ago</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">3</td>
+                        <td class="url">twitter.com</td>
+                        <td><span class="category-badge">📱 Social Media</span></td>
+                        <td>89</td>
+                        <td>1h 45m</td>
+                        <td>1 hour ago</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">4</td>
+                        <td class="url">stackoverflow.com</td>
+                        <td><span class="category-badge">💻 Development</span></td>
+                        <td>67</td>
+                        <td>2h 10m</td>
+                        <td>3 hours ago</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">5</td>
+                        <td class="url">reddit.com</td>
+                        <td><span class="category-badge">📱 Social Media</span></td>
+                        <td>45</td>
+                        <td>1h 30m</td>
+                        <td>Yesterday</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <h2>📥 Export Analytics Report</h2>
+            <div class="modal-content">
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                    Select export format for your analytics report:
+                </p>
+                <div class="format-options">
+                    <div class="format-option selected" onclick="selectFormat(this, 'pdf')" data-format="pdf">
+                        <div class="icon">📄</div>
+                        <div class="name">PDF</div>
+                    </div>
+                    <div class="format-option" onclick="selectFormat(this, 'csv')" data-format="csv">
+                        <div class="icon">📊</div>
+                        <div class="name">CSV</div>
+                    </div>
+                    <div class="format-option" onclick="selectFormat(this, 'json')" data-format="json">
+                        <div class="icon">{ }</div>
+                        <div class="name">JSON</div>
+                    </div>
+                    <div class="format-option" onclick="selectFormat(this, 'html')" data-format="html">
+                        <div class="icon">🌐</div>
+                        <div class="name">HTML</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="includeCharts" checked>
+                        <span>Include charts as images</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 10px;">
+                        <input type="checkbox" id="includeRawData">
+                        <span>Include raw data (JSON only)</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeExportModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="exportReport()">📥 Export</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart instances
+        let trendsChart, categoryChart, heatmapChart, categoriesBarChart;
+        let selectedFormat = 'pdf';
+        let currentDateRange = 7;
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', () => {
+            initTrendsChart();
+            initCategoryChart();
+            initHeatmapChart();
+            initCategoriesBarChart();
+        });
+
+        // Usage Trends Chart
+        function initTrendsChart() {
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            const labels = generateDateLabels(currentDateRange);
+            
+            trendsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Time Spent (hours)',
+                        data: generateRandomData(currentDateRange, 1, 8),
+                        borderColor: '#dc2626',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#dc2626',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }, {
+                        label: 'Sessions',
+                        data: generateRandomData(currentDateRange, 5, 25),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#a3a3a3' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a3a3a3' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a3a3a3' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Category Distribution Chart
+        function initCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            categoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Development', 'Entertainment', 'Social Media', 'Productivity', 'News', 'Shopping'],
+                    datasets: [{
+                        data: [35, 25, 18, 12, 6, 4],
+                        backgroundColor: [
+                            '#dc2626',
+                            '#ef4444',
+                            '#f87171',
+                            '#3b82f6',
+                            '#22c55e',
+                            '#eab308'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { 
+                                color: '#a3a3a3',
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        // Activity Heatmap Chart
+        function initHeatmapChart() {
+            const ctx = document.getElementById('heatmapChart').getContext('2d');
+            
+            // Generate heatmap data (hour x day)
+            const data = [];
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            for (let day = 0; day < 7; day++) {
+                for (let hour = 0; hour < 24; hour++) {
+                    // Simulate activity patterns
+                    let value = 0;
+                    if (hour >= 9 && hour <= 17 && day >= 1 && day <= 5) {
+                        // Work hours on weekdays
+                        value = Math.random() * 80 + 20;
+                    } else if (hour >= 19 && hour <= 23) {
+                        // Evening hours
+                        value = Math.random() * 40 + 10;
+                    } else {
+                        value = Math.random() * 15;
+                    }
+                    
+                    data.push({
+                        x: hour,
+                        y: day,
+                        v: Math.round(value)
+                    });
+                }
+            }
+
+            heatmapChart = new Chart(ctx, {
+                type: 'matrix',
+                data: {
+                    datasets: [{
+                        label: 'Activity',
+                        data: data,
+                        backgroundColor(ctx) {
+                            const value = ctx.dataset.data[ctx.dataIndex].v;
+                            const alpha = value / 100;
+                            return `rgba(220, 38, 38, ${alpha})`;
+                        },
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        width: ({chart}) => (chart.chartArea || {}).width / 24 - 2,
+                        height: ({chart}) => (chart.chartArea || {}).height / 7 - 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title() { return ''; },
+                                label(ctx) {
+                                    const v = ctx.dataset.data[ctx.dataIndex];
+                                    return [`Hour: ${v.x}:00`, `Day: ${days[v.y]}`, `Activity: ${v.v}%`];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 23,
+                            ticks: { 
+                                color: '#a3a3a3',
+                                stepSize: 3
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            min: 0,
+                            max: 6,
+                            ticks: {
+                                color: '#a3a3a3',
+                                callback: (val) => days[val]
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Top Categories Bar Chart
+        function initCategoriesBarChart() {
+            const ctx = document.getElementById('categoriesBarChart').getContext('2d');
+            
+            categoriesBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['💻 Dev', '🎬 Entertain', '📱 Social', '📊 Productivity', '📰 News', '🛒 Shopping'],
+                    datasets: [{
+                        label: 'Hours',
+                        data: [12, 8, 5, 4, 2, 1],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(248, 113, 113, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(234, 179, 8, 0.8)'
+                        ],
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#a3a3a3' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a3a3a3' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Helper functions
+        function generateDateLabels(days) {
+            const labels = [];
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function generateRandomData(count, min, max) {
+            return Array.from({ length: count }, () => 
+                Math.floor(Math.random() * (max - min + 1)) + min
+            );
+        }
+
+        // Date range functions
+        function setDateRange(days) {
+            currentDateRange = days;
+            document.querySelectorAll('.date-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updateCharts();
+        }
+
+        function applyCustomRange() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            
+            if (start && end) {
+                const days = Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
+                currentDateRange = Math.max(1, days);
+                updateCharts();
+            }
+        }
+
+        function updateCharts() {
+            const labels = generateDateLabels(currentDateRange);
+            
+            trendsChart.data.labels = labels;
+            trendsChart.data.datasets[0].data = generateRandomData(currentDateRange, 1, 8);
+            trendsChart.data.datasets[1].data = generateRandomData(currentDateRange, 5, 25);
+            trendsChart.update();
+        }
+
+        function refreshData() {
+            // Show loading state
+            document.querySelectorAll('.summary-card .value').forEach(el => {
+                el.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>';
+            });
+
+            // Simulate API call
+            setTimeout(() => {
+                updateCharts();
+                // Update summary cards with new data
+                document.getElementById('totalTime').textContent = `${Math.floor(Math.random() * 20) + 5}h ${Math.floor(Math.random() * 59)}m`;
+                document.getElementById('totalSessions').textContent = Math.floor(Math.random() * 200) + 50;
+                document.getElementById('websitesVisited').textContent = Math.floor(Math.random() * 300) + 100;
+                document.getElementById('tabsOpened').textContent = (Math.floor(Math.random() * 2000) + 500).toLocaleString();
+                document.getElementById('avgLoadTime').textContent = `${Math.floor(Math.random() * 300) + 100}ms`;
+                document.getElementById('memoryUsage').textContent = `${Math.floor(Math.random() * 500) + 300}MB`;
+            }, 1000);
+        }
+
+        // Profile comparison
+        function compareProfiles() {
+            const profile1 = document.getElementById('compareProfile1').value;
+            const profile2 = document.getElementById('compareProfile2').value;
+            
+            // Update comparison grid with simulated data
+            document.getElementById('comparisonGrid').innerHTML = `
+                <div class="comparison-item">
+                    <div class="metric-name">Total Time</div>
+                    <div class="values">
+                        <span class="value">${Math.floor(Math.random() * 20) + 5}h</span>
+                        <span class="diff ${Math.random() > 0.5 ? 'positive' : 'negative'}">${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 5) + 1}h</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Sessions</div>
+                    <div class="values">
+                        <span class="value">${Math.floor(Math.random() * 100) + 20}</span>
+                        <span class="diff ${Math.random() > 0.5 ? 'positive' : 'negative'}">${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 15)}</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Websites</div>
+                    <div class="values">
+                        <span class="value">${Math.floor(Math.random() * 150) + 50}</span>
+                        <span class="diff ${Math.random() > 0.5 ? 'positive' : 'negative'}">${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 20)}</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Avg Session</div>
+                    <div class="values">
+                        <span class="value">${Math.floor(Math.random() * 30) + 5}m</span>
+                        <span class="diff ${Math.random() > 0.5 ? 'positive' : 'negative'}">${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 10)}m</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Tabs Opened</div>
+                    <div class="values">
+                        <span class="value">${Math.floor(Math.random() * 300) + 100}</span>
+                        <span class="diff ${Math.random() > 0.5 ? 'positive' : 'negative'}">${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 50)}</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <div class="metric-name">Performance</div>
+                    <div class="values">
+                        <span class="value">${Math.floor(Math.random() * 200) + 100}ms</span>
+                        <span class="diff ${Math.random() > 0.5 ? 'positive' : 'negative'}">${Math.random() > 0.5 ? '-' : '+'}${Math.floor(Math.random() * 30)}ms</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Export functions
+        function openExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('active');
+        }
+
+        function selectFormat(element, format) {
+            document.querySelectorAll('.format-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedFormat = format;
+        }
+
+        function exportReport() {
+            const includeCharts = document.getElementById('includeCharts').checked;
+            const includeRawData = document.getElementById('includeRawData').checked;
+            
+            // Simulate export
+            const btn = event.target;
+            btn.innerHTML = '⏳ Exporting...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                // Create download
+                const content = generateReportContent(selectedFormat);
+                const blob = new Blob([content], { type: getMimeType(selectedFormat) });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `analytics-report.${selectedFormat === 'pdf' ? 'html' : selectedFormat}`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                btn.innerHTML = '📥 Export';
+                btn.disabled = false;
+                closeExportModal();
+            }, 1500);
+        }
+
+        function generateReportContent(format) {
+            if (format === 'json') {
+                return JSON.stringify({
+                    profile: 'Work Profile',
+                    dateRange: { start: '2024-01-01', end: '2024-01-07' },
+                    summary: {
+                        totalTime: '12h 45m',
+                        sessions: 127,
+                        websites: 234
+                    }
+                }, null, 2);
+            } else if (format === 'csv') {
+                return `Date,Time Spent,Sessions,Websites
+2024-01-01,2h 15m,18,34
+2024-01-02,1h 45m,15,28
+2024-01-03,2h 30m,22,41`;
+            } else {
+                return document.documentElement.outerHTML;
+            }
+        }
+
+        function getMimeType(format) {
+            const types = {
+                json: 'application/json',
+                csv: 'text/csv',
+                html: 'text/html',
+                pdf: 'text/html'
+            };
+            return types[format] || 'text/plain';
+        }
+
+        function exportWebsites() {
+            const csv = `Rank,Website,Category,Visits,Time,Last Visit
+1,github.com,Development,234,5h 23m,2 min ago
+2,youtube.com,Entertainment,156,4h 12m,15 min ago
+3,twitter.com,Social Media,89,1h 45m,1 hour ago`;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'top-websites.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Real-time updates simulation
+        setInterval(() => {
+            // Simulate minor real-time updates
+            const memoryEl = document.getElementById('memoryUsage');
+            const currentMemory = parseInt(memoryEl.textContent);
+            const newMemory = currentMemory + Math.floor(Math.random() * 10) - 5;
+            memoryEl.textContent = `${Math.max(300, newMemory)}MB`;
+        }, 5000);
+
+        // Close modal on outside click
+        document.getElementById('exportModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeExportModal();
+            }
+        });
+    </script>
+</body>
+</html>

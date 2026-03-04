@@ -20,12 +20,29 @@ pub mod sync;
 pub mod analytics;
 pub mod security;
 pub mod import_export;
+pub mod analytics_visualization;
 
 use crate::core::kernel::VantisKernel;
 
 pub use templates::{TemplateManager, ProfileTemplate, TemplateCategory, TemplateSettings, PrivacySettings, PerformanceSettings, CPUPriority};
 pub use sync::{ProfileSyncManager, SyncConfig, SyncProvider, SyncStatus, SyncedProfile, SyncConflict, SyncResult};
 pub use analytics::{AnalyticsManager, ProfileAnalytics, DailyUsage, WebsiteUsage, TabStatistics, PerformanceMetrics, UsageSummary};
+pub use analytics_visualization::{
+    VisualizationManager, WebsiteCategory, HeatmapCell, TrendDataPoint,
+    ProfileComparison, ComparisonMetrics, ExportFormat, DateRange, AnalyticsReport
+};
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_profile_creation() {
+        let profile = ProfileConfig::new("Test Profile".to_string(), ProfileType::Custom("Test".to_string()));
+        assert_eq!(profile.name, "Test Profile");
+        assert!(!profile.active);
+    }
+}
 pub use security::{ProfileSecurityManager, ProfileSecurity, SecurityLevel, AuthMethod};
 pub use import_export::{
     ProfileExport, ProfilesExport, ImportOptions, ExportOptions,
