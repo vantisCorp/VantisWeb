@@ -5,12 +5,17 @@
 //! - Extension API (browser, storage, messaging, tabs, requests)
 //! - Security and sandboxing
 //! - Manifest-based configuration
+//! - Extension marketplace
+//! - Permission management
 
 pub mod extension;
 pub mod manager;
 pub mod registry;
 pub mod loader;
 pub mod manifest;
+pub mod marketplace;
+pub mod permissions;
+pub mod sandbox;
 
 pub mod api {
     pub mod browser;
@@ -25,6 +30,9 @@ pub use manager::ExtensionManager;
 pub use registry::ExtensionRegistry;
 pub use loader::ExtensionLoader;
 pub use manifest::{Manifest, ManifestParser};
+pub use marketplace::{ExtensionMarketplace, ExtensionListing, MarketplaceConfig};
+pub use permissions::{Permission, PermissionManager, PermissionConfig};
+pub use sandbox::{ExtensionSandbox, SandboxConfig, SandboxContext};
 
 pub use api::browser::BrowserAPI;
 pub use api::storage::StorageAPI;
