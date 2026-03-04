@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb Profile Comparison</title>
+    <style>
+        :root {
+            --primary-red: #dc2626;
+            --dark-red: #991b1b;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --success-green: #22c55e;
+            --warning-yellow: #eab308;
+            --accent-purple: #8b5cf6;
+            --only-a-color: #3b82f6;
+            --only-b-color: #f97316;
+            --shared-color: #22c55e;
+            --diff-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1f1f1f 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--primary-red);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Profile Selection */
+        .selection-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .selection-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .selection-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .selection-header p {
+            color: var(--text-secondary);
+        }
+
+        .profile-selectors {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .profile-selector {
+            background: var(--dark-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px dashed var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .profile-selector:hover {
+            border-color: var(--primary-red);
+        }
+
+        .profile-selector.selected {
+            border-style: solid;
+            border-color: var(--primary-red);
+        }
+
+        .profile-selector.profile-a.selected {
+            border-color: var(--only-a-color);
+        }
+
+        .profile-selector.profile-b.selected {
+            border-color: var(--only-b-color);
+        }
+
+        .selector-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .selector-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .selector-name {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .vs-badge {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .profile-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        .compare-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 2rem auto 0;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .compare-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Comparison Results */
+        .comparison-results {
+            display: none;
+        }
+
+        .comparison-results.active {
+            display: block;
+        }
+
+        /* Similarity Score */
+        .score-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: var(--border-color);
+            stroke-width: 10;
+        }
+
+        .score-circle-progress {
+            fill: none;
+            stroke: var(--primary-red);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .score-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab:hover {
+            background: var(--border-color);
+        }
+
+        .tab.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: white;
+        }
+
+        .tab .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Comparison Tables */
+        .comparison-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--dark-bg);
+            font-weight: 600;
+        }
+
+        .comparison-table th.profile-a-header {
+            color: var(--only-a-color);
+        }
+
+        .comparison-table th.profile-b-header {
+            color: var(--only-b-color);
+        }
+
+        .comparison-table th.status-header {
+            width: 120px;
+            text-align: center;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-same {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--shared-color);
+        }
+
+        .status-different {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--diff-color);
+        }
+
+        .status-only-a {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--only-a-color);
+        }
+
+        .status-only-b {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--only-b-color);
+        }
+
+        /* Diff Highlight */
+        .diff-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+        }
+
+        .diff-a {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .diff-b {
+            background: rgba(249, 115, 22, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Bookmark List */
+        .bookmark-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .bookmark-column {
+            background: var(--dark-bg);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .bookmark-column h4 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .bookmark-column.profile-a h4 {
+            color: var(--only-a-color);
+        }
+
+        .bookmark-column.profile-b h4 {
+            color: var(--only-b-color);
+        }
+
+        .bookmark-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .bookmark-item:hover {
+            background: var(--border-color);
+        }
+
+        .bookmark-item.shared {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .bookmark-item.only-a {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .bookmark-item.only-b {
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        .bookmark-favicon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .bookmark-url {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Actions */
+        .actions-bar {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Merge Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .merge-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .merge-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .merge-item-info {
+            flex: 1;
+        }
+
+        .merge-item-name {
+            font-weight: 500;
+        }
+
+        .merge-item-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.same { background: var(--shared-color); }
+        .legend-dot.different { background: var(--diff-color); }
+        .legend-dot.only-a { background: var(--only-a-color); }
+        .legend-dot.only-b { background: var(--only-b-color); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-selectors {
+                grid-template-columns: 1fr;
+            }
+
+            .vs-badge {
+                margin: 0 auto;
+            }
+
+            .bookmark-list {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                text-align: center;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🌐</div>
+                <div class="logo-text">Vantis<span>Web</span></div>
+            </div>
+            <div>
+                <button class="btn btn-secondary" onclick="goBack()">← Back to Profiles</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Profile Selection Section -->
+        <section class="selection-section">
+            <div class="selection-header">
+                <h1>⚖️ Profile Comparison</h1>
+                <p>Select two profiles to compare their settings, bookmarks, extensions, and more</p>
+            </div>
+
+            <div class="profile-selectors">
+                <div class="profile-selector profile-a" id="selectorA">
+                    <div class="selector-icon">🔵</div>
+                    <div class="selector-title">Profile A</div>
+                    <div class="selector-name" id="profileAName">Select a profile...</div>
+                    <select class="profile-select" id="profileASelect" onchange="selectProfile('a')">
+                        <option value="">-- Select Profile --</option>
+                    </select>
+                </div>
+
+                <div class="vs-badge">VS</div>
+
+                <div class="profile-selector profile-b" id="selectorB">
+                    <div class="selector-icon">🟠</div>
+                    <div class="selector-title">Profile B</div>
+                    <div class="selector-name" id="profileBName">Select a profile...</div>
+                    <select class="profile-select" id="profileBSelect" onchange="selectProfile('b')">
+                        <option value="">-- Select Profile --</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="compare-btn" id="compareBtn" onclick="startComparison()" disabled>
+                🔍 Compare Profiles
+            </button>
+        </section>
+
+        <!-- Comparison Results -->
+        <section class="comparison-results" id="comparisonResults">
+            <!-- Similarity Score -->
+            <div class="score-section">
+                <div class="score-circle">
+                    <svg width="200" height="200">
+                        <circle class="score-circle-bg" cx="100" cy="100" r="90"></circle>
+                        <circle class="score-circle-progress" cx="100" cy="100" r="90" 
+                            stroke-dasharray="565.48" stroke-dashoffset="565.48" id="scoreCircle"></circle>
+                    </svg>
+                    <div class="score-value" id="scoreValue">0%</div>
+                </div>
+                <div class="score-label">Profile Similarity Score</div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('settings')">
+                    ⚙️ Settings <span class="badge" id="settingsBadge">0</span>
+                </button>
+                <button class="tab" onclick="showTab('bookmarks')">
+                    🔖 Bookmarks <span class="badge" id="bookmarksBadge">0</span>
+                </button>
+                <button class="tab" onclick="showTab('extensions')">
+                    🧩 Extensions <span class="badge" id="extensionsBadge">0</span>
+                </button>
+                <button class="tab" onclick="showTab('history')">
+                    📜 History <span class="badge" id="historyBadge">0</span>
+                </button>
+                <button class="tab" onclick="showTab('security')">
+                    🔒 Security <span class="badge" id="securityBadge">0</span>
+                </button>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot same"></div>
+                    <span>Same</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot different"></div>
+                    <span>Different</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot only-a"></div>
+                    <span>Only in Profile A</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot only-b"></div>
+                    <span>Only in Profile B</span>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="settingsContent">
+                <div class="comparison-section">
+                    <div class="section-header">
+                        <h3 class="section-title">⚙️ Settings Comparison</h3>
+                        <button class="btn btn-secondary" onclick="openMergeModal('settings')">
+                            🔀 Merge Settings
+                        </button>
+                    </div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Setting</th>
+                                <th class="profile-a-header" id="settingsHeaderA">Profile A</th>
+                                <th class="profile-b-header" id="settingsHeaderB">Profile B</th>
+                                <th class="status-header">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="settingsTable">
+                            <!-- Settings will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bookmarks Tab -->
+            <div class="tab-content" id="bookmarksContent" style="display: none;">
+                <div class="comparison-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🔖 Bookmarks Comparison</h3>
+                        <button class="btn btn-secondary" onclick="openMergeModal('bookmarks')">
+                            🔀 Merge Bookmarks
+                        </button>
+                    </div>
+                    <div class="bookmark-list">
+                        <div class="bookmark-column profile-a">
+                            <h4 id="bookmarksHeaderA">Profile A Bookmarks</h4>
+                            <div id="bookmarksA">
+                                <!-- Bookmarks will be populated here -->
+                            </div>
+                        </div>
+                        <div class="bookmark-column profile-b">
+                            <h4 id="bookmarksHeaderB">Profile B Bookmarks</h4>
+                            <div id="bookmarksB">
+                                <!-- Bookmarks will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extensions Tab -->
+            <div class="tab-content" id="extensionsContent" style="display: none;">
+                <div class="comparison-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🧩 Extensions Comparison</h3>
+                        <button class="btn btn-secondary" onclick="openMergeModal('extensions')">
+                            🔀 Merge Extensions
+                        </button>
+                    </div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Extension</th>
+                                <th class="profile-a-header" id="extensionsHeaderA">Profile A</th>
+                                <th class="profile-b-header" id="extensionsHeaderB">Profile B</th>
+                                <th class="status-header">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="extensionsTable">
+                            <!-- Extensions will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="historyContent" style="display: none;">
+                <div class="comparison-section">
+                    <div class="section-header">
+                        <h3 class="section-title">📜 History Comparison</h3>
+                    </div>
+                    <div class="comparison-section">
+                        <h4 style="margin-bottom: 1rem;">Common Domains Visited</h4>
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Domain</th>
+                                    <th class="profile-a-header">Visits in A</th>
+                                    <th class="profile-b-header">Visits in B</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable">
+                                <!-- History will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div class="tab-content" id="securityContent" style="display: none;">
+                <div class="comparison-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🔒 Security Comparison</h3>
+                    </div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Security Setting</th>
+                                <th class="profile-a-header" id="securityHeaderA">Profile A</th>
+                                <th class="profile-b-header" id="securityHeaderB">Profile B</th>
+                                <th class="status-header">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="securityTable">
+                            <!-- Security settings will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="actions-bar">
+                <button class="btn btn-secondary" onclick="exportComparison('json')">
+                    📄 Export JSON
+                </button>
+                <button class="btn btn-secondary" onclick="exportComparison('html')">
+                    🌐 Export HTML
+                </button>
+                <button class="btn btn-primary" onclick="openMergeModal('all')">
+                    🔀 Merge Profiles
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Merge Modal -->
+    <div class="modal-overlay" id="mergeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">🔀 Merge Items</h2>
+                <button class="modal-close" onclick="closeMergeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                    Select items to merge from the source profile to the target profile.
+                </p>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Source Profile:</label>
+                    <select class="profile-select" id="mergeSource">
+                        <option value="a">Profile A</option>
+                        <option value="b">Profile B</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Target Profile:</label>
+                    <select class="profile-select" id="mergeTarget">
+                        <option value="b">Profile B</option>
+                        <option value="a">Profile A</option>
+                    </select>
+                </div>
+                <div id="mergeItems">
+                    <!-- Merge items will be populated here -->
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="closeMergeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="executeMerge()">Merge Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample profile data
+        const profiles = [
+            { id: 'work', name: 'Work Profile', icon: '💼' },
+            { id: 'personal', name: 'Personal Profile', icon: '🏠' },
+            { id: 'dev', name: 'Development Profile', icon: '👨‍💻' },
+            { id: 'gaming', name: 'Gaming Profile', icon: '🎮' },
+            { id: 'shopping', name: 'Shopping Profile', icon: '🛒' },
+        ];
+
+        // Sample comparison data
+        let comparisonData = null;
+        let selectedProfileA = null;
+        let selectedProfileB = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            populateProfileSelects();
+        });
+
+        function populateProfileSelects() {
+            const selectA = document.getElementById('profileASelect');
+            const selectB = document.getElementById('profileBSelect');
+
+            profiles.forEach(profile => {
+                selectA.innerHTML += `<option value="${profile.id}">${profile.icon} ${profile.name}</option>`;
+                selectB.innerHTML += `<option value="${profile.id}">${profile.icon} ${profile.name}</option>`;
+            });
+        }
+
+        function selectProfile(profile) {
+            const selectId = profile === 'a' ? 'profileASelect' : 'profileBSelect';
+            const nameId = profile === 'a' ? 'profileAName' : 'profileBName';
+            const selectorId = profile === 'a' ? 'selectorA' : 'selectorB';
+            
+            const select = document.getElementById(selectId);
+            const selectedOption = select.options[select.selectedIndex];
+            const nameEl = document.getElementById(nameId);
+            const selectorEl = document.getElementById(selectorId);
+
+            if (select.value) {
+                nameEl.textContent = selectedOption.text;
+                selectorEl.classList.add('selected');
+                if (profile === 'a') {
+                    selectedProfileA = profiles.find(p => p.id === select.value);
+                } else {
+                    selectedProfileB = profiles.find(p => p.id === select.value);
+                }
+            } else {
+                nameEl.textContent = 'Select a profile...';
+                selectorEl.classList.remove('selected');
+                if (profile === 'a') {
+                    selectedProfileA = null;
+                } else {
+                    selectedProfileB = null;
+                }
+            }
+
+            // Enable compare button if both profiles selected
+            document.getElementById('compareBtn').disabled = !(selectedProfileA && selectedProfileB);
+        }
+
+        function startComparison() {
+            if (!selectedProfileA || !selectedProfileB) return;
+
+            // Generate sample comparison data
+            comparisonData = generateSampleComparison();
+            
+            // Show results
+            document.getElementById('comparisonResults').classList.add('active');
+            
+            // Animate score
+            animateScore(comparisonData.similarityScore);
+            
+            // Populate tabs
+            populateSettings();
+            populateBookmarks();
+            populateExtensions();
+            populateHistory();
+            populateSecurity();
+            
+            // Update badges
+            updateBadges();
+            
+            // Update headers with profile names
+            updateHeaders();
+            
+            // Scroll to results
+            document.getElementById('comparisonResults').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateSampleComparison() {
+            return {
+                similarityScore: 67,
+                settings: {
+                    different: [
+                        { key: 'theme', valueA: 'dark', valueB: 'light' },
+                        { key: 'homepage', valueA: 'https://google.com', valueB: 'https://bing.com' },
+                        { key: 'startup_action', valueA: 'continue', valueB: 'new_tab' },
+                    ],
+                    same: [
+                        { key: 'download_path', value: '/Downloads' },
+                        { key: 'language', value: 'en-US' },
+                    ],
+                    onlyInA: [
+                        { key: 'dev_tools.enabled', value: 'true' },
+                    ],
+                    onlyInB: [
+                        { key: 'shopping.alerts', value: 'true' },
+                    ]
+                },
+                bookmarks: {
+                    shared: ['https://github.com', 'https://stackoverflow.com', 'https://google.com'],
+                    onlyInA: ['https://docs.rs', 'https://crates.io', 'https://rust-lang.org'],
+                    onlyInB: ['https://amazon.com', 'https://ebay.com'],
+                },
+                extensions: {
+                    shared: ['uBlock Origin', 'LastPass', 'Dark Reader'],
+                    onlyInA: ['React DevTools', 'Rust Analyzer', 'WASM Explorer'],
+                    onlyInB: ['Honey', 'Amazon Assistant'],
+                },
+                history: {
+                    commonDomains: [
+                        { domain: 'github.com', countA: 45, countB: 12 },
+                        { domain: 'google.com', countA: 89, countB: 67 },
+                        { domain: 'youtube.com', countA: 34, countB: 120 },
+                    ]
+                },
+                security: {
+                    different: [
+                        { key: 'tracking_protection', valueA: 'strict', valueB: 'basic' },
+                        { key: 'https_only', valueA: 'true', valueB: 'false' },
+                    ],
+                    same: [
+                        { key: 'password_manager', value: 'enabled' },
+                    ]
+                }
+            };
+        }
+
+        function animateScore(score) {
+            const circle = document.getElementById('scoreCircle');
+            const valueEl = document.getElementById('scoreValue');
+            
+            const circumference = 565.48;
+            const offset = circumference - (score / 100) * circumference;
+            
+            circle.style.strokeDashoffset = offset;
+            
+            // Animate number
+            let current = 0;
+            const interval = setInterval(() => {
+                current += 1;
+                if (current >= score) {
+                    current = score;
+                    clearInterval(interval);
+                }
+                valueEl.textContent = current + '%';
+            }, 20);
+        }
+
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById(tabName + 'Content').style.display = 'block';
+            
+            // Activate selected tab
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        function populateSettings() {
+            const table = document.getElementById('settingsTable');
+            const data = comparisonData.settings;
+            let html = '';
+
+            // Different settings
+            data.different.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.key}</td>
+                        <td><span class="diff-value diff-a">${item.valueA}</span></td>
+                        <td><span class="diff-value diff-b">${item.valueB}</span></td>
+                        <td><span class="status-badge status-different">Different</span></td>
+                    </tr>
+                `;
+            });
+
+            // Only in A
+            data.onlyInA.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.key}</td>
+                        <td><span class="diff-value">${item.value}</span></td>
+                        <td><span class="diff-value" style="color: var(--text-secondary);">—</span></td>
+                        <td><span class="status-badge status-only-a">Only A</span></td>
+                    </tr>
+                `;
+            });
+
+            // Only in B
+            data.onlyInB.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.key}</td>
+                        <td><span class="diff-value" style="color: var(--text-secondary);">—</span></td>
+                        <td><span class="diff-value">${item.value}</span></td>
+                        <td><span class="status-badge status-only-b">Only B</span></td>
+                    </tr>
+                `;
+            });
+
+            // Same settings
+            data.same.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.key}</td>
+                        <td><span class="diff-value">${item.value}</span></td>
+                        <td><span class="diff-value">${item.value}</span></td>
+                        <td><span class="status-badge status-same">Same</span></td>
+                    </tr>
+                `;
+            });
+
+            table.innerHTML = html;
+        }
+
+        function populateBookmarks() {
+            const containerA = document.getElementById('bookmarksA');
+            const containerB = document.getElementById('bookmarksB');
+            const data = comparisonData.bookmarks;
+
+            let htmlA = '';
+            let htmlB = '';
+
+            // Shared
+            data.shared.forEach(url => {
+                htmlA += `<div class="bookmark-item shared">✓ ${url}</div>`;
+                htmlB += `<div class="bookmark-item shared">✓ ${url}</div>`;
+            });
+
+            // Only in A
+            data.onlyInA.forEach(url => {
+                htmlA += `<div class="bookmark-item only-a">🔵 ${url}</div>`;
+            });
+
+            // Only in B
+            data.onlyInB.forEach(url => {
+                htmlB += `<div class="bookmark-item only-b">🟠 ${url}</div>`;
+            });
+
+            containerA.innerHTML = htmlA;
+            containerB.innerHTML = htmlB;
+        }
+
+        function populateExtensions() {
+            const table = document.getElementById('extensionsTable');
+            const data = comparisonData.extensions;
+            let html = '';
+
+            // Shared
+            data.shared.forEach(ext => {
+                html += `
+                    <tr>
+                        <td>${ext}</td>
+                        <td>✓ Installed</td>
+                        <td>✓ Installed</td>
+                        <td><span class="status-badge status-same">Shared</span></td>
+                    </tr>
+                `;
+            });
+
+            // Only in A
+            data.onlyInA.forEach(ext => {
+                html += `
+                    <tr>
+                        <td>${ext}</td>
+                        <td>✓ Installed</td>
+                        <td style="color: var(--text-secondary);">—</td>
+                        <td><span class="status-badge status-only-a">Only A</span></td>
+                    </tr>
+                `;
+            });
+
+            // Only in B
+            data.onlyInB.forEach(ext => {
+                html += `
+                    <tr>
+                        <td>${ext}</td>
+                        <td style="color: var(--text-secondary);">—</td>
+                        <td>✓ Installed</td>
+                        <td><span class="status-badge status-only-b">Only B</span></td>
+                    </tr>
+                `;
+            });
+
+            table.innerHTML = html;
+        }
+
+        function populateHistory() {
+            const table = document.getElementById('historyTable');
+            const domains = comparisonData.history.commonDomains;
+            let html = '';
+
+            domains.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.domain}</td>
+                        <td>${item.countA} visits</td>
+                        <td>${item.countB} visits</td>
+                    </tr>
+                `;
+            });
+
+            table.innerHTML = html;
+        }
+
+        function populateSecurity() {
+            const table = document.getElementById('securityTable');
+            const data = comparisonData.security;
+            let html = '';
+
+            data.different.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.key}</td>
+                        <td><span class="diff-value diff-a">${item.valueA}</span></td>
+                        <td><span class="diff-value diff-b">${item.valueB}</span></td>
+                        <td><span class="status-badge status-different">Different</span></td>
+                    </tr>
+                `;
+            });
+
+            data.same.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.key}</td>
+                        <td><span class="diff-value">${item.value}</span></td>
+                        <td><span class="diff-value">${item.value}</span></td>
+                        <td><span class="status-badge status-same">Same</span></td>
+                    </tr>
+                `;
+            });
+
+            table.innerHTML = html;
+        }
+
+        function updateBadges() {
+            const data = comparisonData;
+            document.getElementById('settingsBadge').textContent = 
+                data.settings.different.length + data.settings.onlyInA.length + data.settings.onlyInB.length;
+            document.getElementById('bookmarksBadge').textContent = 
+                data.bookmarks.onlyInA.length + data.bookmarks.onlyInB.length;
+            document.getElementById('extensionsBadge').textContent = 
+                data.extensions.onlyInA.length + data.extensions.onlyInB.length;
+            document.getElementById('historyBadge').textContent = 
+                data.history.commonDomains.length;
+            document.getElementById('securityBadge').textContent = 
+                data.security.different.length;
+        }
+
+        function updateHeaders() {
+            document.getElementById('settingsHeaderA').textContent = selectedProfileA.name;
+            document.getElementById('settingsHeaderB').textContent = selectedProfileB.name;
+            document.getElementById('extensionsHeaderA').textContent = selectedProfileA.name;
+            document.getElementById('extensionsHeaderB').textContent = selectedProfileB.name;
+            document.getElementById('securityHeaderA').textContent = selectedProfileA.name;
+            document.getElementById('securityHeaderB').textContent = selectedProfileB.name;
+            document.getElementById('bookmarksHeaderA').textContent = selectedProfileA.name + ' Bookmarks';
+            document.getElementById('bookmarksHeaderB').textContent = selectedProfileB.name + ' Bookmarks';
+        }
+
+        function openMergeModal(type) {
+            const modal = document.getElementById('mergeModal');
+            const itemsContainer = document.getElementById('mergeItems');
+            
+            let items = [];
+            if (type === 'settings' || type === 'all') {
+                comparisonData.settings.different.forEach(s => items.push({ type: 'Setting', name: s.key, detail: `${s.valueA} → ${s.valueB}` }));
+                comparisonData.settings.onlyInA.forEach(s => items.push({ type: 'Setting', name: s.key, detail: `Value: ${s.value}` }));
+                comparisonData.settings.onlyInB.forEach(s => items.push({ type: 'Setting', name: s.key, detail: `Value: ${s.value}` }));
+            }
+            if (type === 'bookmarks' || type === 'all') {
+                comparisonData.bookmarks.onlyInA.forEach(b => items.push({ type: 'Bookmark', name: b, detail: 'Unique to A' }));
+                comparisonData.bookmarks.onlyInB.forEach(b => items.push({ type: 'Bookmark', name: b, detail: 'Unique to B' }));
+            }
+            if (type === 'extensions' || type === 'all') {
+                comparisonData.extensions.onlyInA.forEach(e => items.push({ type: 'Extension', name: e, detail: 'Installed in A' }));
+                comparisonData.extensions.onlyInB.forEach(e => items.push({ type: 'Extension', name: e, detail: 'Installed in B' }));
+            }
+
+            let html = '';
+            items.slice(0, 10).forEach((item, i) => {
+                html += `
+                    <div class="merge-item">
+                        <input type="checkbox" id="merge${i}" checked>
+                        <div class="merge-item-info">
+                            <div class="merge-item-name">${item.type}: ${item.name}</div>
+                            <div class="merge-item-detail">${item.detail}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            itemsContainer.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function closeMergeModal() {
+            document.getElementById('mergeModal').classList.remove('active');
+        }
+
+        function executeMerge() {
+            alert('Merge completed successfully!');
+            closeMergeModal();
+        }
+
+        function exportComparison(format) {
+            if (format === 'json') {
+                const data = JSON.stringify(comparisonData, null, 2);
+                downloadFile(data, 'profile-comparison.json', 'application/json');
+            } else if (format === 'html') {
+                const html = generateHTMLReport();
+                downloadFile(html, 'profile-comparison.html', 'text/html');
+            }
+        }
+
+        function generateHTMLReport() {
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Comparison Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; color: #fff; padding: 2rem; }
+        h1 { color: #dc2626; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #2a2a2a; }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <h1>Profile Comparison Report</h1>
+    <p>Generated on ${new Date().toLocaleString()}</p>
+    <p><strong>${selectedProfileA.name}</strong> vs <strong>${selectedProfileB.name}</strong></p>
+    <p>Similarity Score: ${comparisonData.similarityScore}%</p>
+</body>
+</html>`;
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function goBack() {
+            alert('Navigating back to profiles...');
+        }
+    </script>
+</body>
+</html>

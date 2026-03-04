@@ -23,6 +23,7 @@ pub mod import_export;
 pub mod analytics_visualization;
 pub mod community_templates;
 pub mod template_manager;
+pub mod profile_comparison;
 
 use crate::core::kernel::VantisKernel;
 
@@ -57,6 +58,11 @@ pub use community_templates::{
     CreatorInfo, TemplateApiResponse, TemplateListResponse, TemplateStatistics
 };
 pub use template_manager::{TemplateManager, TemplateError};
+pub use profile_comparison::{
+    ProfileComparison, ProfileComparisonManager, SettingsDiff, BookmarksDiff,
+    ExtensionsDiff, SecurityDiff, HistoryDiff, ComparisonOptions, ComparisonReport,
+    MergeOperation, MergeItem, MergeItemType, MergeStrategy
+};
 
 /// Profile type
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
