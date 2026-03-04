@@ -12,10 +12,12 @@ pub mod profiles;
 pub mod network;
 pub mod ai;
 pub mod utils;
+pub mod sync;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
 pub use ui::VantisUI;
+pub use sync::{CloudSyncManager, SyncError, SyncProvider, SyncProviderType};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
