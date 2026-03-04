@@ -12,4 +12,4 @@
 - [ ] Issue #24: Add API documentation and code comments (Medium Priority)
 - [ ] Issue #25: Implement AI-powered ad blocking (Medium Priority)
 - [ ] Issue #26: Add voice commands integration (Medium Priority)
-- [ ] Issue #27: Implement browser extension marketplace (High Priority)
+- [x] Issue #27: Implement browser extension marketplace (PR #29)
