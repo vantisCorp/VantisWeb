@@ -29,6 +29,14 @@ rand = "0.8"
 async-trait = "0.1"
 futures = "0.3"
 
+# HTTP / Web
+reqwest = { version = "0.11", features = ["json"] }
+urlencoding = "2.1"
+base64 = "0.21"
+
+# Encryption
+md5 = "0.7"
+
 # WebGPU / Graphics
 wgpu = { version = "0.19", features = ["webgl"] }
 winit = "0.29"
