@@ -15,6 +15,7 @@ pub mod utils;
 pub mod sync;
 pub mod auth;
 pub mod voice;
+pub mod webrtc;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -22,6 +23,7 @@ pub use ui::VantisUI;
 pub use sync::{CloudSyncManager, SyncError, SyncProvider, SyncProviderType};
 pub use auth::{AuthManager, AuthConfig, AuthError};
 pub use voice::{VoiceRecognizer, VoiceProcessor, CommandRegistry};
+pub use webrtc::{WebRTCManager, RTCConfiguration};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
