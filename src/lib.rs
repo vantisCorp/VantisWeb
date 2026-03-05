@@ -20,6 +20,7 @@ pub mod history;
 pub mod installer;
 pub mod profiling;
 pub mod reading;
+pub mod adblock;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
