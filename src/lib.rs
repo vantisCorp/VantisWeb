@@ -22,6 +22,7 @@ pub mod profiling;
 pub mod reading;
 pub mod adblock;
 pub mod password;
+pub mod vpn;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -32,6 +33,7 @@ pub use voice::{VoiceRecognizer, VoiceProcessor, CommandRegistry};
 pub use webrtc::{WebRTCManager, RTCConfiguration};
 pub use history::{HistoryManager, HistoryEntry, HistoryQuery};
 pub use password::{PasswordManager, PasswordConfig, PasswordEntry, PasswordStrength};
+pub use vpn::{VPNManager, VPNConfig, VPNState, VPNProtocol, VPNServer, VPNStats};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
