@@ -24,6 +24,7 @@ pub mod adblock;
 pub mod password;
 pub mod vpn;
 pub mod capture;
+pub mod pdf;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -36,6 +37,7 @@ pub use history::{HistoryManager, HistoryEntry, HistoryQuery};
 pub use password::{PasswordManager, PasswordConfig, PasswordEntry, PasswordStrength};
 pub use vpn::{VPNManager, VPNConfig, VPNState, VPNProtocol, VPNServer, VPNStats};
 pub use capture::{CaptureManager, CaptureConfig, CaptureResult, CaptureError};
+pub use pdf::{PDFManager, PDFConfig, PDFDocument, PDFError, PDFAnnotation, FormField};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
