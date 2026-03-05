@@ -23,3 +23,13 @@
 - [ ] Issue #24: Add API documentation and code comments (Medium Priority)
 - [ ] Issue #25: Implement AI-powered ad blocking (Medium Priority)
 - [ ] Issue #26: Add voice commands integration (Medium Priority)
+
+## Current Work - Issue #25: AI-powered Ad Blocking
+- [ ] Create feature branch
+- [ ] Create ad block module structure
+- [ ] Implement ML-based ad detection
+- [ ] Create block list manager
+- [ ] Add tracker blocking
+- [ ] Add UI components for rule management
+- [ ] Update lib.rs to export ad block module
+- [ ] Commit and create PR
