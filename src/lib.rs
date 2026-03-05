@@ -17,6 +17,7 @@ pub mod auth;
 pub mod voice;
 pub mod webrtc;
 pub mod history;
+pub mod installer;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
