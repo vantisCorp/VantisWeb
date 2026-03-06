@@ -13,7 +13,8 @@ export default defineConfig({
   reporter: [
     ['html'],
     ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['list']
+    ['list'],
+    ['allure-playwright']
   ],
   use: {
     baseURL: 'http://localhost:8080',
