@@ -26,6 +26,7 @@ pub mod vpn;
 pub mod capture;
 pub mod bookmarks;
 pub mod downloads;
+pub mod devtools;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -42,6 +43,7 @@ pub use pdf::{PDFManager, PDFConfig, PDFDocument, PDFError, PDFAnnotation, FormF
 pub use tabs::{TabManager, TabGroupManager, WorkspaceManager, TabHibernationManager, TabSyncManager, TabSearchIndex};
 pub use bookmarks::{BookmarkManager, BookmarkFolderManager, BookmarkSearchEngine, BookmarkSyncManager, BookmarkImporter, BookmarkExporter};
 pub use downloads::{DownloadManager, DownloadScheduler, DownloadAccelerator, DownloadOrganizer, DownloadHistory, BrowserIntegration};
+pub use devtools::{DevToolsManager, ElementsInspector, NetworkMonitor, JSConsole, PerformanceProfiler, StorageInspector};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
