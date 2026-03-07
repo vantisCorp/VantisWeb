@@ -1,0 +1,345 @@
+name: Build Installers
+
+on:
+  push:
+    branches: [ main, release/* ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-linux-deb:
+    name: Build Linux DEB Package
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          curl \
+          dpkg-dev \
+          fakeroot \
+          debhelper \
+          libwebkit2gtk-4.1-dev \
+          libssl-dev \
+          libx11-dev \
+          libxext-dev \
+          libxrandr-dev \
+          libxrender-dev \
+          libxtst-dev \
+          libgtk-3-dev
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: rustfmt, clippy
+    
+    - name: Cache cargo registry
+      uses: actions/cache@v3
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Cache cargo index
+      uses: actions/cache@v3
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Cache cargo build
+      uses: actions/cache@v3
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Build release binary
+      run: |
+        cargo build --release --verbose
+    
+    - name: Build DEB package
+      run: |
+        cd packaging/linux/deb
+        chmod +x postinst
+        mkdir -p deb-build/DEBIAN
+        mkdir -p deb-build/usr/bin
+        mkdir -p deb-build/usr/share/applications
+        mkdir -p deb-build/usr/share/icons/hicolor/256x256/apps
+        mkdir -p deb-build/opt/vantisweb
+        
+        cp control deb-build/DEBIAN/
+        cp postinst deb-build/DEBIAN/
+        cp ../../vantisweb.desktop deb-build/usr/share/applications/
+        
+        if [ -f "../../../target/release/vantisweb" ]; then
+          cp ../../../target/release/vantisweb deb-build/usr/bin/
+          chmod 755 deb-build/usr/bin/vantisweb
+        else
+          echo "Binary not found!"
+          exit 1
+        fi
+        
+        # Calculate installed size
+        INSTALLED_SIZE=$(du -sk deb-build | cut -f1)
+        sed -i "s/^Installed-Size:.*/Installed-Size: ${INSTALLED_SIZE}/" deb-build/DEBIAN/control
+        
+        # Build package
+        cd deb-build
+        dpkg-deb --build . ../../../vantisweb_${{ github.ref_name }}_amd64.deb
+        cd ../../..
+    
+    - name: Upload DEB artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: vantisweb-linux-deb
+        path: vantisweb_*.deb
+
+  build-linux-rpm:
+    name: Build Linux RPM Package
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install build dependencies
+      run: |
+        dnf install -y \
+          cargo \
+          gcc \
+          make \
+          rpm-build \
+          openssl-devel \
+          libX11-devel \
+          libXext-devel \
+          libXrandr-devel \
+          libXrender-devel \
+          libXtst-devel \
+          gtk3-devel \
+          webkit2gtk4.1-devel
+    
+    - name: Cache cargo
+      uses: actions/cache@v3
+      with:
+        path: ~/.cargo
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Cache cargo build
+      uses: actions/cache@v3
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Build release binary
+      run: cargo build --release --verbose
+    
+    - name: Build RPM package
+      run: |
+        mkdir -p rpmbuild/SOURCES
+        mkdir -p rpmbuild/SPECS
+        mkdir -p rpmbuild/RPMS
+        mkdir -p rpmbuild/SRPMS
+        mkdir -p rpmbuild/BUILD
+        
+        tar czf rpmbuild/SOURCES/vantisweb-0.1.0.tar.gz \
+          --exclude=target \
+          --exclude=.git \
+          .
+        
+        cp packaging/linux/rpm/vantisweb.spec rpmbuild/SPECS/
+        
+        rpmbuild -ba rpmbuild/SPECS/vantisweb.spec \
+          --define "_topdir $(pwd)/rpmbuild"
+        
+        find rpmbuild/RPMS -name "*.rpm" -exec cp {} /github/workspace/ \;
+    
+    - name: Upload RPM artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: vantisweb-linux-rpm
+        path: *.rpm
+
+  build-windows:
+    name: Build Windows Installer
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    
+    - name: Cache cargo
+      uses: actions/cache@v3
+      with:
+        path: ~/.cargo
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Cache cargo build
+      uses: actions/cache@v3
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Build release binary
+      run: cargo build --release --verbose
+    
+    - name: Create installer directory
+      run: |
+        mkdir -p installer/vantisweb
+        copy target\release\vantisweb.exe installer\vantisweb\
+        
+    - name: Upload Windows binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: vantisweb-windows-binary
+        path: installer/vantisweb/*.exe
+
+  build-macos:
+    name: Build macOS DMG
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    
+    - name: Cache cargo
+      uses: actions/cache@v3
+      with:
+        path: ~/.cargo
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Cache cargo build
+      uses: actions/cache@v3
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Build release binary
+      run: cargo build --release --verbose
+    
+    - name: Create app bundle
+      run: |
+        mkdir -p VantisWeb.app/Contents/MacOS
+        mkdir -p VantisWeb.app/Contents/Resources
+        
+        cat > VantisWeb.app/Contents/Info.plist << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleExecutable</key>
+            <string>vantisweb</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.vantiscorp.VantisWeb</string>
+            <key>CFBundleName</key>
+            <string>VantisWeb</string>
+            <key>CFBundleVersion</key>
+            <string>0.1.0</string>
+            <key>CFBundleShortVersionString</key>
+            <string>0.1.0</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleSignature</key>
+            <string>????</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.15</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+        </dict>
+        </plist>
+        EOF
+        
+        cp target/release/vantisweb VantisWeb.app/Contents/MacOS/
+        chmod +x VantisWeb.app/Contents/MacOS/vantisweb
+    
+    - name: Create DMG
+      run: |
+        hdiutil create -volname "VantisWeb" -srcfolder VantisWeb.app -ov -format UDZO VantisWeb.dmg
+    
+    - name: Upload macOS DMG
+      uses: actions/upload-artifact@v3
+      with:
+        name: vantisweb-macos-dmg
+        path: VantisWeb.dmg
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-linux-deb, build-linux-rpm, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          artifacts/vantisweb-linux-deb/*.deb
+          artifacts/vantisweb-linux-rpm/*.rpm
+          artifacts/vantisweb-windows-binary/*.exe
+          artifacts/vantisweb-macos-dmg/*.dmg
+        draft: false
+        prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+        body: |
+          ## VantisWeb Browser Release
+          
+          ### Installation
+          
+          **Linux (Debian/Ubuntu):**
+          ```bash
+          sudo dpkg -i vantisweb_*.deb
+          ```
+          
+          **Linux (Fedora/RedHat):**
+          ```bash
+          sudo dnf install vantisweb-*.rpm
+          ```
+          
+          **Windows:**
+          Download and run the installer
+          
+          **macOS:**
+          Download and open the DMG file
+          
+          ### Features
+          - Advanced security and privacy
+          - AI-powered ad blocking
+          - Built-in password manager
+          - VPN client
+          - Developer tools
+          - Extensions support
+          
+          ### Changelog
+          See [CHANGELOG.md](https://github.com/vantisCorp/VantisWeb/blob/main/CHANGELOG.md) for details.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

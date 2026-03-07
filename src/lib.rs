@@ -27,6 +27,7 @@ pub mod capture;
 pub mod bookmarks;
 pub mod downloads;
 pub mod devtools;
+pub mod analytics;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -44,6 +45,7 @@ pub use tabs::{TabManager, TabGroupManager, WorkspaceManager, TabHibernationMana
 pub use bookmarks::{BookmarkManager, BookmarkFolderManager, BookmarkSearchEngine, BookmarkSyncManager, BookmarkImporter, BookmarkExporter};
 pub use downloads::{DownloadManager, DownloadScheduler, DownloadAccelerator, DownloadOrganizer, DownloadHistory, BrowserIntegration};
 pub use devtools::{DevToolsManager, ElementsInspector, NetworkMonitor, JSConsole, PerformanceProfiler, StorageInspector};
+pub use analytics::{AnalyticsEngine, AnalyticsConfig, AnalyticsError, AnalyticsSnapshot};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

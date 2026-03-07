@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+# Post-installation script for VantisWeb DEB package
+
+case "$1" in
+    configure)
+        # Update desktop database
+        if [ -x "$(command -v update-desktop-database)" ]; then
+            update-desktop-database /usr/share/applications || true
+        fi
+
+        # Update icon cache
+        if [ -x "$(command -v gtk-update-icon-cache)" ]; then
+            gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true
+        fi
+
+        # Set VantisWeb as default browser if requested
+        # This is optional and requires user confirmation
+        if [ -f /usr/share/applications/vantisweb.desktop ]; then
+            echo "VantisWeb installed successfully!"
+            echo "To set VantisWeb as default browser, run:"
+            echo "  xdg-settings set default-web-browser vantisweb.desktop"
+        fi
+
+        # Create desktop shortcut for current user
+        if [ -d "$HOME/Desktop" ]; then
+            cp /usr/share/applications/vantisweb.desktop "$HOME/Desktop/" 2>/dev/null || true
+            chmod +x "$HOME/Desktop/vantisweb.desktop" 2>/dev/null || true
+        fi
+
+        echo ""
+        echo "VantisWeb Browser installed successfully!"
+        echo "Launch from: Applications -> Internet -> VantisWeb Browser"
+        echo ""
+        ;;
+esac
+
+exit 0
