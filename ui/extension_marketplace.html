@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension Marketplace - VantisWeb</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ff0000, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+
+        .search-bar button {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-bar button:hover {
+            transform: scale(1.05);
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .category {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .category:hover, .category.active {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .extensions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .extension-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .extension-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff0000;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.2);
+        }
+
+        .extension-card.featured {
+            border-color: #ff6b6b;
+        }
+
+        .extension-header {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 107, 107, 0.05));
+        }
+
+        .extension-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff0000, #ff6b6b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .extension-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .extension-author {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .extension-body {
+            padding: 20px;
+        }
+
+        .extension-description {
+            color: #ccc;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .extension-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #888;
+        }
+
+        .rating {
+            color: #ffd700;
+        }
+
+        .extension-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .install-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .install-btn.installed {
+            background: #28a745;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .badge-featured {
+            background: #ff6b6b;
+        }
+
+        .badge-verified {
+            background: #4CAF50;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover, .pagination button.active {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .extensions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧩 Extension Marketplace</h1>
+            <p class="subtitle">Discover and install extensions to customize your VantisWeb experience</p>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Search extensions..." id="searchInput">
+            <button onclick="searchExtensions()">Search</button>
+        </div>
+
+        <div class="categories" id="categories">
+            <div class="category active" onclick="filterCategory('all')">All</div>
+            <div class="category" onclick="filterCategory('productivity')">Productivity</div>
+            <div class="category" onclick="filterCategory('privacy')">Privacy</div>
+            <div class="category" onclick="filterCategory('social')">Social</div>
+            <div class="category" onclick="filterCategory('entertainment')">Entertainment</div>
+            <div class="category" onclick="filterCategory('developer')">Developer</div>
+            <div class="category" onclick="filterCategory('appearance')">Appearance</div>
+        </div>
+
+        <div class="extensions-grid" id="extensionsGrid">
+            <!-- Extensions will be loaded here -->
+        </div>
+
+        <div class="pagination">
+            <button onclick="loadPage(1)" class="active">1</button>
+            <button onclick="loadPage(2)">2</button>
+            <button onclick="loadPage(3)">3</button>
+            <button onclick="loadPage(4)">4</button>
+            <button onclick="loadPage(5)">5</button>
+        </div>
+    </div>
+
+    <div class="modal" id="extensionModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modalBody">
+                <!-- Extension details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample extension data
+        const extensions = [
+            {
+                id: 1,
+                name: "AdBlocker Pro",
+                description: "Block ads and trackers for a cleaner, faster browsing experience.",
+                author: "VantisWeb Team",
+                icon: "🛡️",
+                rating: 4.8,
+                downloads: "2.5M",
+                tags: ["privacy", "productivity"],
+                featured: true,
+                verified: true
+            },
+            {
+                id: 2,
+                name: "Dark Mode Everywhere",
+                description: "Enable dark mode on all websites for comfortable browsing.",
+                author: "Night Owl",
+                icon: "🌙",
+                rating: 4.6,
+                downloads: "1.8M",
+                tags: ["appearance"],
+                featured: true,
+                verified: false
+            },
+            {
+                id: 3,
+                name: "Password Manager",
+                description: "Securely store and auto-fill your passwords across devices.",
+                author: "SecureCorp",
+                icon: "🔐",
+                rating: 4.9,
+                downloads: "3.2M",
+                tags: ["privacy", "productivity"],
+                featured: true,
+                verified: true
+            },
+            {
+                id: 4,
+                name: "Translation Assistant",
+                description: "Translate any webpage instantly with one click.",
+                author: "GlobalConnect",
+                icon: "🌐",
+                rating: 4.5,
+                downloads: "980K",
+                tags: ["productivity"],
+                featured: false,
+                verified: true
+            },
+            {
+                id: 5,
+                name: "Social Media Integrator",
+                description: "Share content to all your social media accounts instantly.",
+                author: "ShareHub",
+                icon: "📱",
+                rating: 4.3,
+                downloads: "750K",
+                tags: ["social"],
+                featured: false,
+                verified: false
+            },
+            {
+                id: 6,
+                name: "Developer Tools",
+                description: "Advanced debugging and development tools for web developers.",
+                author: "DevTools Inc",
+                icon: "👨‍💻",
+                rating: 4.7,
+                downloads: "1.2M",
+                tags: ["developer"],
+                featured: false,
+                verified: true
+            }
+        ];
+
+        function renderExtensions(extList) {
+            const grid = document.getElementById('extensionsGrid');
+            grid.innerHTML = '';
+
+            extList.forEach(ext => {
+                const card = document.createElement('div');
+                card.className = `extension-card ${ext.featured ? 'featured' : ''}`;
+                card.onclick = () => openModal(ext);
+
+                card.innerHTML = `
+                    <div class="extension-header">
+                        <div class="extension-icon">${ext.icon}</div>
+                        <div class="extension-name">
+                            ${ext.name}
+                            ${ext.featured ? '<span class="badge badge-featured">Featured</span>' : ''}
+                            ${ext.verified ? '<span class="badge badge-verified">✓</span>' : ''}
+                        </div>
+                        <div class="extension-author">by ${ext.author}</div>
+                    </div>
+                    <div class="extension-body">
+                        <p class="extension-description">${ext.description}</p>
+                        <div class="extension-stats">
+                            <div class="stat">
+                                <span class="rating">★★★★★</span>
+                                <span>${ext.rating}</span>
+                            </div>
+                            <div class="stat">
+                                <span>📥</span>
+                                <span>${ext.downloads}</span>
+                            </div>
+                        </div>
+                        <div class="extension-tags">
+                            ${ext.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        <button class="install-btn" onclick="event.stopPropagation(); installExtension(${ext.id})">
+                            Install
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function searchExtensions() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = extensions.filter(ext => 
+                ext.name.toLowerCase().includes(query) ||
+                ext.description.toLowerCase().includes(query)
+            );
+            renderExtensions(filtered);
+        }
+
+        function filterCategory(category) {
+            document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (category === 'all') {
+                renderExtensions(extensions);
+            } else {
+                const filtered = extensions.filter(ext => ext.tags.includes(category));
+                renderExtensions(filtered);
+            }
+        }
+
+        function openModal(ext) {
+            const modal = document.getElementById('extensionModal');
+            const body = document.getElementById('modalBody');
+
+            body.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 5rem; margin-bottom: 20px;">${ext.icon}</div>
+                    <h2>${ext.name}</h2>
+                    <p style="color: #888;">by ${ext.author}</p>
+                </div>
+                <p style="line-height: 1.8; margin-bottom: 20px;">${ext.description}</p>
+                <div style="margin-bottom: 20px;">
+                    <strong>Rating:</strong> ${ext.rating}/5<br>
+                    <strong>Downloads:</strong> ${ext.downloads}<br>
+                    <strong>Version:</strong> 1.0.0<br>
+                    <strong>Last Updated:</strong> 2024-03-01
+                </div>
+                <button class="install-btn" onclick="installExtension(${ext.id})">Install Extension</button>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('extensionModal').classList.remove('active');
+        }
+
+        function installExtension(id) {
+            alert('Extension installation started! (Demo)');
+        }
+
+        function loadPage(page) {
+            document.querySelectorAll('.pagination button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderExtensions(extensions);
+        }
+
+        // Initialize
+        renderExtensions(extensions);
+    </script>
+</body>
+</html>

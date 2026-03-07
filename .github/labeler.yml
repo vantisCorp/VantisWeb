@@ -1,0 +1,113 @@
+# PR Labeler Configuration
+# Automatically labels pull requests based on changed files
+
+# Labels for different file types
+documentation:
+  - "*.md"
+  - "docs/**"
+  - "**/README*"
+
+bug:
+  - any: ["bugfix", "fix", "bug"]
+  - all: ["!*.md"]
+
+enhancement:
+  - any: ["feat", "feature", "enhance"]
+  - all: ["!*.md"]
+
+refactor:
+  - any: ["refactor", "refact"]
+  - all: ["!*.md"]
+
+performance:
+  - any: ["perf", "perform", "optim"]
+  - all: ["!*.md"]
+
+security:
+  - any: ["security", "sec", "vuln"]
+  - all: ["!*.md"]
+  - changed-files:
+      - any: ["src/security/**", "SECURITY.md", "deny.toml"]
+
+testing:
+  - any: ["test", "spec"]
+  - all: ["!*.md"]
+  - changed-files:
+      - any: ["tests/**", "**/*test*.rs", "**/tests.rs"]
+
+ci:
+  - changed-files:
+      - any: [".github/**", ".pre-commit-config.yaml", "deny.toml", "clippy.toml"]
+
+extensions:
+  - changed-files:
+      - any: ["src/extensions/**", "extensions/**", "**/*extension*"]
+
+ui:
+  - changed-files:
+      - any: ["ui/**", "assets/**"]
+
+dependencies:
+  - any: ["Cargo.toml", "Cargo.lock"]
+
+# Labels for release types
+breaking:
+  - any: ["breaking", "BREAKING CHANGE"]
+  - all: ["!*.md"]
+
+# Labels for file-specific changes
+rust:
+  - changed-files:
+      - any: ["**/*.rs", "Cargo.toml", "Cargo.lock"]
+
+javascript:
+  - changed-files:
+      - any: ["**/*.js", "**/*.ts", "package.json", "yarn.lock"]
+
+# Size labels
+size/XS:
+  - changed-files:
+      - diff: 0-10
+
+size/S:
+  - changed-files:
+      - diff: 11-50
+
+size/M:
+  - changed-files:
+      - diff: 51-200
+
+size/L:
+  - changed-files:
+      - diff: 201-500
+
+size/XL:
+  - changed-files:
+      - diff: 501-1000
+
+size/XXL:
+  - changed-files:
+      - diff: 1001+
+
+# Priority labels
+priority/critical:
+  - any: ["critical", "urgent", "hotfix"]
+
+priority/high:
+  - any: ["high priority", "important"]
+
+priority/medium:
+  - any: ["medium priority"]
+
+priority/low:
+  - any: ["low priority", "minor"]
+
+# Good for new contributors
+good first issue:
+  - changed-files:
+      - any: ["**/*.rs", "**/*.js"]
+      - diff: 0-50
+
+help wanted:
+  - changed-files:
+      - diff: 51-200

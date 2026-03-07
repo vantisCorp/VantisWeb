@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb Bulk Profile Operations</title>
+    <style>
+        :root {
+            --primary-red: #dc2626;
+            --dark-red: #991b1b;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --success-green: #22c55e;
+            --warning-yellow: #eab308;
+            --danger-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1f1f1f 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--primary-red);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-description {
+            color: var(--text-secondary);
+        }
+
+        /* Selection Info */
+        .selection-info {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .selection-count strong {
+            color: var(--primary-red);
+        }
+
+        .selection-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Bulk Action Toolbar */
+        .bulk-toolbar {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .bulk-toolbar.active {
+            display: flex;
+        }
+
+        .bulk-toolbar-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Profiles Grid */
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .profile-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .profile-card.selected {
+            border-color: var(--primary-red);
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .profile-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .profile-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-red);
+        }
+
+        .profile-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-type {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--success-green);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .stat strong {
+            color: var(--text-primary);
+        }
+
+        /* Progress Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-red), var(--dark-red));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Results List */
+        .results-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-icon.success {
+            background: var(--success-green);
+        }
+
+        .result-icon.error {
+            background: var(--danger-red);
+        }
+
+        .result-name {
+            flex: 1;
+        }
+
+        .result-error {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .setting-group {
+            margin-bottom: 1rem;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .setting-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .setting-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Warning */
+        .warning-box {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid var(--warning-yellow);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .warning-icon {
+            color: var(--warning-yellow);
+            font-size: 1.25rem;
+        }
+
+        .warning-text {
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bulk-toolbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .bulk-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🌐</div>
+                <div class="logo-text">Vantis<span>Web</span></div>
+            </div>
+            <div>
+                <button class="btn btn-secondary" onclick="goBack()">← Back to Profiles</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">📦 Bulk Profile Operations</h1>
+            <p class="page-description">Select multiple profiles and perform operations on them all at once</p>
+        </div>
+
+        <!-- Selection Info -->
+        <div class="selection-info">
+            <div class="selection-count">
+                <input type="checkbox" class="profile-checkbox" id="selectAll" onchange="toggleSelectAll()">
+                <label for="selectAll" style="cursor: pointer;">Select all profiles</label>
+                <span id="selectedCount"><strong>0</strong> profiles selected</span>
+            </div>
+            <div class="selection-actions">
+                <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear Selection</button>
+            </div>
+        </div>
+
+        <!-- Bulk Action Toolbar -->
+        <div class="bulk-toolbar" id="bulkToolbar">
+            <div class="bulk-toolbar-title">
+                <span>⚡</span>
+                <span id="toolbarTitle"><strong>0</strong> profiles selected</span>
+            </div>
+            <div class="bulk-actions">
+                <button class="btn btn-secondary" onclick="openBulkExport()">
+                    📤 Export
+                </button>
+                <button class="btn btn-secondary" onclick="openBulkClone()">
+                    📋 Clone
+                </button>
+                <button class="btn btn-secondary" onclick="openBulkSettings()">
+                    ⚙️ Apply Settings
+                </button>
+                <button class="btn btn-secondary" onclick="openBulkSecurity()">
+                    🔒 Security
+                </button>
+                <button class="btn btn-danger" onclick="openBulkDelete()">
+                    🗑️ Delete
+                </button>
+            </div>
+        </div>
+
+        <!-- Profiles Grid -->
+        <div class="profiles-grid" id="profilesGrid">
+            <!-- Profiles will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div class="modal-overlay" id="progressModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="progressTitle">Processing...</h2>
+            </div>
+            <div class="modal-body">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span id="progressCurrent">Processing profile...</span>
+                        <span id="progressCount">0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="results-list" id="resultsList">
+                    <!-- Results will be rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="progressCloseBtn" onclick="closeProgressModal()" disabled>
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
+                <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure?</p>
+                
+                <div class="warning-box" id="confirmWarning" style="display: none;">
+                    <span class="warning-icon">⚠️</span>
+                    <span class="warning-text" id="confirmWarningText"></span>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Affected Profiles:</h4>
+                    <div id="confirmProfiles" style="max-height: 150px; overflow-y: auto;">
+                        <!-- Profile list will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Dynamic settings panel -->
+                <div class="settings-panel" id="settingsPanel">
+                    <!-- Settings will be rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn" id="confirmBtn" onclick="executeBulkOperation()">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample profile data
+        const profiles = [
+            { id: 'work', name: 'Work Profile', type: 'Work', icon: '💼', bookmarks: 25, history: 150, active: true },
+            { id: 'personal', name: 'Personal Profile', type: 'Personal', icon: '🏠', bookmarks: 42, history: 320, active: false },
+            { id: 'dev', name: 'Development Profile', type: 'Development', icon: '👨‍💻', bookmarks: 38, history: 520, active: false },
+            { id: 'gaming', name: 'Gaming Profile', type: 'Gaming', icon: '🎮', bookmarks: 12, history: 80, active: false },
+            { id: 'shopping', name: 'Shopping Profile', type: 'Shopping', icon: '🛒', bookmarks: 18, history: 45, active: false },
+            { id: 'social', name: 'Social Media', type: 'Social', icon: '📱', bookmarks: 8, history: 200, active: false },
+            { id: 'news', name: 'News Reader', type: 'News', icon: '📰', bookmarks: 15, history: 180, active: false },
+            { id: 'finance', name: 'Finance', type: 'Finance', icon: '💰', bookmarks: 10, history: 60, active: false },
+        ];
+
+        let selectedProfiles = new Set();
+        let currentOperation = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProfiles();
+        });
+
+        function renderProfiles() {
+            const grid = document.getElementById('profilesGrid');
+            grid.innerHTML = profiles.map(profile => `
+                <div class="profile-card ${selectedProfiles.has(profile.id) ? 'selected' : ''}" id="card-${profile.id}">
+                    ${profile.active ? '<span class="profile-badge">Active</span>' : ''}
+                    <div class="profile-card-header">
+                        <input type="checkbox" class="profile-checkbox" 
+                            ${selectedProfiles.has(profile.id) ? 'checked' : ''} 
+                            onchange="toggleProfile('${profile.id}')">
+                        <div class="profile-icon">${profile.icon}</div>
+                        <div class="profile-info">
+                            <div class="profile-name">${profile.name}</div>
+                            <div class="profile-type">${profile.type}</div>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <span class="stat">🔖 <strong>${profile.bookmarks}</strong> bookmarks</span>
+                        <span class="stat">📜 <strong>${profile.history}</strong> history</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleProfile(profileId) {
+            if (selectedProfiles.has(profileId)) {
+                selectedProfiles.delete(profileId);
+            } else {
+                selectedProfiles.add(profileId);
+            }
+            updateSelection();
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox.checked) {
+                profiles.forEach(p => selectedProfiles.add(p.id));
+            } else {
+                selectedProfiles.clear();
+            }
+            updateSelection();
+        }
+
+        function clearSelection() {
+            selectedProfiles.clear();
+            document.getElementById('selectAll').checked = false;
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const count = selectedProfiles.size;
+            document.getElementById('selectedCount').innerHTML = `<strong>${count}</strong> profiles selected`;
+            document.getElementById('toolbarTitle').innerHTML = `<strong>${count}</strong> profiles selected`;
+            
+            // Toggle toolbar visibility
+            const toolbar = document.getElementById('bulkToolbar');
+            if (count > 0) {
+                toolbar.classList.add('active');
+            } else {
+                toolbar.classList.remove('active');
+            }
+
+            // Update checkboxes
+            profiles.forEach(p => {
+                const card = document.getElementById(`card-${p.id}`);
+                if (card) {
+                    if (selectedProfiles.has(p.id)) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                }
+            });
+
+            // Check if all are selected
+            document.getElementById('selectAll').checked = count === profiles.length && count > 0;
+        }
+
+        function getSelectedProfiles() {
+            return profiles.filter(p => selectedProfiles.has(p.id));
+        }
+
+        // Bulk Export
+        function openBulkExport() {
+            currentOperation = 'export';
+            openConfirmModal({
+                title: '📤 Export Profiles',
+                message: `Export ${selectedProfiles.size} profile(s) to a file?`,
+                profiles: getSelectedProfiles(),
+                warning: 'Exported file may contain sensitive data. Keep it secure.',
+                settings: [
+                    { type: 'checkbox', id: 'includeBookmarks', label: 'Include bookmarks', default: true },
+                    { type: 'checkbox', id: 'includeHistory', label: 'Include browsing history', default: false },
+                    { type: 'select', id: 'exportFormat', label: 'Export format', options: ['JSON', 'CSV'], default: 'JSON' }
+                ]
+            });
+        }
+
+        // Bulk Clone
+        function openBulkClone() {
+            currentOperation = 'clone';
+            openConfirmModal({
+                title: '📋 Clone Profiles',
+                message: `Create copies of ${selectedProfiles.size} profile(s)?`,
+                profiles: getSelectedProfiles(),
+                warning: 'New profiles will be created with "(Copy)" suffix.',
+                settings: [
+                    { type: 'checkbox', id: 'cloneBookmarks', label: 'Include bookmarks', default: true },
+                    { type: 'checkbox', id: 'cloneHistory', label: 'Include browsing history', default: false }
+                ]
+            });
+        }
+
+        // Bulk Settings
+        function openBulkSettings() {
+            currentOperation = 'settings';
+            openConfirmModal({
+                title: '⚙️ Apply Settings',
+                message: `Apply settings to ${selectedProfiles.size} profile(s)?`,
+                profiles: getSelectedProfiles(),
+                warning: 'This will override existing settings in selected profiles.',
+                settings: [
+                    { type: 'select', id: 'theme', label: 'Theme', options: ['No change', 'Light', 'Dark', 'System'], default: 'No change' },
+                    { type: 'select', id: 'homepage', label: 'Homepage', options: ['No change', 'Blank', 'Google', 'Custom'], default: 'No change' },
+                    { type: 'select', id: 'startup', label: 'On startup', options: ['No change', 'Continue where left off', 'Open homepage', 'Open blank page'], default: 'No change' }
+                ]
+            });
+        }
+
+        // Bulk Security
+        function openBulkSecurity() {
+            currentOperation = 'security';
+            openConfirmModal({
+                title: '🔒 Change Security Level',
+                message: `Set security level for ${selectedProfiles.size} profile(s)?`,
+                profiles: getSelectedProfiles(),
+                warning: 'This may affect security and tracking protection.',
+                settings: [
+                    { type: 'select', id: 'securityLevel', label: 'Security Level', options: ['No change', 'None', 'Low', 'Medium', 'High', 'Strict'], default: 'No change' },
+                    { type: 'checkbox', id: 'trackingProtection', label: 'Enable tracking protection', default: true },
+                    { type: 'checkbox', id: 'httpsOnly', label: 'HTTPS-only mode', default: false }
+                ]
+            });
+        }
+
+        // Bulk Delete
+        function openBulkDelete() {
+            currentOperation = 'delete';
+            const selected = getSelectedProfiles();
+            const activeCount = selected.filter(p => p.active).length;
+            const warnings = ['This action cannot be undone!'];
+            
+            if (activeCount > 0) {
+                warnings.push(`Cannot delete ${activeCount} active profile(s). They will be skipped.`);
+            }
+            
+            if (selected.size >= profiles.length) {
+                warnings[0] = 'Cannot delete all profiles. At least one must remain.';
+            }
+
+            openConfirmModal({
+                title: '🗑️ Delete Profiles',
+                message: `Are you sure you want to delete ${selectedProfiles.size} profile(s)?`,
+                profiles: selected,
+                warning: warnings.join(' '),
+                danger: true
+            });
+        }
+
+        function openConfirmModal(options) {
+            document.getElementById('confirmTitle').textContent = options.title;
+            document.getElementById('confirmMessage').textContent = options.message;
+            
+            // Warning
+            const warningBox = document.getElementById('confirmWarning');
+            if (options.warning) {
+                warningBox.style.display = 'flex';
+                document.getElementById('confirmWarningText').textContent = options.warning;
+            } else {
+                warningBox.style.display = 'none';
+            }
+
+            // Profile list
+            document.getElementById('confirmProfiles').innerHTML = options.profiles.map(p => `
+                <div class="result-item">
+                    <span>${p.icon}</span>
+                    <span class="result-name">${p.name}</span>
+                    ${p.active ? '<span class="stat" style="color: var(--success-green);">Active</span>' : ''}
+                </div>
+            `).join('');
+
+            // Settings panel
+            const settingsPanel = document.getElementById('settingsPanel');
+            if (options.settings && options.settings.length > 0) {
+                settingsPanel.classList.add('active');
+                settingsPanel.innerHTML = options.settings.map(setting => {
+                    if (setting.type === 'checkbox') {
+                        return `
+                            <div class="setting-checkbox-group">
+                                <input type="checkbox" class="profile-checkbox" id="${setting.id}" ${setting.default ? 'checked' : ''}>
+                                <label for="${setting.id}">${setting.label}</label>
+                            </div>
+                        `;
+                    } else if (setting.type === 'select') {
+                        return `
+                            <div class="setting-group">
+                                <label class="setting-label">${setting.label}</label>
+                                <select class="setting-select" id="${setting.id}">
+                                    ${setting.options.map(opt => `<option ${opt === setting.default ? 'selected' : ''}>${opt}</option>`).join('')}
+                                </select>
+                            </div>
+                        `;
+                    }
+                    return '';
+                }).join('');
+            } else {
+                settingsPanel.classList.remove('active');
+            }
+
+            // Button style
+            const confirmBtn = document.getElementById('confirmBtn');
+            if (options.danger) {
+                confirmBtn.className = 'btn btn-danger';
+                confirmBtn.textContent = 'Delete';
+            } else {
+                confirmBtn.className = 'btn btn-primary';
+                confirmBtn.textContent = 'Confirm';
+            }
+
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function executeBulkOperation() {
+            closeConfirmModal();
+            openProgressModal();
+            simulateBulkOperation();
+        }
+
+        function openProgressModal() {
+            const total = selectedProfiles.size;
+            document.getElementById('progressTitle').textContent = getOperationTitle();
+            document.getElementById('progressCount').textContent = `0/${total}`;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('resultsList').innerHTML = '';
+            document.getElementById('progressCloseBtn').disabled = true;
+            document.getElementById('progressModal').classList.add('active');
+        }
+
+        function getOperationTitle() {
+            switch (currentOperation) {
+                case 'export': return '📤 Exporting Profiles...';
+                case 'clone': return '📋 Cloning Profiles...';
+                case 'settings': return '⚙️ Applying Settings...';
+                case 'security': return '🔒 Changing Security...';
+                case 'delete': return '🗑️ Deleting Profiles...';
+                default: return 'Processing...';
+            }
+        }
+
+        function simulateBulkOperation() {
+            const selected = getSelectedProfiles();
+            let processed = 0;
+            const results = [];
+
+            function processNext() {
+                if (processed >= selected.length) {
+                    finishOperation(results);
+                    return;
+                }
+
+                const profile = selected[processed];
+                
+                // Simulate processing
+                setTimeout(() => {
+                    processed++;
+                    const success = Math.random() > 0.1; // 90% success rate
+                    
+                    results.push({
+                        profile: profile,
+                        success: success,
+                        error: success ? null : 'Operation failed'
+                    });
+
+                    updateProgress(processed, selected.length, profile.name, results);
+                    processNext();
+                }, 500);
+            }
+
+            processNext();
+        }
+
+        function updateProgress(processed, total, currentName, results) {
+            const percentage = (processed / total) * 100;
+            
+            document.getElementById('progressCurrent').textContent = `Processing: ${currentName}`;
+            document.getElementById('progressCount').textContent = `${processed}/${total}`;
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+
+            // Update results list
+            const lastResult = results[results.length - 1];
+            document.getElementById('resultsList').innerHTML += `
+                <div class="result-item">
+                    <div class="result-icon ${lastResult.success ? 'success' : 'error'}">
+                        ${lastResult.success ? '✓' : '✗'}
+                    </div>
+                    <span class="result-name">${lastResult.profile.name}</span>
+                    ${lastResult.error ? `<span class="result-error">${lastResult.error}</span>` : ''}
+                </div>
+            `;
+        }
+
+        function finishOperation(results) {
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.length - successCount;
+
+            document.getElementById('progressTitle').textContent = 
+                `✅ ${successCount} succeeded, ${failCount} failed`;
+            document.getElementById('progressCurrent').textContent = 'Operation complete';
+            document.getElementById('progressCloseBtn').disabled = false;
+
+            // Clear selection after delete
+            if (currentOperation === 'delete') {
+                clearSelection();
+            }
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.remove('active');
+            currentOperation = null;
+        }
+
+        function goBack() {
+            alert('Navigating back to profiles...');
+        }
+    </script>
+</body>
+</html>

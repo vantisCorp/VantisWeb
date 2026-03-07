@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Commands - VantisWeb</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .voice-indicator {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff0000, #ff6b6b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .voice-indicator:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+        }
+
+        .voice-indicator.listening {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 60px rgba(255, 0, 0, 0.6);
+            }
+        }
+
+        .voice-icon {
+            font-size: 5rem;
+        }
+
+        .status {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #888;
+        }
+
+        .transcript {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .transcript-text {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+        }
+
+        .commands-list {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: left;
+        }
+
+        .commands-list h2 {
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        .command-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .command-item:last-child {
+            border-bottom: none;
+        }
+
+        .command-phrase {
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .command-desc {
+            color: #888;
+        }
+
+        .settings {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .setting {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+
+        .setting label {
+            color: #aaa;
+        }
+
+        .setting select,
+        .setting input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 8px 15px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .setting select:focus,
+        .setting input:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            z-index: 1000;
+        }
+
+        .feedback.success {
+            background: #4CAF50;
+            display: block;
+        }
+
+        .feedback.error {
+            background: #f44336;
+            display: block;
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 style="margin-bottom: 30px;">🎤 Voice Commands</h1>
+
+        <div class="voice-indicator" id="voiceIndicator" onclick="toggleListening()">
+            <div class="voice-icon">🎤</div>
+        </div>
+
+        <div class="status" id="status">Click microphone to start listening</div>
+
+        <div class="transcript">
+            <div class="transcript-text" id="transcript">Your voice command will appear here...</div>
+        </div>
+
+        <div class="commands-list">
+            <h2>Available Commands</h2>
+            <div class="command-item">
+                <span class="command-phrase">"go back" / "back"</span>
+                <span class="command-desc">Navigate to previous page</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"go forward" / "forward"</span>
+                <span class="command-desc">Navigate to next page</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"refresh" / "reload"</span>
+                <span class="command-desc">Refresh current page</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"search for [query]"</span>
+                <span class="command-desc">Search the web</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"new tab"</span>
+                <span class="command-desc">Open new tab</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"close tab"</span>
+                <span class="command-desc">Close current tab</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"next tab" / "previous tab"</span>
+                <span class="command-desc">Switch tabs</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"bookmark this"</span>
+                <span class="command-desc">Bookmark current page</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"scroll down" / "scroll up"</span>
+                <span class="command-desc">Scroll the page</span>
+            </div>
+            <div class="command-item">
+                <span class="command-phrase">"go home"</span>
+                <span class="command-desc">Navigate to homepage</span>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="setting">
+                <label>Language:</label>
+                <select id="language">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="es-ES">Spanish</option>
+                    <option value="fr-FR">French</option>
+                    <option value="de-DE">German</option>
+                    <option value="zh-CN">Chinese</option>
+                    <option value="ja-JP">Japanese</option>
+                    <option value="ko-KR">Korean</option>
+                    <option value="pl-PL">Polish</option>
+                    <option value="ru-RU">Russian</option>
+                </select>
+            </div>
+            <div class="setting">
+                <label>
+                    <input type="checkbox" id="wakeWord" checked>
+                    Wake word ("VantisWeb")
+                </label>
+            </div>
+            <div class="setting">
+                <label>
+                    <input type="checkbox" id="feedback" checked>
+                    Voice feedback
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <script>
+        let isListening = false;
+        let recognition = null;
+
+        const statusEl = document.getElementById('status');
+        const transcriptEl = document.getElementById('transcript');
+        const indicatorEl = document.getElementById('voiceIndicator');
+        const feedbackEl = document.getElementById('feedback');
+
+        const commands = {
+            'back': () => executeCommand('back'),
+            'forward': () => executeCommand('forward'),
+            'refresh': () => executeCommand('refresh'),
+            'reload': () => executeCommand('refresh'),
+            'search': (query) => executeCommand('search', query),
+            'new tab': () => executeCommand('new_tab'),
+            'close tab': () => executeCommand('close_tab'),
+            'next tab': () => executeCommand('next_tab'),
+            'previous tab': () => executeCommand('previous_tab'),
+            'bookmark': () => executeCommand('bookmark'),
+            'bookmark this': () => executeCommand('bookmark'),
+            'scroll down': () => executeCommand('scroll_down'),
+            'scroll up': () => executeCommand('scroll_up'),
+            'home': () => executeCommand('go_home'),
+            'go home': () => executeCommand('go_home')
+        };
+
+        function initRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = document.getElementById('language').value;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    indicatorEl.classList.add('listening');
+                    statusEl.textContent = 'Listening...';
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    indicatorEl.classList.remove('listening');
+                    if (transcriptEl.textContent === 'Your voice command will appear here...') {
+                        statusEl.textContent = 'Click microphone to start listening';
+                    }
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    transcriptEl.textContent = transcript;
+
+                    if (event.results[0].isFinal) {
+                        processCommand(transcript);
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    statusEl.textContent = 'Error: ' + event.error;
+                    showFeedback(event.error, 'error');
+                };
+            } else {
+                statusEl.textContent = 'Speech recognition not supported in this browser';
+            }
+        }
+
+        function toggleListening() {
+            if (!recognition) {
+                initRecognition();
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.lang = document.getElementById('language').value;
+                recognition.start();
+            }
+        }
+
+        function processCommand(transcript) {
+            const lower = transcript.toLowerCase();
+            let commandFound = false;
+
+            for (const [pattern, handler] of Object.entries(commands)) {
+                if (lower.includes(pattern)) {
+                    // Extract search query if present
+                    if (pattern === 'search') {
+                        const query = lower.replace(/search for|search/gi, '').trim();
+                        handler(query);
+                    } else {
+                        handler();
+                    }
+                    commandFound = true;
+                    break;
+                }
+            }
+
+            if (commandFound) {
+                statusEl.textContent = 'Command executed!';
+                showFeedback('Command executed successfully', 'success');
+            } else {
+                statusEl.textContent = 'No command recognized';
+                showFeedback('Command not recognized', 'error');
+            }
+        }
+
+        function executeCommand(command, param = null) {
+            console.log(`Executing command: ${command}`, param);
+            // In a real implementation, this would communicate with the browser
+            switch (command) {
+                case 'back':
+                    console.log('Navigating back');
+                    break;
+                case 'forward':
+                    console.log('Navigating forward');
+                    break;
+                case 'refresh':
+                    console.log('Refreshing page');
+                    break;
+                case 'search':
+                    console.log('Searching for:', param);
+                    break;
+                case 'new_tab':
+                    console.log('Opening new tab');
+                    break;
+                case 'close_tab':
+                    console.log('Closing tab');
+                    break;
+                case 'next_tab':
+                    console.log('Switching to next tab');
+                    break;
+                case 'previous_tab':
+                    console.log('Switching to previous tab');
+                    break;
+                case 'bookmark':
+                    console.log('Bookmarking page');
+                    break;
+                case 'scroll_down':
+                    console.log('Scrolling down');
+                    break;
+                case 'scroll_up':
+                    console.log('Scrolling up');
+                    break;
+                case 'go_home':
+                    console.log('Going home');
+                    break;
+            }
+        }
+
+        function showFeedback(message, type) {
+            feedbackEl.textContent = message;
+            feedbackEl.className = `feedback ${type}`;
+            setTimeout(() => {
+                feedbackEl.className = 'feedback';
+            }, 3000);
+        }
+
+        document.getElementById('language').addEventListener('change', () => {
+            if (recognition) {
+                recognition.lang = document.getElementById('language').value;
+            }
+        });
+
+        // Initialize on load
+        window.onload = () => {
+            initRecognition();
+        };
+    </script>
+</body>
+</html>
