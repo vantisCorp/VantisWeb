@@ -12,7 +12,35 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ### Planowane
 - Visual Regression Testing
 - Performance Load Testing
-- Tor Integration (.onion support)
+
+---
+
+## [1.3.0] - 2026-03-07
+
+### Added ✨
+- **Network Protocol Suite** (Issue #76)
+  - Onion Protocol (Tor) with circuits and hidden services
+  - Magnet Core (BitTorrent) with peer management
+  - Nano-Sharding VPN with WireGuard support
+  - Decentralized Mesh Networking
+- **WebRenderer Engine**
+  - WebKit/Blink backend support
+  - Hardware acceleration configuration
+  - Render contexts and page management
+  - JavaScript execution and image rendering
+- **Atom Switch Module System**
+  - Dynamic module loading with validation
+  - Module registry with dependency tracking
+  - Module marketplace client
+  - Plugin system with hooks and permissions
+- **Remote Profile Sync**
+  - HTTP client-based profile synchronization
+  - Push/delete operations for remote profiles
+  - Custom sync provider support with API authentication
+
+### Changed 🔄
+- All TODO/FIXME items resolved (0 remaining)
+- Phase 2 completed at 100%
 
 ---
 
