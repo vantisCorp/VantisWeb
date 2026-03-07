@@ -1,0 +1,31 @@
+Package: vantisweb
+Version: 0.1.0
+Section: web
+Priority: optional
+Architecture: amd64
+Maintainer: Vantis Corp <info@vantiscorp.com>
+Installed-Size: 50000
+Depends: libc6, libssl3, libx11-6, libxext6, libxrandr2, libxrender1, libxtst6, libgtk-3-0, libwebkit2gtk-4.1-0
+Recommends: libnotify4
+Homepage: https://github.com/vantisCorp/VantisWeb
+Vcs-Browser: https://github.com/vantisCorp/VantisWeb
+Vcs-Git: https://github.com/vantisCorp/VantisWeb.git
+
+Package: vantisweb-browser
+Package-Type: deb
+
+Description: Next-generation web browser with Liquid Core Architecture
+ VantisWeb is a modern, high-performance web browser built with Rust
+ and featuring advanced security, privacy, and AI-powered features.
+ .
+ Key features:
+  - Advanced security and privacy protections
+  - AI-powered ad blocking and content filtering
+  - Built-in password manager and VPN
+  - Developer tools and extensions support
+  - Cross-platform support (Linux, Windows, macOS)
+  - Fast and lightweight using Liquid Core Architecture
+  - Modern UI with customizable themes
+  - Screenshot and screen recording tools
+  - PDF viewer and editor
+  - Tab groups and workspaces
