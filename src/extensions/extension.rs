@@ -127,25 +127,29 @@ impl ExtensionStorage {
 
     /// Gets a value from storage
     pub fn get(&self, key: &str) -> Result<Option<String>> {
-        // TODO: Implement storage retrieval
-        Ok(None)
+        let api = super::api::storage::StorageAPI::new(self.extension_id.clone());
+        let value = api.get_local(key)?;
+        Ok(value.map(|v| serde_json::to_string(&v).unwrap_or_default()))
     }
 
     /// Sets a value in storage
     pub fn set(&self, key: &str, value: &str) -> Result<()> {
-        // TODO: Implement storage setting
+        let api = super::api::storage::StorageAPI::new(self.extension_id.clone());
+        api.set_local(key, super::api::storage::StorageValue::String(value.to_string()))?;
         Ok(())
     }
 
     /// Removes a value from storage
     pub fn remove(&self, key: &str) -> Result<()> {
-        // TODO: Implement storage removal
+        let api = super::api::storage::StorageAPI::new(self.extension_id.clone());
+        api.remove_local(key)?;
         Ok(())
     }
 
     /// Clears all storage
     pub fn clear(&self) -> Result<()> {
-        // TODO: Implement storage clearing
+        let api = super::api::storage::StorageAPI::new(self.extension_id.clone());
+        api.clear_local()?;
         Ok(())
     }
 }
@@ -167,13 +171,19 @@ impl ExtensionMessaging {
 
     /// Sends a message to another extension
     pub fn send_message(&self, target_extension_id: &str, message: &str) -> Result<String> {
-        // TODO: Implement message sending
-        Ok(String::new())
+        let api = super::api::messaging::MessagingAPI::new(self.extension_id.clone());
+        let msg = super::api::messaging::Message::new("extension_message")
+            .with_data(serde_json::json!(message));
+        let response = api.send_message(target_extension_id, msg)?;
+        Ok(serde_json::to_string(&response).unwrap_or_default())
     }
 
     /// Broadcasts a message to all extensions
     pub fn broadcast(&self, message: &str) -> Result<()> {
-        // TODO: Implement message broadcasting
+        let api = super::api::messaging::MessagingAPI::new(self.extension_id.clone());
+        let msg = super::api::messaging::Message::new("broadcast")
+            .with_data(serde_json::json!(message));
+        api.broadcast(msg)?;
         Ok(())
     }
 
@@ -182,7 +192,11 @@ impl ExtensionMessaging {
     where
         F: Fn(String, String) + Send + Sync + 'static,
     {
-        // TODO: Implement message listening
+        let api = super::api::messaging::MessagingAPI::new(self.extension_id.clone());
+        api.on_message(move |sender, msg| {
+            let msg_str = serde_json::to_string(&msg).unwrap_or_default();
+            callback(sender, msg_str);
+        });
     }
 }
 
