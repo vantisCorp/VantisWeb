@@ -133,6 +133,11 @@ impl PasswordStorage {
         self.entries.read().await.values().filter(|e| e.in_breach).count()
     }
 
+    /// Get all password entries
+    pub async fn get_all_entries(&self) -> Vec<PasswordEntry> {
+        self.entries.read().await.values().cloned().collect()
+    }
+
     /// Check if password is in a breach
     pub async fn check_breach(&self, _password: &str) -> Result<super::BreachResult, PasswordError> {
         // In production, this would check against HaveIBeenPwned API

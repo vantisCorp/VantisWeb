@@ -390,15 +390,37 @@ impl PasswordManager {
 
     /// Get statistics
     pub async fn get_stats(&self) -> PasswordStats {
-        let total = self.storage.get_entry_count().await;
-        let breached = self.storage.get_breached_count().await;
+        let entries = self.storage.get_all_entries().await;
+        let total = entries.len();
+        let breached = entries.iter().filter(|e| e.in_breach).count();
+        
+        // Calculate weak passwords (strength score < 50)
+        let weak_passwords = entries.iter().filter(|e| e.strength_score < 50).count();
+        
+        // Calculate unique domains
+        use std::collections::HashSet;
+        let domains: HashSet<String> = entries.iter()
+            .filter_map(|e| {
+                url::Url::parse(&e.url)
+                    .ok()
+                    .and_then(|u| u.host_str().map(|h| h.to_string()))
+            })
+            .collect();
+        let unique_domains = domains.len();
+        
+        // Calculate average strength
+        let average_strength = if total > 0 {
+            (entries.iter().map(|e| e.strength_score as u32).sum::<u32>() / total as u32) as u8
+        } else {
+            0
+        };
         
         PasswordStats {
             total_passwords: total,
             breached_passwords: breached,
-            weak_passwords: 0, // TODO: Calculate
-            unique_domains: 0, // TODO: Calculate
-            average_strength: 0, // TODO: Calculate
+            weak_passwords,
+            unique_domains,
+            average_strength,
         }
     }
 
