@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb - AI Ad Blocker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .toggle input {
+            margin-right: 10px;
+            transform: scale(1.5);
+        }
+
+        .toggle label {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .slider-container {
+            margin-top: 15px;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .rules-list {
+            margin-top: 20px;
+        }
+
+        .rules-list h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .rule-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rule-info {
+            flex: 1;
+        }
+
+        .rule-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .rule-pattern {
+            color: #666;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .rule-reason {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .rule-actions button {
+            padding: 8px 16px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-add {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .add-rule-form {
+            display: none;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .add-rule-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .recent-blocks {
+            margin-top: 30px;
+        }
+
+        .recent-blocks h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .block-entry {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .block-url {
+            flex: 1;
+            color: #555;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .block-reason {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        .whitelist-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .whitelist-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .whitelist-item {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ AI-Powered Ad Blocker</h1>
+            <p>Intelligent ad and tracker detection using machine learning</p>
+        </div>
+
+        <div class="content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBlocks">0</div>
+                    <div class="stat-label">Total Blocks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRequests">0</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="efficiency">0%</div>
+                    <div class="stat-label">Block Efficiency</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="cacheHits">0</div>
+                    <div class="stat-label">Cache Hits</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <h3>Blocker Settings</h3>
+                    <div class="toggle">
+                        <input type="checkbox" id="enableMl" checked>
+                        <label for="enableMl">Enable ML Detection</label>
+                    </div>
+                    <div class="toggle">
+                        <input type="checkbox" id="enablePatterns" checked>
+                        <label for="enablePatterns">Enable Pattern Matching</label>
+                    </div>
+                    <div class="toggle">
+                        <input type="checkbox" id="blockTrackers" checked>
+                        <label for="blockTrackers">Block Trackers</label>
+                    </div>
+                    <div class="toggle">
+                        <input type="checkbox" id="enableMalware" checked>
+                        <label for="enableMalware">Malware Protection</label>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="confidenceSlider">Minimum Confidence: <span id="confidenceValue">70%</span></label>
+                        <input type="range" id="confidenceSlider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="rules-list">
+                <h3>Custom Blocking Rules</h3>
+                <button class="btn-add" onclick="toggleAddRule()">+ Add Custom Rule</button>
+                
+                <div class="add-rule-form" id="addRuleForm">
+                    <div class="form-group">
+                        <label>Rule Name</label>
+                        <input type="text" id="ruleName" placeholder="e.g., Block Example Ads">
+                    </div>
+                    <div class="form-group">
+                        <label>Pattern (Regex)</label>
+                        <input type="text" id="rulePattern" placeholder="e.g., ads?\.example\.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Reason</label>
+                        <textarea id="ruleReason" placeholder="Why should this be blocked?" rows="3"></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button class="btn-submit" onclick="addRule()">Add Rule</button>
+                        <button class="btn-cancel" onclick="toggleAddRule()">Cancel</button>
+                    </div>
+                </div>
+
+                <div id="rulesContainer"></div>
+            </div>
+
+            <div class="whitelist-section">
+                <h3>Whitelist</h3>
+                <div class="form-group">
+                    <input type="text" id="whitelistInput" placeholder="Add domain to whitelist (e.g., example.com)">
+                </div>
+                <button class="btn-submit" onclick="addToWhitelist()">Add to Whitelist</button>
+                <div id="whitelistContainer"></div>
+            </div>
+
+            <div class="recent-blocks">
+                <h3>Recent Blocks</h3>
+                <div id="recentBlocks"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stats
+        let stats = {
+            totalBlocks: 0,
+            totalRequests: 0,
+            cacheHits: 0,
+            recentBlocks: []
+        };
+
+        // Custom rules
+        let customRules = [
+            {
+                id: '1',
+                name: 'Block Ads',
+                pattern: 'ads?\\.',
+                reason: 'Common ad network pattern',
+                active: true,
+                created_at: new Date().toISOString()
+            }
+        ];
+
+        // Whitelist
+        let whitelist = ['trusted-site.com'];
+
+        // Initialize
+        function init() {
+            renderStats();
+            renderRules();
+            renderWhitelist();
+            simulateTraffic();
+        }
+
+        function renderStats() {
+            document.getElementById('totalBlocks').textContent = stats.totalBlocks.toLocaleString();
+            document.getElementById('totalRequests').textContent = stats.totalRequests.toLocaleString();
+            
+            let efficiency = stats.totalRequests > 0 
+                ? Math.round((stats.totalBlocks / stats.totalRequests) * 100) 
+                : 0;
+            document.getElementById('efficiency').textContent = efficiency + '%';
+            document.getElementById('cacheHits').textContent = stats.cacheHits.toLocaleString();
+        }
+
+        function renderRules() {
+            const container = document.getElementById('rulesContainer');
+            container.innerHTML = '';
+            
+            customRules.forEach(rule => {
+                const div = document.createElement('div');
+                div.className = 'rule-item';
+                div.innerHTML = `
+                    <div class="rule-info">
+                        <div class="rule-name">${rule.name}</div>
+                        <div class="rule-pattern">${rule.pattern}</div>
+                        <div class="rule-reason">${rule.reason}</div>
+                    </div>
+                    <div class="rule-actions">
+                        <button class="btn-delete" onclick="deleteRule('${rule.id}')">Delete</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderWhitelist() {
+            const container = document.getElementById('whitelistContainer');
+            container.innerHTML = '';
+            
+            whitelist.forEach(domain => {
+                const div = document.createElement('div');
+                div.className = 'whitelist-item';
+                div.innerHTML = `
+                    <span>${domain}</span>
+                    <button class="btn-delete" onclick="removeFromWhitelist('${domain}')">Remove</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleAddRule() {
+            const form = document.getElementById('addRuleForm');
+            form.classList.toggle('active');
+        }
+
+        function addRule() {
+            const name = document.getElementById('ruleName').value;
+            const pattern = document.getElementById('rulePattern').value;
+            const reason = document.getElementById('ruleReason').value;
+
+            if (name && pattern && reason) {
+                customRules.push({
+                    id: Date.now().toString(),
+                    name,
+                    pattern,
+                    reason,
+                    active: true,
+                    created_at: new Date().toISOString()
+                });
+                renderRules();
+                toggleAddRule();
+                
+                // Clear form
+                document.getElementById('ruleName').value = '';
+                document.getElementById('rulePattern').value = '';
+                document.getElementById('ruleReason').value = '';
+            }
+        }
+
+        function deleteRule(id) {
+            customRules = customRules.filter(r => r.id !== id);
+            renderRules();
+        }
+
+        function addToWhitelist() {
+            const input = document.getElementById('whitelistInput');
+            const domain = input.value.trim();
+            
+            if (domain && !whitelist.includes(domain)) {
+                whitelist.push(domain);
+                renderWhitelist();
+                input.value = '';
+            }
+        }
+
+        function removeFromWhitelist(domain) {
+            whitelist = whitelist.filter(d => d !== domain);
+            renderWhitelist();
+        }
+
+        function simulateTraffic() {
+            setInterval(() => {
+                const blocked = Math.random() > 0.5;
+                stats.totalRequests++;
+                
+                if (blocked) {
+                    stats.totalBlocks++;
+                    stats.recentBlocks.unshift({
+                        url: 'https://example' + Math.floor(Math.random() * 1000) + '.com/ad.js',
+                        reason: ['AdNetwork', 'Tracker', 'PatternMatch'][Math.floor(Math.random() * 3)]
+                    });
+                    
+                    if (stats.recentBlocks.length > 10) {
+                        stats.recentBlocks.pop();
+                    }
+                    
+                    renderRecentBlocks();
+                }
+                
+                renderStats();
+            }, 1000);
+        }
+
+        function renderRecentBlocks() {
+            const container = document.getElementById('recentBlocks');
+            container.innerHTML = '';
+            
+            stats.recentBlocks.forEach(block => {
+                const div = document.createElement('div');
+                div.className = 'block-entry';
+                div.innerHTML = `
+                    <div class="block-url">${block.url}</div>
+                    <div class="block-reason">${block.reason}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Confidence slider
+        document.getElementById('confidenceSlider').addEventListener('input', (e) => {
+            document.getElementById('confidenceValue').textContent = e.target.value + '%';
+        });
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>

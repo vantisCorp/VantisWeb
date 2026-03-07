@@ -1,106 +1,92 @@
-# VantisWeb Web APIs Integration Tests
+# VantisWeb Browser Test Suite
 
-This directory contains integration tests for the VantisWeb browser's Web APIs.
+This directory contains comprehensive tests for the VantisWeb Browser project.
 
-## Test Files
+## Test Structure
 
-### web_apis_test.html
-A comprehensive test page that validates all Web APIs implemented in VantisWeb:
+```
+tests/
+├── auth/              # Authentication and security tests
+│   ├── totp_test.rs          # TOTP implementation tests
+│   └── session_test.rs       # Session management tests
+├── core/              # Core browser engine tests
+│   ├── kernel_test.rs        # Vantis Kernel tests
+│   ├── scheduler_test.rs     # Task scheduler tests
+│   └── storage_test.rs       # Storage system tests
+├── profiles/          # Profile management tests
+│   └── profile_manager_test.rs  # Profile manager tests
+├── sync/              # Cloud sync tests
+│   └── providers_test.rs     # Sync provider tests
+├── integration/       # Integration tests
+│   └── browser_workflow_test.rs  # End-to-end workflow tests
+└── *_tests.rs         # Legacy test files
+```
 
-1. **Console API Tests**
-   - `console.log()`
-   - `console.warn()`
-   - `console.error()`
-   - `console.info()`
-   - `console.debug()`
+## Running Tests
 
-2. **Storage API Tests**
-   - `localStorage.setItem()`
-   - `localStorage.getItem()`
-   - `localStorage.removeItem()`
-   - `localStorage.clear()`
-   - `sessionStorage.setItem()`
-   - `sessionStorage.getItem()`
-   - `sessionStorage.removeItem()`
-   - `sessionStorage.clear()`
+### Run All Tests
+```bash
+cargo test
+```
 
-3. **Fetch API Tests**
-   - HTTP GET requests
-   - JSON response parsing
-   - Error handling
-   - Custom URL testing
+### Run Specific Test Module
+```bash
+cargo test --test kernel_test
+```
 
-4. **Event Loop Tests**
-   - `setTimeout()`
-   - `setInterval()`
-   - `clearTimeout()`
-   - `clearInterval()`
+### Run Specific Test
+```bash
+cargo test test_kernel_initialization
+```
 
-## How to Run Tests
+### Run Tests with Output
+```bash
+cargo test -- --nocapture
+```
 
-### Using VantisWeb Browser
-1. Build and run VantisWeb browser
-2. Open `tests/web_apis_test.html` in the browser
-3. Click "Run All Tests" or test individual APIs
-4. Review the results in the test sections
+### Run Tests with Coverage
+```bash
+cargo tarpaulin --out Html
+```
 
-### Expected Results
-All tests should pass with green status indicators:
-- ✅ Console API tests passed!
-- ✅ Storage API tests passed!
-- ✅ Fetch API tests passed!
-- ✅ Event Loop tests passed!
+## Test Categories
 
-## Test Coverage
+### Unit Tests
+- Test individual functions and modules
+- Fast to run
+- No external dependencies
+- Located in `tests/` subdirectories
 
-| API | Functions | Status |
-|-----|-----------|--------|
-| Console | log, warn, error, info, debug | ✅ Implemented |
-| Storage | localStorage, sessionStorage | ✅ Implemented |
-| Fetch | fetch() | ✅ Implemented |
-| Event Loop | setTimeout, setInterval, clearTimeout, clearInterval | ✅ Implemented |
+### Integration Tests
+- Test interactions between modules
+- Test complete workflows
+- May require external resources
+- Located in `tests/integration/`
 
-## Known Limitations
+## Coverage Goals
 
-1. **Fetch API**: Currently uses placeholder implementation. Full HTTP client integration needed.
-2. **Event Loop**: Timer callbacks are not yet fully integrated with JavaScript execution.
-3. **Storage**: Data is stored in memory and will be lost on browser restart.
+- Target coverage: **80%**
+- Critical modules: **90%+**
+- Current coverage: TBD
 
-## Future Enhancements
+## Writing Tests
 
-- [ ] Add performance benchmarks
-- [ ] Add stress tests for large datasets
-- [ ] Add WebSocket API tests
-- [ ] Add Web Workers API tests
-- [ ] Add IndexedDB API tests
-- [ ] Add Service Worker API tests
+1. Place test files in appropriate subdirectory
+2. Use descriptive test names: `test_<functionality>_<scenario>`
+3. Follow the Arrange-Act-Assert pattern
+4. Keep tests focused and independent
+5. Add documentation for complex tests
 
-## Troubleshooting
+## CI/CD Integration
 
-### Tests Fail to Load
-- Ensure VantisWeb browser is running
-- Check browser console for errors
-- Verify JavaScript Bridge is properly initialized
-
-### Storage Tests Fail
-- Check if storage APIs are properly registered
-- Verify storage quota limits
-- Clear browser cache and retry
-
-### Fetch Tests Fail
-- Verify network connectivity
-- Check CORS settings
-- Ensure fetch API is properly registered
+Tests run automatically on:
+- Pull requests
+- Main branch commits
+- Scheduled runs (nightly)
 
 ## Contributing
 
-When adding new Web APIs:
-1. Implement the API in Rust
-2. Register it in the JavaScript Bridge
-3. Add corresponding tests to `web_apis_test.html`
-4. Update this README with test coverage
-5. Run all tests to ensure no regressions
-
-## License
-
-MIT License - See LICENSE file for details
+When adding new features, include corresponding tests:
+1. Unit tests for new functions
+2. Integration tests for new workflows
+3. Update this README with test descriptions

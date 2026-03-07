@@ -1,0 +1,97 @@
+# Pre-commit hooks configuration for VantisWeb
+# Based on Firefox development practices
+
+repos:
+  # Rust specific hooks
+  - repo: local
+    hooks:
+      - id: rustfmt
+        name: Rust Format
+        entry: cargo fmt --all -- --check
+        language: system
+        files: \.rs$
+        pass_filenames: false
+
+      - id: clippy
+        name: Rust Lint
+        entry: cargo clippy --all-targets --all-features -- -D warnings -W clippy::all
+        language: system
+        files: \.rs$
+        pass_filenames: false
+
+      - id: cargo-test
+        name: Cargo Test
+        entry: cargo test --all-features
+        language: system
+        files: \.rs$
+        pass_filenames: false
+
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim Trailing Whitespace
+        exclude: ^(docs/|\.md$)
+
+      - id: end-of-file-fixer
+        name: Fix End of Files
+        exclude: ^(docs/|\.md$)
+
+      - id: check-yaml
+        name: Check YAML
+        files: \.(yml|yaml)$
+
+      - id: check-json
+        name: Check JSON
+        files: \.json$
+
+      - id: check-toml
+        name: Check TOML
+        files: \.toml$
+
+      - id: check-added-large-files
+        name: Check for Large Files
+        args: ['--maxkb=1000']
+
+      - id: check-merge-conflict
+        name: Check for Merge Conflicts
+
+      - id: check-case-conflict
+        name: Check for Case Conflicts
+
+      - id: detect-private-key
+        name: Detect Private Keys
+
+      - id: mixed-line-ending
+        name: Mixed Line Ending
+        args: ['--fix=lf']
+
+  # Markdown hooks
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        name: Markdown Lint
+        args: ['--fix']
+        exclude: ^(CHANGELOG\.md)$
+
+  # Shell scripts
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        name: ShellCheck
+        files: \.(sh|bash)$
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
