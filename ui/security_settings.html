@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb - Security Settings</title>
+    <link rel="stylesheet" href="../assets/styles/main.css">
+    <style>
+        :root {
+            --primary-color: #7c3aed;
+            --primary-hover: #6d28d9;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-primary: #0f0f14;
+            --bg-secondary: #1a1a24;
+            --bg-tertiary: #252532;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border-color: #2a2a3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.enabled {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.disabled {
+            background: rgba(163, 163, 163, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .code-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .code-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .session-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .session-details h4 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .session-details p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .audit-log {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .audit-item {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .audit-info {
+            flex: 1;
+        }
+
+        .audit-event {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .audit-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .audit-severity {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 1rem;
+        }
+
+        .audit-severity.info { background: var(--text-secondary); }
+        .audit-severity.warning { background: var(--warning-color); }
+        .audit-severity.error { background: var(--danger-color); }
+        .audit-severity.critical { background: var(--danger-color); }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+            z-index: 1001;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success { border-color: var(--success-color); }
+        .toast.error { border-color: var(--danger-color); }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔒 Security Settings</h1>
+            <p class="subtitle">Manage your account security and authentication methods</p>
+        </header>
+
+        <div class="grid">
+            <nav class="sidebar">
+                <div class="nav-item active" onclick="showSection('auth')" data-section="auth">
+                    <span>🔐</span>
+                    <span>Authentication</span>
+                </div>
+                <div class="nav-item" onclick="showSection('mfa')" data-section="mfa">
+                    <span>🛡️</span>
+                    <span>Two-Factor Auth</span>
+                </div>
+                <div class="nav-item" onclick="showSection('sessions')" data-section="sessions">
+                    <span>💻</span>
+                    <span>Active Sessions</span>
+                </div>
+                <div class="nav-item" onclick="showSection('recovery')" data-section="recovery">
+                    <span>🔑</span>
+                    <span>Recovery</span>
+                </div>
+                <div class="nav-item" onclick="showSection('audit')" data-section="audit">
+                    <span>📋</span>
+                    <span>Audit Log</span>
+                </div>
+            </nav>
+
+            <main>
+                <!-- Authentication Section -->
+                <div class="content active" id="auth">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Password</h2>
+                            <button class="btn btn-secondary btn-small" onclick="changePassword()">Change Password</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Password Strength</h3>
+                                <span class="status-badge enabled">Strong</span>
+                            </div>
+                            <p class="card-description">Your password is secure and meets all requirements.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Last Changed</h3>
+                                <span class="status-badge disabled">30 days ago</span>
+                            </div>
+                            <p class="card-description">Consider changing your password regularly for optimal security.</p>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Biometric Authentication</h2>
+                            <span class="status-badge disabled">Disabled</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Use fingerprint or face recognition to log in quickly.</p>
+                        <button class="btn btn-primary" onclick="enableBiometric()">Enable Biometrics</button>
+                    </div>
+                </div>
+
+                <!-- MFA Section -->
+                <div class="content" id="mfa">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Two-Factor Authentication (TOTP)</h2>
+                            <span class="status-badge disabled" id="totpStatus">Disabled</span>
+                        </div>
+                        <div id="totpDisabled">
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                Add an extra layer of security by requiring a code from your authenticator app when logging in.
+                            </p>
+                            <button class="btn btn-primary" onclick="setupTOTP()">Set Up TOTP</button>
+                        </div>
+                        <div id="totpEnabled" style="display: none;">
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                Two-factor authentication is enabled for your account.
+                            </p>
+                            <button class="btn btn-danger" onclick="disableTOTP()">Disable TOTP</button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Hardware Security Keys</h2>
+                            <span class="status-badge disabled" id="webauthnStatus">0 keys</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            Use a USB security key (like YubiKey) for passwordless authentication.
+                        </p>
+                        <div id="securityKeysList" class="session-list" style="margin-bottom: 1rem;">
+                            <!-- Security keys will be populated dynamically -->
+                        </div>
+                        <button class="btn btn-primary" onclick="addSecurityKey()">Add Security Key</button>
+                    </div>
+                </div>
+
+                <!-- Sessions Section -->
+                <div class="content" id="sessions">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Active Sessions</h2>
+                            <button class="btn btn-secondary btn-small" onclick="revokeAllSessions()">Revoke All</button>
+                        </div>
+                        <div class="session-list" id="sessionList">
+                            <!-- Sessions will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Section -->
+                <div class="content" id="recovery">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Recovery Codes</h2>
+                            <span class="status-badge disabled" id="recoveryCodesStatus">Not Generated</span>
+                        </div>
+                        <div id="recoveryCodesNotGenerated">
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                Generate backup codes you can use to access your account if you lose access to your authenticator.
+                            </p>
+                            <button class="btn btn-primary" onclick="generateRecoveryCodes()">Generate Codes</button>
+                        </div>
+                        <div id="recoveryCodesGenerated" style="display: none;">
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                Store these codes in a safe place. Each code can only be used once.
+                            </p>
+                            <div class="code-grid" id="recoveryCodesList">
+                                <!-- Codes will be populated dynamically -->
+                            </div>
+                            <div style="margin-top: 1.5rem;">
+                                <button class="btn btn-secondary" onclick="downloadCodes()">Download</button>
+                                <button class="btn btn-danger" onclick="regenerateCodes()">Regenerate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Log Section -->
+                <div class="content" id="audit">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Security Audit Log</h2>
+                            <button class="btn btn-secondary btn-small" onclick="exportAuditLog()">Export</button>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            View all security-related events for your account.
+                        </p>
+                        <div class="audit-log" id="auditLog">
+                            <!-- Audit entries will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- TOTP Setup Modal -->
+    <div class="modal" id="totpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Set Up Two-Factor Authentication</h3>
+                <button class="modal-close" onclick="closeTOTPModal()">&times;</button>
+            </div>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="width: 200px; height: 200px; background: white; margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: black;">QR Code Placeholder</span>
+                </div>
+                <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 0.875rem;">
+                    Scan this QR code with your authenticator app
+                </p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter the 6-digit code from your authenticator app</label>
+                <input type="text" class="form-input" id="totpCode" placeholder="123456" maxlength="6">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="verifyTOTP()">Verify</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // State
+        let currentSection = 'auth';
+        let totpEnabled = false;
+        let securityKeys = [];
+
+        // Navigation
+        function showSection(sectionId) {
+            currentSection = sectionId;
+            
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update content
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === sectionId) {
+                    content.classList.add('active');
+                }
+            });
+            
+            // Load section data
+            loadSectionData(sectionId);
+        }
+
+        function loadSectionData(sectionId) {
+            switch (sectionId) {
+                case 'sessions':
+                    loadSessions();
+                    break;
+                case 'audit':
+                    loadAuditLog();
+                    break;
+                case 'mfa':
+                    loadSecurityKeys();
+                    break;
+            }
+        }
+
+        // Password
+        function changePassword() {
+            showToast('Password change dialog would open here', 'success');
+        }
+
+        // Biometrics
+        function enableBiometric() {
+            showToast('Enabling biometrics...', 'success');
+        }
+
+        // TOTP
+        function setupTOTP() {
+            document.getElementById('totpModal').classList.add('active');
+        }
+
+        function closeTOTPModal() {
+            document.getElementById('totpModal').classList.remove('active');
+            document.getElementById('totpCode').value = '';
+        }
+
+        function verifyTOTP() {
+            const code = document.getElementById('totpCode').value;
+            if (code.length === 6) {
+                totpEnabled = true;
+                document.getElementById('totpStatus').className = 'status-badge enabled';
+                document.getElementById('totpStatus').textContent = 'Enabled';
+                document.getElementById('totpDisabled').style.display = 'none';
+                document.getElementById('totpEnabled').style.display = 'block';
+                closeTOTPModal();
+                showToast('Two-factor authentication enabled!', 'success');
+            } else {
+                showToast('Please enter a valid 6-digit code', 'error');
+            }
+        }
+
+        function disableTOTP() {
+            if (confirm('Are you sure you want to disable two-factor authentication?')) {
+                totpEnabled = false;
+                document.getElementById('totpStatus').className = 'status-badge disabled';
+                document.getElementById('totpStatus').textContent = 'Disabled';
+                document.getElementById('totpDisabled').style.display = 'block';
+                document.getElementById('totpEnabled').style.display = 'none';
+                showToast('Two-factor authentication disabled', 'success');
+            }
+        }
+
+        // Security Keys
+        function loadSecurityKeys() {
+            const container = document.getElementById('securityKeysList');
+            const status = document.getElementById('webauthnStatus');
+            
+            if (securityKeys.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No security keys registered</p>';
+                status.textContent = '0 keys';
+            } else {
+                container.innerHTML = securityKeys.map((key, index) => `
+                    <div class="session-item">
+                        <div class="session-info">
+                            <div class="session-icon">🔑</div>
+                            <div class="session-details">
+                                <h4>${key.name}</h4>
+                                <p>Added ${key.added}</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger btn-small" onclick="removeSecurityKey(${index})">Remove</button>
+                    </div>
+                `).join('');
+                status.textContent = `${securityKeys.length} key${securityKeys.length > 1 ? 's' : ''}`;
+            }
+        }
+
+        function addSecurityKey() {
+            const name = prompt('Enter a name for this security key:');
+            if (name) {
+                securityKeys.push({
+                    name,
+                    added: 'just now',
+                    id: Date.now()
+                });
+                loadSecurityKeys();
+                showToast('Security key added successfully!', 'success');
+            }
+        }
+
+        function removeSecurityKey(index) {
+            if (confirm('Are you sure you want to remove this security key?')) {
+                securityKeys.splice(index, 1);
+                loadSecurityKeys();
+                showToast('Security key removed', 'success');
+            }
+        }
+
+        // Sessions
+        function loadSessions() {
+            const container = document.getElementById('sessionList');
+            
+            const sessions = [
+                {
+                    icon: '💻',
+                    name: 'This Device',
+                    device: 'MacBook Pro',
+                    location: 'San Francisco, CA',
+                    current: true
+                },
+                {
+                    icon: '📱',
+                    name: 'iPhone 14',
+                    device: 'iPhone',
+                    location: 'San Francisco, CA',
+                    current: false
+                },
+                {
+                    icon: '🌐',
+                    name: 'Chrome Browser',
+                    device: 'Windows PC',
+                    location: 'New York, NY',
+                    current: false
+                }
+            ];
+            
+            container.innerHTML = sessions.map(session => `
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="session-icon">${session.icon}</div>
+                        <div class="session-details">
+                            <h4>${session.name} ${session.current ? '<span class="status-badge enabled" style="margin-left: 0.5rem;">Current</span>' : ''}</h4>
+                            <p>${session.device} • ${session.location}</p>
+                        </div>
+                    </div>
+                    ${!session.current ? '<button class="btn btn-secondary btn-small" onclick="revokeSession()">Revoke</button>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function revokeSession() {
+            showToast('Session revoked', 'success');
+        }
+
+        function revokeAllSessions() {
+            if (confirm('Are you sure you want to revoke all other sessions?')) {
+                showToast('All sessions revoked', 'success');
+                loadSessions();
+            }
+        }
+
+        // Recovery Codes
+        function generateRecoveryCodes() {
+            const codes = generateRandomCodes(10);
+            document.getElementById('recoveryCodesList').innerHTML = codes.map(code => 
+                `<div class="code-item">${code}</div>`
+            ).join('');
+            
+            document.getElementById('recoveryCodesNotGenerated').style.display = 'none';
+            document.getElementById('recoveryCodesGenerated').style.display = 'block';
+            document.getElementById('recoveryCodesStatus').className = 'status-badge enabled';
+            document.getElementById('recoveryCodesStatus').textContent = 'Generated';
+            
+            showToast('Recovery codes generated successfully!', 'success');
+        }
+
+        function generateRandomCodes(count) {
+            const codes = [];
+            const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            
+            for (let i = 0; i < count; i++) {
+                let code = '';
+                for (let j = 0; j < 10; j++) {
+                    if (j === 5) code += '-';
+                    code += charset[Math.floor(Math.random() * charset.length)];
+                }
+                codes.push(code);
+            }
+            
+            return codes;
+        }
+
+        function downloadCodes() {
+            showToast('Downloading recovery codes...', 'success');
+        }
+
+        function regenerateCodes() {
+            if (confirm('This will invalidate your old codes. Are you sure?')) {
+                generateRecoveryCodes();
+            }
+        }
+
+        // Audit Log
+        function loadAuditLog() {
+            const container = document.getElementById('auditLog');
+            
+            const events = [
+                {
+                    event: 'Successful login',
+                    timestamp: 'Today, 10:30 AM',
+                    location: 'San Francisco, CA',
+                    severity: 'info'
+                },
+                {
+                    event: 'Password changed',
+                    timestamp: 'Yesterday, 3:45 PM',
+                    location: 'San Francisco, CA',
+                    severity: 'warning'
+                },
+                {
+                    event: 'Failed login attempt',
+                    timestamp: 'Mar 1, 2024, 8:20 AM',
+                    location: 'Unknown',
+                    severity: 'error'
+                },
+                {
+                    event: 'TOTP enabled',
+                    timestamp: 'Feb 28, 2024, 2:15 PM',
+                    location: 'San Francisco, CA',
+                    severity: 'warning'
+                },
+                {
+                    event: 'Account created',
+                    timestamp: 'Feb 15, 2024, 11:00 AM',
+                    location: 'San Francisco, CA',
+                    severity: 'info'
+                }
+            ];
+            
+            container.innerHTML = events.map(entry => `
+                <div class="audit-item">
+                    <div class="audit-info">
+                        <div class="audit-event">${entry.event}</div>
+                        <div class="audit-meta">${entry.timestamp} • ${entry.location}</div>
+                    </div>
+                    <div class="audit-severity ${entry.severity}"></div>
+                </div>
+            `).join('');
+        }
+
+        function exportAuditLog() {
+            showToast('Exporting audit log...', 'success');
+        }
+
+        // Utility functions
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : '❌'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSessions();
+        });
+    </script>
+</body>
+</html>
