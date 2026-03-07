@@ -173,10 +173,16 @@ graph TD
 
 Postęp v1.1.0: `[██████████] 100%`
 
-### Faza 3: Specjalizowane Profile
+### Faza 3: Specjalizowane Profile ✅
+
+- [x] Gamer Profile ✅
+- [x] Streamer Profile ✅
+- [x] Developer Profile ✅
+- [x] Privacy Profile ✅
+- [x] Social Profile ✅
 
 ```mermaid
-pie title Planowane Profile
+pie title Zaimplementowane Profile
     "Gamer" : 25
     "Streamer" : 20
     "Developer" : 20
@@ -289,10 +295,16 @@ graph TD
 
 v1.1.0 Progress: `[██████████░░] 60%`
 
-### Phase 3: Specialized Profiles
+### Phase 3: Specialized Profiles ✅
+
+- [x] Gamer Profile ✅
+- [x] Streamer Profile ✅
+- [x] Developer Profile ✅
+- [x] Privacy Profile ✅
+- [x] Social Profile ✅
 
 ```mermaid
-pie title Planned Profiles
+pie title Implemented Profiles
     "Gamer" : 25
     "Streamer" : 20
     "Developer" : 20

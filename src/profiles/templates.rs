@@ -34,6 +34,10 @@ pub enum TemplateCategory {
     Privacy,
     /// Developer profile
     Developer,
+    /// Streamer profile
+    Streamer,
+    /// Social profile
+    Social,
     /// Custom profile
     Custom(String),
 }
@@ -263,10 +267,93 @@ impl TemplateManager {
             theme: Some("dark".to_string()),
         };
 
+        // Streamer template
+        let streamer_template = ProfileTemplate {
+            name: "Streamer".to_string(),
+            description: "Optimized for live streaming and content creation".to_string(),
+            category: TemplateCategory::Streamer,
+            settings: TemplateSettings {
+                search_engine: Some("https://www.google.com/search?q=".to_string()),
+                homepage: Some("https://dashboard.twitch.tv".to_string()),
+                start_pages: vec![
+                    "https://dashboard.twitch.tv".to_string(),
+                    "https://www.youtube.com/studio".to_string(),
+                    "https://streamelements.com".to_string(),
+                    "https://streamlabs.com".to_string(),
+                ],
+                keyboard_shortcuts: {
+                    let mut shortcuts = HashMap::new();
+                    shortcuts.insert("Ctrl+Shift+S".to_string(), "toggle-stream".to_string());
+                    shortcuts.insert("Ctrl+Shift+C".to_string(), "toggle-chat".to_string());
+                    shortcuts
+                },
+                privacy: PrivacySettings {
+                    block_trackers: false,
+                    block_ads: false,
+                    clear_cookies_on_exit: false,
+                    clear_history_on_exit: false,
+                    private_mode_by_default: false,
+                    disable_javascript: false,
+                },
+                performance: PerformanceSettings {
+                    hardware_acceleration: true,
+                    memory_limit: Some(8192),
+                    cpu_priority: CPUPriority::High,
+                    cache_size: 2048,
+                },
+            },
+            extensions: vec![
+                "twitch-enhancer".to_string(),
+                "stream-elements".to_string(),
+                "streamlabs-overlay".to_string(),
+                "chat-overlay".to_string(),
+            ],
+            theme: Some("dark".to_string()),
+        };
+
+        // Social template
+        let social_template = ProfileTemplate {
+            name: "Social".to_string(),
+            description: "Optimized for social media and communication".to_string(),
+            category: TemplateCategory::Social,
+            settings: TemplateSettings {
+                search_engine: Some("https://www.google.com/search?q=".to_string()),
+                homepage: Some("https://twitter.com".to_string()),
+                start_pages: vec![
+                    "https://twitter.com".to_string(),
+                    "https://www.facebook.com".to_string(),
+                    "https://www.instagram.com".to_string(),
+                    "https://www.linkedin.com".to_string(),
+                ],
+                keyboard_shortcuts: HashMap::new(),
+                privacy: PrivacySettings {
+                    block_trackers: true,
+                    block_ads: true,
+                    clear_cookies_on_exit: false,
+                    clear_history_on_exit: false,
+                    private_mode_by_default: false,
+                    disable_javascript: false,
+                },
+                performance: PerformanceSettings {
+                    hardware_acceleration: true,
+                    memory_limit: Some(4096),
+                    cpu_priority: CPUPriority::Normal,
+                    cache_size: 512,
+                },
+            },
+            extensions: vec![
+                "social-media-manager".to_string(),
+                "notification-aggregator".to_string(),
+            ],
+            theme: Some("light".to_string()),
+        };
+
         self.templates.insert("work".to_string(), work_template);
         self.templates.insert("gaming".to_string(), gaming_template);
         self.templates.insert("privacy".to_string(), privacy_template);
         self.templates.insert("developer".to_string(), developer_template);
+        self.templates.insert("streamer".to_string(), streamer_template);
+        self.templates.insert("social".to_string(), social_template);
     }
 
     /// Gets a template by name
