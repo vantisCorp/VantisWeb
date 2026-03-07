@@ -1,0 +1,25 @@
+# Clippy.toml - Configuration for Clippy linter
+# Based on Firefox Rust coding standards
+
+# Threshold for function complexity
+cognitive-complexity-threshold = 30
+
+# Maximum number of arguments for a function
+too-many-arguments-threshold = 7
+
+# Maximum type complexity
+type-complexity-threshold = 250
+
+# Disallow certain pedantic lints that might be too strict
+allow-expect-in-tests = true
+allow-unwrap-in-tests = true
+allow-dbg-in-tests = true
+
+# Enable more strict checking
+warn-on-all-wildcard-imports = true
+
+# Documentation requirements
+missing-docs-in-private-items = false
+
+# Single char binding names are allowed in certain contexts
+single-char-binding-names-threshold = 4
