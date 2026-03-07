@@ -30,6 +30,19 @@ pub enum AuthMethod {
     TwoFactor,
 }
 
+/// Two-factor authentication configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TwoFactorConfig {
+    /// TOTP secret (Base32 encoded)
+    pub totp_secret: String,
+    /// Recovery codes (hashed)
+    pub recovery_codes: Vec<String>,
+    /// Is 2FA enabled
+    pub enabled: bool,
+    /// Last used code (to prevent replay)
+    pub last_used_code: Option<String>,
+}
+
 /// Profile security configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProfileSecurity {
@@ -45,6 +58,8 @@ pub struct ProfileSecurity {
     pub biometric_data: Option<String>,
     /// Encryption key (if encryption is enabled)
     pub encryption_key: Option<String>,
+    /// Two-factor authentication configuration
+    pub two_factor_config: Option<TwoFactorConfig>,
     /// Auto-lock timeout (in seconds)
     pub auto_lock_timeout: Option<u64>,
     /// Last authentication timestamp
@@ -92,6 +107,7 @@ impl ProfileSecurityManager {
             password_hash: None,
             biometric_data: None,
             encryption_key: None,
+            two_factor_config: None,
             auto_lock_timeout: Some(300), // 5 minutes
             last_auth: None,
             failed_attempts: 0,
@@ -167,6 +183,138 @@ impl ProfileSecurityManager {
         }
     }
 
+    /// Verifies two-factor authentication code (TOTP or recovery code)
+    pub fn verify_two_factor(&mut self, profile_id: &str, code: &str) -> Result<bool> {
+        let security = self.securities.get_mut(profile_id)
+            .ok_or_else(|| anyhow!("Security not found for profile: {}", profile_id))?;
+
+        let two_factor = security.two_factor_config.as_ref()
+            .filter(|tf| tf.enabled)
+            .ok_or_else(|| anyhow!("2FA not configured for profile: {}", profile_id))?;
+
+        // Check if this code was already used (replay protection)
+        if let Some(last_code) = &two_factor.last_used_code {
+            if last_code == code {
+                return Err(anyhow!("Code already used. Please wait for a new code."));
+            }
+        }
+
+        // Try TOTP verification first
+        if self.verify_totp(&two_factor.totp_secret, code)? {
+            // Update last used code
+            if let Some(tf) = &mut security.two_factor_config {
+                tf.last_used_code = Some(code.to_string());
+            }
+            return Ok(true);
+        }
+
+        // Try recovery code
+        let code_hash = self.crypto.hash(code.as_bytes())?;
+        for (i, stored_hash) in two_factor.recovery_codes.iter().enumerate() {
+            if &code_hash == stored_hash {
+                // Remove used recovery code
+                if let Some(tf) = &mut security.two_factor_config {
+                    tf.recovery_codes.remove(i);
+                }
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    /// Verifies TOTP code using RFC 6238 algorithm
+    fn verify_totp(&self, secret: &str, code: &str) -> Result<bool> {
+        use base32::{self, Alphabet};
+        
+        // Decode Base32 secret
+        let secret_bytes = base32::decode(Alphabet::RFC4648:: PaddingSensitive, secret)
+            .ok_or_else(|| anyhow!("Invalid TOTP secret"))?;
+
+        // Get current time step (30 second intervals)
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_secs() / 30;
+
+        // Calculate expected TOTP codes (current, previous, next for clock skew)
+        for time_offset in -1i64..=1 {
+            let time_step = (timestamp as i64 + time_offset) as u64;
+            let expected_code = self.calculate_totp(&secret_bytes, time_step)?;
+            
+            if code == expected_code {
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    /// Calculates TOTP code for a given time step
+    fn calculate_totp(&self, secret: &[u8], time_step: u64) -> Result<String> {
+        use hmac::{Hmac, Mac};
+        use sha1::Sha1;
+
+        // Convert time step to big-endian bytes
+        let time_bytes = time_step.to_be_bytes();
+
+        // Calculate HMAC-SHA1
+        let mut mac = Hmac::<Sha1>::new_from_slice(secret)?;
+        mac.update(&time_bytes);
+        let result = mac.finalize();
+        let hmac_result = result.into_bytes();
+
+        // Dynamic truncation (RFC 4226)
+        let offset = (hmac_result[19] & 0x0f) as usize;
+        let binary = ((hmac_result[offset] as u32 & 0x7f) << 24)
+            | ((hmac_result[offset + 1] as u32) << 16)
+            | ((hmac_result[offset + 2] as u32) << 8)
+            | (hmac_result[offset + 3] as u32);
+
+        let otp = binary % 1_000_000;
+
+        // Format as 6-digit string with leading zeros
+        Ok(format!("{:06}", otp))
+    }
+
+    /// Generates a new TOTP secret and recovery codes for 2FA setup
+    pub fn setup_two_factor(&mut self, profile_id: &str) -> Result<TwoFactorConfig> {
+        use base32::{self, Alphabet};
+        use rand::Rng;
+
+        let security = self.securities.get_mut(profile_id)
+            .ok_or_else(|| anyhow!("Security not found for profile: {}", profile_id))?;
+
+        // Generate random 20-byte secret (160 bits, as recommended by RFC 4226)
+        let mut secret_bytes = [0u8; 20];
+        rand::thread_rng().fill(&mut secret_bytes);
+        
+        // Encode as Base32
+        let totp_secret = base32::encode(Alphabet::RFC4648::PaddingSensitive, &secret_bytes);
+
+        // Generate 8 recovery codes
+        let mut recovery_codes = Vec::new();
+        let mut rng = rand::thread_rng();
+        for _ in 0..8 {
+            let code: String = (0..8)
+                .map(|_| rng.sample(rand::distributions::Alphanumeric) as char)
+                .collect();
+            let hashed = self.crypto.hash(code.as_bytes())?;
+            recovery_codes.push(hashed);
+        }
+
+        let config = TwoFactorConfig {
+            totp_secret: totp_secret.clone(),
+            recovery_codes: recovery_codes.clone(),
+            enabled: true,
+            last_used_code: None,
+        };
+
+        security.two_factor_config = Some(config.clone());
+        security.auth_methods.push(AuthMethod::TwoFactor);
+
+        Ok(config)
+    }
+
     /// Authenticates a profile
     pub fn authenticate(&mut self, profile_id: &str, auth_method: &AuthMethod, credential: &str) -> Result<bool> {
         let security = self.securities.get_mut(profile_id)
@@ -189,13 +337,22 @@ impl ProfileSecurityManager {
             AuthMethod::Password => self.verify_password(profile_id, credential)?,
             AuthMethod::Biometric => self.verify_biometric(profile_id, credential)?,
             AuthMethod::TwoFactor => {
-                // For 2FA, verify password first
-                if self.verify_password(profile_id, credential)? {
-                    // TODO: Implement second factor verification
-                    true
-                } else {
-                    false
+                // For 2FA, verify password first, then TOTP code
+                // Credential format: "password:totp_code" or "password:recovery_code"
+                let parts: Vec<&str> = credential.splitn(2, ':').collect();
+                if parts.len() != 2 {
+                    return Ok(false);
                 }
+                
+                let password = parts[0];
+                let second_factor = parts[1];
+                
+                if !self.verify_password(profile_id, password)? {
+                    return Ok(false);
+                }
+                
+                // Verify second factor (TOTP or recovery code)
+                self.verify_two_factor(profile_id, second_factor)?
             }
         };
 
@@ -216,7 +373,7 @@ impl ProfileSecurityManager {
         }
     }
 
-    /// Encrypts profile data
+    /// Encrypts profile data using ChaCha20-Poly1305
     pub fn encrypt_profile_data(&self, profile_id: &str, data: &[u8]) -> Result<Vec<u8>> {
         let security = self.securities.get(profile_id)
             .ok_or_else(|| anyhow!("Security not found for profile: {}", profile_id))?;
@@ -225,21 +382,22 @@ impl ProfileSecurityManager {
             return Ok(data.to_vec());
         }
 
-        // Use encryption key if available, otherwise use password hash
+        // Use encryption key if available, otherwise derive from password hash
         let key = if let Some(encryption_key) = &security.encryption_key {
             hex::decode(encryption_key)?
         } else if let Some(password_hash) = &security.password_hash {
-            password_hash.as_bytes().to_vec()
+            // Derive a 32-byte key from the password hash
+            crate::security::CryptoEngine::derive_key_from_password(password_hash, b"vantis_profile_salt")?
         } else {
             return Err(anyhow!("No encryption key available"));
         };
 
-        // TODO: Implement proper encryption with key
-        // For now, use the crypto engine
-        self.crypto.encrypt(data)
+        // Create a cipher with the profile-specific key
+        let crypto = crate::security::CryptoEngine::with_key(key)?;
+        crypto.encrypt(data)
     }
 
-    /// Decrypts profile data
+    /// Decrypts profile data using ChaCha20-Poly1305
     pub fn decrypt_profile_data(&self, profile_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>> {
         let security = self.securities.get(profile_id)
             .ok_or_else(|| anyhow!("Security not found for profile: {}", profile_id))?;
@@ -248,9 +406,19 @@ impl ProfileSecurityManager {
             return Ok(encrypted_data.to_vec());
         }
 
-        // TODO: Implement proper decryption with key
-        // For now, use the crypto engine
-        self.crypto.decrypt(encrypted_data)
+        // Use encryption key if available, otherwise derive from password hash
+        let key = if let Some(encryption_key) = &security.encryption_key {
+            hex::decode(encryption_key)?
+        } else if let Some(password_hash) = &security.password_hash {
+            // Derive a 32-byte key from the password hash
+            crate::security::CryptoEngine::derive_key_from_password(password_hash, b"vantis_profile_salt")?
+        } else {
+            return Err(anyhow!("No encryption key available"));
+        };
+
+        // Create a cipher with the profile-specific key
+        let crypto = crate::security::CryptoEngine::with_key(key)?;
+        crypto.decrypt(encrypted_data)
     }
 
     /// Checks if a profile is locked

@@ -124,28 +124,57 @@ fn validate_export_format(export: &ProfilesExport) -> Result<()> {
     Ok(())
 }
 
-/// Encrypt profile data (placeholder - implement actual encryption)
+/// Encrypt profile data using ChaCha20-Poly1305
 fn encrypt_data(data: &str, password: &str) -> Result<String> {
-    // TODO: Implement actual encryption using AES-256-GCM
-    // For now, just return base64 encoded data as placeholder
     use base64::{engine::general_purpose::STANDARD, Engine};
-    Ok(STANDARD.encode(format!("{}:{}", data, password)))
+    use rand::RngCore;
+    
+    // Generate random salt for key derivation
+    let mut salt = [0u8; 16];
+    rand::thread_rng().fill_bytes(&mut salt);
+    
+    // Derive key from password
+    let key = crate::security::CryptoEngine::derive_key_from_password(password, &salt)?;
+    
+    // Create cipher with derived key
+    let crypto = crate::security::CryptoEngine::with_key(key)?;
+    
+    // Encrypt the data
+    let encrypted = crypto.encrypt(data.as_bytes())?;
+    
+    // Combine salt + encrypted data and encode as base64
+    let mut result = Vec::with_capacity(salt.len() + encrypted.len());
+    result.extend_from_slice(&salt);
+    result.extend_from_slice(&encrypted);
+    
+    Ok(STANDARD.encode(&result))
 }
 
-/// Decrypt profile data (placeholder - implement actual decryption)
+/// Decrypt profile data using ChaCha20-Poly1305
 fn decrypt_data(encrypted_data: &str, password: &str) -> Result<String> {
-    // TODO: Implement actual decryption using AES-256-GCM
-    // For now, just decode base64 as placeholder
     use base64::{engine::general_purpose::STANDARD, Engine};
-    let decoded = STANDARD.decode(encrypted_data)?;
-    let data = String::from_utf8(decoded)?;
     
-    // Remove password suffix (placeholder logic)
-    if data.ends_with(password) {
-        Ok(data[..data.len() - password.len()].to_string())
-    } else {
-        Err(anyhow::anyhow!("Decryption failed"))
+    // Decode base64
+    let decoded = STANDARD.decode(encrypted_data)?;
+    
+    if decoded.len() < 16 + 12 + 16 {
+        return Err(anyhow::anyhow!("Encrypted data too short"));
     }
+    
+    // Extract salt (first 16 bytes)
+    let salt = &decoded[..16];
+    let data = &decoded[16..];
+    
+    // Derive key from password with the extracted salt
+    let key = crate::security::CryptoEngine::derive_key_from_password(password, salt)?;
+    
+    // Create cipher with derived key
+    let crypto = crate::security::CryptoEngine::with_key(key)?;
+    
+    // Decrypt the data
+    let decrypted = crypto.decrypt(data)?;
+    
+    Ok(String::from_utf8(decrypted)?)
 }
 
 /// Export a single profile to a file
