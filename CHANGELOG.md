@@ -15,6 +15,27 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.3.1] - 2026-03-07
+
+### Added ✨
+- **Post-Quantum Cryptography Implementation**
+  - Full Kyber-768 key encapsulation mechanism (KEM)
+  - Dilithium3 digital signatures
+  - Key generation, signing, and verification
+  - Encapsulate/decapsulate for secure key exchange
+  - 8 comprehensive unit tests
+  - NIST FIPS 203/204 compliant key sizes
+- **Profile Templates Expansion**
+  - Streamer Profile Template (Twitch/YouTube/StreamElements integration)
+  - Social Profile Template (social media management)
+  - New template categories: Streamer, Social
+
+### Changed 🔄
+- All `todo!` macros resolved (0 remaining)
+- Complete post-quantum crypto implementation with BLAKE3 hashing
+
+---
+
 ## [1.3.0] - 2026-03-07
 
 ### Added ✨
