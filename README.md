@@ -5,7 +5,7 @@
 # ⚔️ VantisWeb Browser ⚔️
 
 **[![Version](https://img.shields.io/badge/version-v1.2.0-red.svg?style=for-the-badge)](https://github.com/vantisCorp/VantisWeb/releases)**
-**[![License](https://img.shields.io/badge/license-MIT-black.svg?style=for-the-badge)](LICENSE)**
+**[![License](https://img.shields.io/badge/license-Dual%20(MIT%20|%20Commercial)-blue.svg?style=for-the-badge)](LICENSE)**
 **[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)]()**
 **[![Tests](https://img.shields.io/badge/tests-93%25-passing-red.svg?style=for-the-badge)]()**
 **[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg?style=for-the-badge&logo=rust)](https://www.rust-lang.org)**
