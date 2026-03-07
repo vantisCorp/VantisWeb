@@ -28,6 +28,8 @@ pub mod bookmarks;
 pub mod downloads;
 pub mod devtools;
 pub mod analytics;
+pub mod pdf;
+pub mod tabs;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
