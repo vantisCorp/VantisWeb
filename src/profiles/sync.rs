@@ -260,11 +260,124 @@ impl ProfileSyncManager {
         Ok(profiles)
     }
 
-    /// Fetches remote profiles
-    fn fetch_remote_profiles(&self, _url: &str, _api_key: &Option<String>) -> Result<HashMap<String, SyncedProfile>> {
-        // TODO: Implement remote profile fetching
-        // For now, return empty map
-        Ok(HashMap::new())
+    /// Fetches remote profiles from sync server
+    fn fetch_remote_profiles(&self, url: &str, api_key: &Option<String>) -> Result<HashMap<String, SyncedProfile>> {
+        let mut profiles = HashMap::new();
+        
+        // Build the client
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .user_agent("VantisWeb-Sync/1.0")
+            .build()
+            .map_err(|e| anyhow!("Failed to build HTTP client: {}", e))?;
+        
+        // Build request
+        let mut request = client.get(format!("{}/api/v1/profiles", url.trim_end_matches('/')));
+        
+        // Add authentication if API key is provided
+        if let Some(key) = api_key {
+            request = request.bearer_auth(key);
+        }
+        
+        // Add device ID header for tracking
+        request = request.header("X-Device-ID", &self.device_id);
+        
+        // Execute request
+        let response = request.send()
+            .map_err(|e| anyhow!("Failed to fetch remote profiles: {}", e))?;
+        
+        // Check response status
+        if !response.status().is_success() {
+            let status = response.status();
+            let body = response.text().unwrap_or_default();
+            return Err(anyhow!("Remote sync failed with status {}: {}", status, body));
+        }
+        
+        // Parse response
+        let response_data: SyncListResponse = response.json()
+            .map_err(|e| anyhow!("Failed to parse sync response: {}", e))?;
+        
+        // Convert to HashMap
+        for profile in response_data.profiles {
+            profiles.insert(profile.profile_id.clone(), profile);
+        }
+        
+        log::info!("Fetched {} remote profiles from {}", profiles.len(), url);
+        Ok(profiles)
+    }
+    
+    /// Pushes local profile changes to remote server
+    pub fn push_profile(&self, profile: &SyncedProfile) -> Result<()> {
+        if !self.config.enabled {
+            return Err(anyhow!("Sync is not enabled"));
+        }
+        
+        let (url, api_key) = match &self.config.provider {
+            SyncProvider::Local => {
+                log::debug!("Local sync - skipping push");
+                return Ok(());
+            }
+            SyncProvider::Custom { url, api_key } => (url, api_key),
+        };
+        
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .user_agent("VantisWeb-Sync/1.0")
+            .build()
+            .map_err(|e| anyhow!("Failed to build HTTP client: {}", e))?;
+        
+        let mut request = client.post(format!("{}/api/v1/profiles/{}", url.trim_end_matches('/'), profile.profile_id));
+        
+        if let Some(key) = api_key {
+            request = request.bearer_auth(key);
+        }
+        
+        request = request.header("X-Device-ID", &self.device_id);
+        request = request.json(profile);
+        
+        let response = request.send()
+            .map_err(|e| anyhow!("Failed to push profile: {}", e))?;
+        
+        if !response.status().is_success() {
+            let status = response.status();
+            return Err(anyhow!("Failed to push profile: status {}", status));
+        }
+        
+        log::info!("Pushed profile {} to remote", profile.profile_id);
+        Ok(())
+    }
+    
+    /// Deletes a profile from remote server
+    pub fn delete_remote_profile(&self, profile_id: &str) -> Result<()> {
+        if !self.config.enabled {
+            return Err(anyhow!("Sync is not enabled"));
+        }
+        
+        let (url, api_key) = match &self.config.provider {
+            SyncProvider::Local => return Ok(()),
+            SyncProvider::Custom { url, api_key } => (url, api_key),
+        };
+        
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .map_err(|e| anyhow!("Failed to build HTTP client: {}", e))?;
+        
+        let mut request = client.delete(format!("{}/api/v1/profiles/{}", url.trim_end_matches('/'), profile_id));
+        
+        if let Some(key) = api_key {
+            request = request.bearer_auth(key);
+        }
+        
+        let response = request.send()
+            .map_err(|e| anyhow!("Failed to delete remote profile: {}", e))?;
+        
+        if !response.status().is_success() {
+            return Err(anyhow!("Failed to delete remote profile: status {}", response.status()));
+        }
+        
+        log::info!("Deleted profile {} from remote", profile_id);
+        Ok(())
     }
 
     /// Gets a synced profile
@@ -350,6 +463,17 @@ pub struct SyncResult {
     pub conflicts: usize,
     /// Sync timestamp
     pub timestamp: DateTime<Utc>,
+}
+
+/// Sync list response from remote server
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SyncListResponse {
+    /// List of profiles
+    profiles: Vec<SyncedProfile>,
+    /// Server timestamp
+    timestamp: Option<DateTime<Utc>>,
+    /// Server version
+    server_version: Option<String>,
 }
 
 /// Backup data
