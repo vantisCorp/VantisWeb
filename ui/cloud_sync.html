@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantisWeb - Cloud Sync</title>
+    <link rel="stylesheet" href="../assets/styles/main.css">
+    <style>
+        :root {
+            --primary-color: #7c3aed;
+            --primary-hover: #6d28d9;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-primary: #0f0f14;
+            --bg-secondary: #1a1a24;
+            --bg-tertiary: #252532;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border-color: #2a2a3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .status-indicator.disconnected {
+            background: var(--danger-color);
+        }
+
+        .status-indicator.syncing {
+            background: var(--warning-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .google-icon {
+            background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+        }
+
+        .dropbox-icon {
+            background: linear-gradient(135deg, #0061ff, #0056c2);
+        }
+
+        .icloud-icon {
+            background: linear-gradient(135deg, #5ac8fa, #007aff);
+        }
+
+        .webdav-icon {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .provider-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .provider-status.connected {
+            color: var(--success-color);
+        }
+
+        .provider-status.disconnected {
+            color: var(--danger-color);
+        }
+
+        .provider-info {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sync-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sync-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .sync-item:hover {
+            background: var(--border-color);
+        }
+
+        .sync-item-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sync-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sync-item-details h4 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .sync-item-details p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .sync-item-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.synced {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-badge.conflict {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .conflict-modal-content {
+            max-width: 700px;
+        }
+
+        .conflict-item {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .conflict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .conflict-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .conflict-versions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .version-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .version-card:hover {
+            border-color: var(--primary-color);
+        }
+
+        .version-card.selected {
+            border-color: var(--primary-color);
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .version-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .version-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .version-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .resolution-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+            z-index: 1001;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-color: var(--danger-color);
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div>
+                <h1>☁️ Cloud Sync</h1>
+                <p class="subtitle">Sync your profiles across all your devices</p>
+            </div>
+            <div class="sync-status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span class="status-text" id="statusText">Not connected</span>
+            </div>
+        </header>
+
+        <!-- Cloud Providers -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Cloud Providers</h2>
+            </div>
+            <div class="grid">
+                <!-- Google Drive -->
+                <div class="card" data-provider="google-drive">
+                    <div class="card-header">
+                        <h3 class="card-title">Google Drive</h3>
+                        <div class="card-icon google-icon">📁</div>
+                    </div>
+                    <div class="provider-status disconnected" id="googleDriveStatus">
+                        <span>●</span>
+                        <span>Not connected</span>
+                    </div>
+                    <p class="provider-info">Store your profiles on Google Drive with 15GB free storage</p>
+                    <button class="btn btn-primary btn-full" onclick="connectProvider('google-drive')">
+                        Connect
+                    </button>
+                    <button class="btn btn-danger btn-full" id="googleDriveDisconnect" style="display: none; margin-top: 0.5rem;" onclick="disconnectProvider('google-drive')">
+                        Disconnect
+                    </button>
+                </div>
+
+                <!-- Dropbox -->
+                <div class="card" data-provider="dropbox">
+                    <div class="card-header">
+                        <h3 class="card-title">Dropbox</h3>
+                        <div class="card-icon dropbox-icon">📦</div>
+                    </div>
+                    <div class="provider-status disconnected" id="dropboxStatus">
+                        <span>●</span>
+                        <span>Not connected</span>
+                    </div>
+                    <p class="provider-info">Sync with Dropbox for seamless integration across devices</p>
+                    <button class="btn btn-primary btn-full" onclick="connectProvider('dropbox')">
+                        Connect
+                    </button>
+                    <button class="btn btn-danger btn-full" id="dropboxDisconnect" style="display: none; margin-top: 0.5rem;" onclick="disconnectProvider('dropbox')">
+                        Disconnect
+                    </button>
+                </div>
+
+                <!-- iCloud -->
+                <div class="card" data-provider="icloud">
+                    <div class="card-header">
+                        <h3 class="card-title">iCloud</h3>
+                        <div class="card-icon icloud-icon">☁️</div>
+                    </div>
+                    <div class="provider-status disconnected" id="icloudStatus">
+                        <span>●</span>
+                        <span>Not connected</span>
+                    </div>
+                    <p class="provider-info">Use your iCloud storage for seamless Apple ecosystem sync</p>
+                    <button class="btn btn-primary btn-full" onclick="connectProvider('icloud')">
+                        Connect
+                    </button>
+                    <button class="btn btn-danger btn-full" id="icloudDisconnect" style="display: none; margin-top: 0.5rem;" onclick="disconnectProvider('icloud')">
+                        Disconnect
+                    </button>
+                </div>
+
+                <!-- WebDAV -->
+                <div class="card" data-provider="webdav">
+                    <div class="card-header">
+                        <h3 class="card-title">WebDAV</h3>
+                        <div class="card-icon webdav-icon">🔗</div>
+                    </div>
+                    <div class="provider-status disconnected" id="webdavStatus">
+                        <span>●</span>
+                        <span>Not connected</span>
+                    </div>
+                    <p class="provider-info">Connect to any WebDAV-compatible cloud storage (Nextcloud, ownCloud, etc.)</p>
+                    <button class="btn btn-primary btn-full" onclick="openWebDAVModal()">
+                        Configure
+                    </button>
+                    <button class="btn btn-danger btn-full" id="webdavDisconnect" style="display: none; margin-top: 0.5rem;" onclick="disconnectProvider('webdav')">
+                        Disconnect
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sync Controls -->
+        <section class="section" id="syncControls" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">Sync Controls</h2>
+                <div>
+                    <button class="btn btn-secondary" onclick="openSelectiveSyncModal()">Selective Sync</button>
+                    <button class="btn btn-primary" onclick="startSync()" id="syncButton">Sync Now</button>
+                </div>
+            </div>
+            
+            <div class="progress-bar" id="syncProgress" style="display: none;">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="sync-items" id="syncItems">
+                <!-- Sync items will be populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Sync History -->
+        <section class="section" id="syncHistory" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">Sync History</h2>
+                <button class="btn btn-secondary" onclick="clearSyncHistory()">Clear</button>
+            </div>
+            <div class="sync-items" id="historyItems">
+                <!-- History items will be populated dynamically -->
+            </div>
+        </section>
+    </div>
+
+    <!-- WebDAV Configuration Modal -->
+    <div class="modal" id="webdavModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Configure WebDAV</h3>
+                <button class="modal-close" onclick="closeWebDAVModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Server URL</label>
+                <input type="text" class="form-input" id="webdavUrl" placeholder="https://cloud.example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="webdavUsername" placeholder="username">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="webdavPassword" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="connectWebDAV()">Connect</button>
+        </div>
+    </div>
+
+    <!-- Conflict Resolution Modal -->
+    <div class="modal" id="conflictModal">
+        <div class="modal-content conflict-modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Resolve Conflicts</h3>
+                <button class="modal-close" onclick="closeConflictModal()">&times;</button>
+            </div>
+            <div id="conflictItems">
+                <!-- Conflict items will be populated dynamically -->
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <button class="btn btn-primary btn-full" onclick="applyConflictsResolution()">Apply Resolution</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // State
+        let connectedProvider = null;
+        let syncInProgress = false;
+        let conflicts = [];
+
+        // Provider connections
+        async function connectProvider(provider) {
+            try {
+                // Simulate OAuth flow
+                const authUrl = await getAuthUrl(provider);
+                
+                // Open auth window
+                const authWindow = window.open(authUrl, 'OAuth', 'width=500,height=600');
+                
+                // Wait for callback (simulated)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Update UI
+                updateProviderStatus(provider, true);
+                showSyncControls();
+                showToast('Connected successfully!', 'success');
+            } catch (error) {
+                showToast('Connection failed: ' + error.message, 'error');
+            }
+        }
+
+        async function disconnectProvider(provider) {
+            if (!confirm('Are you sure you want to disconnect?')) return;
+            
+            try {
+                connectedProvider = null;
+                updateProviderStatus(provider, false);
+                hideSyncControls();
+                showToast('Disconnected successfully', 'success');
+            } catch (error) {
+                showToast('Disconnect failed: ' + error.message, 'error');
+            }
+        }
+
+        function updateProviderStatus(provider, connected) {
+            const statusEl = document.getElementById(`${provider}Status`);
+            const disconnectBtn = document.getElementById(`${provider}Disconnect`);
+            
+            if (connected) {
+                statusEl.className = 'provider-status connected';
+                statusEl.innerHTML = '<span>●</span><span>Connected</span>';
+                disconnectBtn.style.display = 'block';
+                connectedProvider = provider;
+            } else {
+                statusEl.className = 'provider-status disconnected';
+                statusEl.innerHTML = '<span>●</span><span>Not connected</span>';
+                disconnectBtn.style.display = 'none';
+            }
+        }
+
+        function showSyncControls() {
+            document.getElementById('syncControls').style.display = 'block';
+            document.getElementById('syncHistory').style.display = 'block';
+            loadSyncItems();
+            loadSyncHistory();
+        }
+
+        function hideSyncControls() {
+            document.getElementById('syncControls').style.display = 'none';
+            document.getElementById('syncHistory').style.display = 'none';
+        }
+
+        async function startSync() {
+            if (syncInProgress) return;
+            
+            syncInProgress = true;
+            const syncButton = document.getElementById('syncButton');
+            syncButton.disabled = true;
+            syncButton.textContent = 'Syncing...';
+            
+            const progressEl = document.getElementById('syncProgress');
+            const progressFill = document.getElementById('progressFill');
+            progressEl.style.display = 'block';
+            
+            try {
+                // Simulate sync progress
+                for (let i = 0; i <= 100; i += 10) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    progressFill.style.width = `${i}%`;
+                }
+                
+                showToast('Sync completed successfully!', 'success');
+                loadSyncItems();
+                loadSyncHistory();
+            } catch (error) {
+                showToast('Sync failed: ' + error.message, 'error');
+            } finally {
+                syncInProgress = false;
+                syncButton.disabled = false;
+                syncButton.textContent = 'Sync Now';
+                progressEl.style.display = 'none';
+            }
+        }
+
+        function loadSyncItems() {
+            const container = document.getElementById('syncItems');
+            
+            // Sample data
+            const items = [
+                {
+                    icon: '👤',
+                    name: 'Personal Profile',
+                    type: 'Profile',
+                    status: 'synced',
+                    lastSync: '2 minutes ago'
+                },
+                {
+                    icon: '💼',
+                    name: 'Work Profile',
+                    type: 'Profile',
+                    status: 'pending',
+                    lastSync: '1 hour ago'
+                },
+                {
+                    icon: '🎮',
+                    name: 'Gaming Profile',
+                    type: 'Profile',
+                    status: 'conflict',
+                    lastSync: 'Yesterday'
+                }
+            ];
+            
+            container.innerHTML = items.map(item => `
+                <div class="sync-item">
+                    <div class="sync-item-info">
+                        <div class="sync-item-icon">${item.icon}</div>
+                        <div class="sync-item-details">
+                            <h4>${item.name}</h4>
+                            <p>${item.type} • Last synced ${item.lastSync}</p>
+                        </div>
+                    </div>
+                    <div class="sync-item-status">
+                        <span class="status-badge ${item.status}">${item.status.toUpperCase()}</span>
+                        ${item.status === 'conflict' ? `<button class="btn btn-secondary" onclick="openConflictModal('${item.name}')">Resolve</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadSyncHistory() {
+            const container = document.getElementById('historyItems');
+            
+            // Sample data
+            const history = [
+                {
+                    date: 'Today, 10:30 AM',
+                    provider: 'Google Drive',
+                    status: 'success',
+                    items: '3 profiles synced'
+                },
+                {
+                    date: 'Yesterday, 6:45 PM',
+                    provider: 'Google Drive',
+                    status: 'success',
+                    items: '2 profiles synced'
+                },
+                {
+                    date: 'Mar 1, 2024',
+                    provider: 'Google Drive',
+                    status: 'partial',
+                    items: '1 profile synced, 1 conflict'
+                }
+            ];
+            
+            container.innerHTML = history.map(entry => `
+                <div class="sync-item">
+                    <div class="sync-item-info">
+                        <div class="sync-item-icon">${entry.status === 'success' ? '✅' : '⚠️'}</div>
+                        <div class="sync-item-details">
+                            <h4>${entry.date}</h4>
+                            <p>${entry.provider} • ${entry.items}</p>
+                        </div>
+                    </div>
+                    <span class="status-badge ${entry.status === 'success' ? 'synced' : 'pending'}">${entry.status.toUpperCase()}</span>
+                </div>
+            `).join('');
+        }
+
+        function clearSyncHistory() {
+            if (!confirm('Are you sure you want to clear sync history?')) return;
+            document.getElementById('historyItems').innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No sync history</p>';
+            showToast('Sync history cleared', 'success');
+        }
+
+        // WebDAV Modal
+        function openWebDAVModal() {
+            document.getElementById('webdavModal').classList.add('active');
+        }
+
+        function closeWebDAVModal() {
+            document.getElementById('webdavModal').classList.remove('active');
+        }
+
+        async function connectWebDAV() {
+            const url = document.getElementById('webdavUrl').value;
+            const username = document.getElementById('webdavUsername').value;
+            const password = document.getElementById('webdavPassword').value;
+            
+            if (!url || !username || !password) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Simulate connection
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            updateProviderStatus('webdav', true);
+            showSyncControls();
+            closeWebDAVModal();
+            showToast('WebDAV connected successfully!', 'success');
+        }
+
+        // Conflict Modal
+        function openConflictModal(profileName) {
+            const container = document.getElementById('conflictItems');
+            
+            container.innerHTML = `
+                <div class="conflict-item">
+                    <div class="conflict-header">
+                        <h4>${profileName}</h4>
+                    </div>
+                    <p class="conflict-description">This profile has been modified both locally and remotely</p>
+                    <div class="conflict-versions">
+                        <div class="version-card selected" onclick="selectVersion(this, 'local')">
+                            <div class="version-header">
+                                <span class="version-label">LOCAL VERSION</span>
+                                <span class="version-date">Today, 10:30 AM</span>
+                            </div>
+                            <p class="version-meta">Size: 1.2 MB • Modified 5 minutes ago</p>
+                        </div>
+                        <div class="version-card" onclick="selectVersion(this, 'remote')">
+                            <div class="version-header">
+                                <span class="version-label">REMOTE VERSION</span>
+                                <span class="version-date">Today, 9:45 AM</span>
+                            </div>
+                            <p class="version-meta">Size: 1.1 MB • Modified 50 minutes ago</p>
+                        </div>
+                    </div>
+                    <div class="resolution-actions">
+                        <button class="btn btn-primary" onclick="resolveConflict('keep-local')">Keep Local</button>
+                        <button class="btn btn-secondary" onclick="resolveConflict('keep-remote')">Keep Remote</button>
+                        <button class="btn btn-secondary" onclick="resolveConflict('keep-newer')">Keep Newer</button>
+                        <button class="btn btn-secondary" onclick="resolveConflict('merge')">Merge</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('conflictModal').classList.add('active');
+        }
+
+        function closeConflictModal() {
+            document.getElementById('conflictModal').classList.remove('active');
+        }
+
+        function selectVersion(element, version) {
+            document.querySelectorAll('.version-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        async function applyConflictsResolution() {
+            closeConflictModal();
+            showToast('Conflicts resolved successfully!', 'success');
+            loadSyncItems();
+        }
+
+        function resolveConflict(strategy) {
+            showToast(`Applying resolution: ${strategy}`, 'success');
+        }
+
+        // Selective Sync Modal (placeholder)
+        function openSelectiveSyncModal() {
+            showToast('Selective sync configuration coming soon!', 'success');
+        }
+
+        // Utility functions
+        async function getAuthUrl(provider) {
+            // Simulated auth URLs
+            const urls = {
+                'google-drive': 'https://accounts.google.com/o/oauth2/auth',
+                'dropbox': 'https://www.dropbox.com/oauth2/authorize',
+                'icloud': 'https://appleid.apple.com/auth/authorize'
+            };
+            return urls[provider] || '';
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : '❌'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for existing connections
+            checkExistingConnections();
+        });
+
+        function checkExistingConnections() {
+            // Simulated check - in real implementation, check stored credentials
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+            
+            indicator.classList.remove('disconnected');
+            text.textContent = 'Ready to sync';
+        }
+    </script>
+</body>
+</html>
