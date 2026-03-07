@@ -15,6 +15,40 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.4.0] - 2026-03-07
+
+### Added ✨
+- **NPU Acceleration Module**
+  - Multi-backend support (CUDA, Metal, Vulkan, OpenCL, CPU)
+  - Hardware acceleration detection and utilization
+  - Low-latency inference optimization
+  - Privacy-preserving AI computation
+  - Inference caching for improved performance
+  - Model loading and management
+  - Comprehensive device scoring and selection
+- **Predictive Branching Module**
+  - Pre-rendering pages before user clicks
+  - Click prediction using ML models
+  - Zero-latency navigation support
+  - Sequential pattern recognition
+  - Temporal pattern detection
+  - Hover-based prediction
+  - Smart resource pre-allocation
+- **Neural Memory Module**
+  - Associative search across browsing history
+  - Contextual understanding of content
+  - Smart suggestions based on patterns
+  - Behavior pattern detection
+  - Auto-tagging of content
+  - Memory importance scoring
+  - Embedding-based similarity search
+
+### Changed 🔄
+- AI module expanded with 3 new major components
+- Total AI features now include: Recommendations, Pattern Analysis, Suggestions, Ad Blocking, NPU Acceleration, Predictive Branching, Neural Memory
+
+---
+
 ## [1.3.1] - 2026-03-07
 
 ### Added ✨
