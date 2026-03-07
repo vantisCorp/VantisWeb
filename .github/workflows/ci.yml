@@ -5,9 +5,14 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:  # Allow manual triggering
 
 env:
   CARGO_TERM_COLOR: always
+
+# Use self-hosted runners if available, otherwise fall back to GitHub runners
+# For private repos without Actions billing, set up self-hosted runners:
+# https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners
 
 jobs:
   build:
@@ -17,6 +22,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         rust: [stable]
+      fail-fast: false
 
     steps:
     - name: Checkout code
