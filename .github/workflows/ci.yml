@@ -27,6 +27,12 @@ jobs:
       with:
         toolchain: ${{ matrix.rust }}
 
+    - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev libsoup-3.0-dev javascriptcoregtk-4.1-dev
+
     - name: Cache cargo registry
       uses: actions/cache@v3
       with:
@@ -65,6 +71,12 @@ jobs:
     - name: Install Rust toolchain
       uses: actions-rust-lang/setup-rust-toolchain@v1
 
+    - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev libsoup-3.0-dev javascriptcoregtk-4.1-dev
+
     - name: Run tests
       run: cargo test --verbose
 
@@ -84,6 +96,11 @@ jobs:
       with:
         components: rustfmt, clippy
 
+    - name: Install system dependencies (Ubuntu)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev libsoup-3.0-dev javascriptcoregtk-4.1-dev
+
     - name: Run rustfmt
       run: cargo fmt -- --check
 
@@ -101,6 +118,11 @@ jobs:
     - name: Install Rust toolchain
       uses: actions-rust-lang/setup-rust-toolchain@v1
 
+    - name: Install system dependencies (Ubuntu)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev libsoup-3.0-dev javascriptcoregtk-4.1-dev
+
     - name: Install cargo-audit
       run: cargo install cargo-audit
 
@@ -117,6 +139,11 @@ jobs:
 
     - name: Install Rust toolchain
       uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: Install system dependencies (Ubuntu)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev libsoup-3.0-dev javascriptcoregtk-4.1-dev
 
     - name: Generate documentation
       run: cargo doc --no-deps
