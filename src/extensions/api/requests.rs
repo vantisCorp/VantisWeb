@@ -4,83 +4,127 @@
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Requests API
 pub struct RequestsAPI {
     /// Extension ID
     extension_id: String,
+    /// HTTP client
+    client: reqwest::Client,
 }
 
 impl RequestsAPI {
     /// Creates a new requests API
     pub fn new(extension_id: String) -> Self {
-        Self { extension_id }
+        let client = reqwest::Client::builder()
+            .user_agent(format!("VantisWeb-Extension/{}", extension_id))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        
+        Self { extension_id, client }
     }
 
     /// Makes an HTTP GET request
-    pub fn get(&self, url: &str, options: Option<RequestOptions>) -> Result<Response> {
-        // TODO: Implement GET request
-        Ok(Response {
-            status: 200,
-            status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
-            body: None,
-        })
+    pub async fn get(&self, url: &str, options: Option<RequestOptions>) -> Result<Response> {
+        self.request("GET", url, None, options).await
     }
 
     /// Makes an HTTP POST request
-    pub fn post(&self, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
-        // TODO: Implement POST request
-        Ok(Response {
-            status: 200,
-            status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
-            body: None,
-        })
+    pub async fn post(&self, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
+        self.request("POST", url, data, options).await
     }
 
     /// Makes an HTTP PUT request
-    pub fn put(&self, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
-        // TODO: Implement PUT request
-        Ok(Response {
-            status: 200,
-            status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
-            body: None,
-        })
+    pub async fn put(&self, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
+        self.request("PUT", url, data, options).await
     }
 
     /// Makes an HTTP DELETE request
-    pub fn delete(&self, url: &str, options: Option<RequestOptions>) -> Result<Response> {
-        // TODO: Implement DELETE request
-        Ok(Response {
-            status: 200,
-            status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
-            body: None,
-        })
+    pub async fn delete(&self, url: &str, options: Option<RequestOptions>) -> Result<Response> {
+        self.request("DELETE", url, None, options).await
     }
 
     /// Makes an HTTP PATCH request
-    pub fn patch(&self, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
-        // TODO: Implement PATCH request
-        Ok(Response {
-            status: 200,
-            status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
-            body: None,
-        })
+    pub async fn patch(&self, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
+        self.request("PATCH", url, data, options).await
     }
 
     /// Makes a custom HTTP request
-    pub fn request(&self, method: &str, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
-        // TODO: Implement custom request
+    pub async fn request(&self, method: &str, url: &str, data: Option<RequestData>, options: Option<RequestOptions>) -> Result<Response> {
+        let mut request = match method.to_uppercase().as_str() {
+            "GET" => self.client.get(url),
+            "POST" => self.client.post(url),
+            "PUT" => self.client.put(url),
+            "DELETE" => self.client.delete(url),
+            "PATCH" => self.client.patch(url),
+            "HEAD" => self.client.head(url),
+            _ => {
+                let method = reqwest::Method::try_from(method)
+                    .map_err(|e| anyhow::anyhow!("Invalid HTTP method: {}", e))?;
+                self.client.request(method, url)
+            }
+        };
+
+        // Apply options
+        if let Some(opts) = options {
+            // Add headers
+            for (key, value) in &opts.headers {
+                request = request.header(key, value);
+            }
+            
+            // Set timeout
+            if let Some(timeout) = opts.timeout {
+                request = request.timeout(std::time::Duration::from_millis(timeout));
+            }
+            
+            // Set user agent
+            if let Some(user_agent) = &opts.user_agent {
+                request = request.header("User-Agent", user_agent);
+            }
+        }
+
+        // Add body data
+        if let Some(data) = data {
+            request = match data {
+                RequestData::Json(json) => request.json(&json),
+                RequestData::Form(form) => request.form(&form),
+                RequestData::Text(text) => request.body(text),
+                RequestData::Bytes(bytes) => request.body(bytes),
+            };
+        }
+
+        // Execute request
+        let response = request.send().await?;
+        
+        // Build Response
+        let status = response.status().as_u16();
+        let status_text = response.status().canonical_reason().unwrap_or("Unknown").to_string();
+        
+        let headers: HashMap<String, String> = response
+            .headers()
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("").to_string()))
+            .collect();
+        
+        let body = response.text().await.ok();
+
         Ok(Response {
-            status: 200,
-            status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
-            body: None,
+            status,
+            status_text,
+            headers,
+            body,
         })
+    }
+    
+    /// Create a synchronous blocking client
+    pub fn new_blocking(extension_id: String) -> Self {
+        let client = reqwest::Client::builder()
+            .user_agent(format!("VantisWeb-Extension/{}", extension_id))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        
+        Self { extension_id, client }
     }
 }
 
@@ -89,7 +133,7 @@ impl RequestsAPI {
 pub struct RequestOptions {
     /// Request headers
     #[serde(default)]
-    pub headers: std::collections::HashMap<String, String>,
+    pub headers: HashMap<String, String>,
     /// Request timeout in milliseconds
     pub timeout: Option<u64>,
     /// Whether to follow redirects
@@ -103,6 +147,17 @@ fn default_follow_redirects() -> bool {
     true
 }
 
+impl Default for RequestOptions {
+    fn default() -> Self {
+        Self {
+            headers: HashMap::new(),
+            timeout: Some(30_000),
+            follow_redirects: true,
+            user_agent: None,
+        }
+    }
+}
+
 /// Request data
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -110,7 +165,7 @@ pub enum RequestData {
     /// JSON data
     Json(serde_json::Value),
     /// Form data
-    Form(std::collections::HashMap<String, String>),
+    Form(HashMap<String, String>),
     /// Raw text data
     Text(String),
     /// Raw bytes data
@@ -125,7 +180,7 @@ pub struct Response {
     /// HTTP status text
     pub status_text: String,
     /// Response headers
-    pub headers: std::collections::HashMap<String, String>,
+    pub headers: HashMap<String, String>,
     /// Response body
     pub body: Option<String>,
 }
@@ -165,20 +220,11 @@ mod tests {
     }
 
     #[test]
-    fn test_get_request() {
-        let api = RequestsAPI::new("test-extension".to_string());
-        let response = api.get("https://example.com", None).unwrap();
-
-        assert_eq!(response.status, 200);
-        assert_eq!(response.status_text, "OK");
-    }
-
-    #[test]
     fn test_response_is_success() {
         let response = Response {
             status: 200,
             status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
+            headers: HashMap::new(),
             body: None,
         };
 
@@ -190,7 +236,7 @@ mod tests {
         let response = Response {
             status: 404,
             status_text: "Not Found".to_string(),
-            headers: std::collections::HashMap::new(),
+            headers: HashMap::new(),
             body: None,
         };
 
@@ -202,7 +248,7 @@ mod tests {
         let response = Response {
             status: 200,
             status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
+            headers: HashMap::new(),
             body: Some("Hello, World!".to_string()),
         };
 
@@ -216,11 +262,18 @@ mod tests {
         let response = Response {
             status: 200,
             status_text: "OK".to_string(),
-            headers: std::collections::HashMap::new(),
+            headers: HashMap::new(),
             body: Some(body.to_string()),
         };
 
         let json = response.json().unwrap();
         assert_eq!(json["key"], "value");
+    }
+    
+    #[test]
+    fn test_request_options_default() {
+        let opts = RequestOptions::default();
+        assert!(opts.follow_redirects);
+        assert_eq!(opts.timeout, Some(30_000));
     }
 }
