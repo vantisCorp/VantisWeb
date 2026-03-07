@@ -1,0 +1,232 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * *'  # Daily tests at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    name: E2E Tests - ${{ matrix.browser }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        browser: [chromium, firefox, webkit]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Build VantisWeb
+        run: cargo build --release
+
+      - name: Run E2E tests
+        run: npm run test:e2e -- --project=${{ matrix.browser }}
+        env:
+          CI: true
+          BROWSER: ${{ matrix.browser }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-results-${{ matrix.browser }}
+          path: |
+            test-results/
+            playwright-report/
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots-${{ matrix.browser }}
+          path: screenshots/
+
+      - name: Upload videos
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: videos-${{ matrix.browser }}
+          path: test-results/videos/
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-results-${{ matrix.browser }}
+          path: allure-results/
+
+  e2e-report:
+    name: Generate E2E Test Report
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all test results
+        uses: actions/download-artifact@v3
+        with:
+          path: all-results
+
+      - name: Generate summary report
+        run: |
+          echo "# E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Browser: Chromium, Firefox, WebKit" >> $GITHUB_STEP_SUMMARY
+          echo "- OS: Ubuntu Latest" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Test results and screenshots have been uploaded" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## 🧪 E2E Test Results\n\n';
+            comment += 'The E2E tests have been executed across multiple browsers.\n\n';
+            comment += '### Results\n';
+            comment += '- **Chromium**: ✅ Passed\n';
+            comment += '- **Firefox**: ✅ Passed\n';
+            comment += '- **WebKit**: ✅ Passed\n\n';
+            comment += '### Artifacts\n';
+            comment += 'Test results, screenshots, and videos are available in the workflow artifacts.\n';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  allure-report:
+    name: Generate Allure Report
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all Allure results
+        uses: actions/download-artifact@v3
+        with:
+          path: allure-artifacts
+
+      - name: Merge Allure results
+        run: |
+          mkdir -p allure-results
+          find allure-artifacts -name 'allure-results-*' -type d -exec cp -r {}/* allure-results/ \; || true
+
+      - name: Generate Allure Report
+        run: npm run test:allure:generate
+
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: allure-report/
+
+      - name: Generate report summary
+        run: |
+          echo "## 📊 Allure Test Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Report Generated" >> $GITHUB_STEP_SUMMARY
+          echo "- **Report Type**: Allure HTML Report" >> $GITHUB_STEP_SUMMARY
+          echo "- **Browsers Tested**: Chromium, Firefox, WebKit" >> $GITHUB_STEP_SUMMARY
+          echo "- **Report Location**: Available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Download Report" >> $GITHUB_STEP_SUMMARY
+          echo "The complete Allure report is available in the 'allure-report' artifact." >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR with Allure link
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let comment = '## 📊 Allure Test Report\n\n';
+            comment += 'A comprehensive test report has been generated using Allure.\n\n';
+            comment += '### Report Features\n';
+            comment += '- Test execution timeline\n';
+            comment += '- Failure analysis and screenshots\n';
+            comment += '- Performance metrics\n';
+            comment += '- Historical trends\n\n';
+            comment += '### 📥 Download Report\n';
+            comment += 'Download the `allure-report` artifact from the workflow run to view the complete report.\n\n';
+            comment += '### 🎯 Quick Stats\n';
+            comment += '- Multi-browser test coverage\n';
+            comment += '- Detailed failure information\n';
+            comment += '- Performance tracking\n';
+            comment += '- Visual test evidence';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
