@@ -1,6 +1,6 @@
 [package]
 name = "vantisweb"
-version = "0.1.0"
+version = "1.2.0"
 edition = "2021"
 authors = ["Vantis Corp"]
 description = "Next-gen browser for VantisOS - Liquid Core Architecture"

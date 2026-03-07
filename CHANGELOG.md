@@ -10,9 +10,72 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [Unreleased]
 
 ### Planowane
-- Enhanced Analytics Dashboard
-- AI-Powered Profile Recommendations
-- Advanced Cloud Sync
+- Visual Regression Testing
+- Performance Load Testing
+- Tor Integration (.onion support)
+
+---
+
+## [1.2.0] - 2026-03-07
+
+### Added ✨
+- **Enhanced Analytics Dashboard** (Issue #67, PR #68)
+  - Real-time metrics visualization
+  - Performance monitoring dashboard
+  - User behavior analytics
+  - Privacy-focused data collection
+  - Export capabilities (JSON, CSV, HTML)
+- **Developer Tools and Debug Console** (Issue #59, PR #69)
+  - Built-in debug console
+  - Performance profiling tools
+  - Network request inspector
+  - JavaScript debugger integration
+- **Download Manager with Advanced Features** (Issue #57, PR #70)
+  - Queue management
+  - Pause/resume downloads
+  - Speed limiting
+  - Batch downloads
+- **Enhanced Security Features** (Issue #12, PR #71)
+  - TOTP (Time-based One-Time Password) support
+  - WebAuthn/FIDO2 hardware key support
+  - AES-256-GCM encryption upgrade
+  - Session management system
+  - Security audit logging
+- **Bulk Profile Operations** (Issue #10, PR #72)
+  - Multi-select in UI
+  - Bulk delete with confirmation
+  - Bulk export selected profiles
+  - Bulk apply settings
+  - Undo functionality
+- **Community Profile Templates** (Issue #8, PR #73)
+  - Template marketplace UI
+  - Rating and review system
+  - Template submission flow
+  - Moderation tools
+- **Profile Comparison Tool** (Issue #9, PR #74)
+  - Side-by-side comparison UI
+  - Settings comparison with diff highlighting
+  - Bookmarks and extensions comparison
+  - Export comparison report
+- **Advanced Cloud Sync Providers** (Issue #11, PR #75)
+  - Google Drive sync
+  - Dropbox sync
+  - iCloud sync
+  - WebDAV sync
+  - OAuth2 authentication
+  - Conflict resolution
+
+### Changed 🔄
+- Updated to Rust 1.75+
+- Improved E2E testing framework with Playwright
+- Added 313 E2E tests (80% coverage)
+- Integrated Allure reporting
+- Added conventional commits with commitlint
+
+### Testing 🧪
+- 313 E2E tests with Playwright
+- Allure reporting integration
+- 80% test coverage
 
 ---
 

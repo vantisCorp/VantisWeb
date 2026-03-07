@@ -1,6 +1,10 @@
-MIT License
+# VantisWeb Browser - Dual License
 
-Copyright (c) 2024 Vantis Corp
+Copyright (c) 2024-2026 Vantis Corp
+
+---
+
+## Open Source License (MIT)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +23,37 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Commercial License
+
+For commercial use, enterprise deployments, or to obtain a commercial license,
+please contact Vantis Corp at: licensing@vantiscorp.com
+
+### Commercial License Benefits:
+- Priority support and SLA guarantees
+- Custom feature development
+- Enterprise deployment assistance
+- Training and onboarding
+- Extended warranty and indemnification
+
+### Commercial Use Includes:
+- Use in proprietary software
+- SaaS/PaaS deployments
+- Enterprise deployments with custom branding
+- Integration with commercial products
+
+For licensing inquiries, please visit: https://vantiscorp.com/licensing
+
+---
+
+## Summary
+
+| Use Case | License Required |
+|----------|-----------------|
+| Personal/Non-profit | MIT (Free) |
+| Open Source Projects | MIT (Free) |
+| Commercial/Enterprise | Commercial License |
+| SaaS/PaaS | Commercial License |
+| Custom Branding | Commercial License |
