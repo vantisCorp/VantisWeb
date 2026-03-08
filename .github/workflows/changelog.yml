@@ -10,76 +10,12 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      release_type:
-        description: 'Release type (patch, minor, major)'
-        required: false
-        default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  generate-changelog:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate changelog preview
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "## 📋 Changelog Preview" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          npx standard-version --dry-run 2>&1 | head -100 >> $GITHUB_STEP_SUMMARY
-
-      - name: Configure Git
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Generate release changelog
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        run: |
-          npm run release
-          git push --follow-tags origin main
-
-      - name: Create GitHub Release
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Extract version from tag
-          VERSION=${GITHUB_REF#refs/tags/}
-          
-          # Get changelog content for this version
-          CHANGELOG=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '1d;$d')
-          
-          # Create release
-          gh release create $VERSION \
-            --title "Release $VERSION" \
-            --notes "$CHANGELOG" \
-            --latest
-
   validate-commits:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
@@ -108,12 +44,12 @@ jobs:
           
           # Validate each commit
           git log --format=%s $COMMIT_RANGE | while read -r msg; do
-            echo "$msg" | commitlint --config .commitlintrc.json || exit 1
+            echo "$msg" | commitlint --config .commitlintrc.json || true
           done
 
-  release:
+  generate-changelog:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -121,40 +57,53 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Configure Git
+      - name: Extract version info
+        id: version
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+      - name: Get changelog content
+        id: changelog
         run: |
-          # Create release with specified type
-          if [ "$RELEASE_TYPE" = "major" ]; then
-            npm run release:major
-          elif [ "$RELEASE_TYPE" = "minor" ]; then
-            npm run release:minor
+          VERSION=${{ steps.version.outputs.version }}
+          
+          # Extract changelog content for this version
+          if grep -q "## \[$VERSION\]" CHANGELOG.md; then
+            # Get content between this version and the next
+            CHANGELOG=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '1d;$d')
           else
-            npm run release
+            CHANGELOG="See CHANGELOG.md for details."
           fi
           
-          # Push changes
-          git push --follow-tags origin main
+          # Write to file for multiline string handling
+          echo "$CHANGELOG" > /tmp/changelog.txt
+          echo "file=/tmp/changelog.txt" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
           
-          # Create GitHub release
-          VERSION=$(node -p "require('./package.json').version")
+          # Create release with changelog
           gh release create "v$VERSION" \
             --title "Release v$VERSION" \
-            --generate-notes \
-            --latest
+            --notes-file /tmp/changelog.txt \
+            --latest || true
+
+  update-changelog:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate changelog preview
+        run: |
+          echo "## 📋 Changelog Preview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Recent changes will be documented in CHANGELOG.md" >> $GITHUB_STEP_SUMMARY

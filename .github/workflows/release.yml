@@ -30,31 +30,48 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Install Rust toolchain
-      uses: actions-rust-lang/setup-rust-toolchain@v1
+      uses: dtolnay/rust-toolchain@stable
       with:
-        toolchain: stable
-        target: ${{ matrix.target }}
+        targets: ${{ matrix.target }}
+
+    - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev libsoup-3.0-dev javascriptcoregtk-4.1-dev
 
     - name: Build release
-      run: cargo build --release --target ${{ matrix.target }}
+      run: cargo build --release --verbose
 
     - name: Create archive (Linux/macOS)
       if: matrix.os != 'windows-latest'
       run: |
-        cd target/${{ matrix.target }}/release
-        tar czf ../../../vantisweb-${{ matrix.target }}.tar.gz vantisweb
+        if [ -f "target/release/vantisweb" ]; then
+          cd target/release
+          tar czf ../../vantisweb-${{ matrix.target }}.tar.gz vantisweb
+        else
+          echo "Binary not found!"
+          exit 1
+        fi
 
     - name: Create archive (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        cd target/${{ matrix.target }}/release
-        Compress-Archive -Path vantisweb.exe -DestinationPath ../../../vantisweb-${{ matrix.target }}.zip
+        if (Test-Path "target/release/vantisweb.exe") {
+          Compress-Archive -Path target/release/vantisweb.exe -DestinationPath vantisweb-${{ matrix.target }}.zip
+        } else {
+          Write-Host "Binary not found!"
+          exit 1
+        }
+      shell: pwsh
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: vantisweb-${{ matrix.target }}
-        path: vantisweb-*.tar.gz
+        path: |
+          vantisweb-*.tar.gz
+          vantisweb-*.zip
 
   create-release:
     name: Create Release
@@ -66,12 +83,16 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
+        pattern: vantisweb-*
+
+    - name: List artifacts
+      run: find artifacts -type f
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: artifacts/**/*
         generate_release_notes: true

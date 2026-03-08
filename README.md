@@ -109,7 +109,7 @@
   <!-- Text -->
   <text x="120" y="50" font-family="Fira Code, monospace" font-size="36" font-weight="bold" fill="white" filter="url(#glow)">VantisWeb</text>
   <text x="120" y="80" font-family="Inter, sans-serif" font-size="16" fill="#B0B0B0">The Future of Web Browsing</text>
-  <text x="120" y="105" font-family="Fira Code, monospace" font-size="12" fill="#DC143C">v1.6.0 Vantis Vitality</text>
+  <text x="120" y="105" font-family="Fira Code, monospace" font-size="12" fill="#DC143C">v2.3.0 Developer Tools</text>
 </svg>
 
 <!-- TYPEWRITER EFFECT -->
@@ -120,7 +120,7 @@
 <!-- DYNAMIC BADGES -->
 <p align="center">
   <a href="https://github.com/vantisCorp/VantisWeb/releases">
-    <img src="https://img.shields.io/badge/version-v1.6.0-DC143C?style=for-the-badge&logo=rust&logoColor=white" alt="Version" class="badge-animate">
+    <img src="https://img.shields.io/badge/version-v2.3.0-DC143C?style=for-the-badge&logo=rust&logoColor=white" alt="Version" class="badge-animate">
   </a>
   <a href="https://github.com/vantisCorp/VantisWeb/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-Dual%20(MIT%20|%20Commercial)-8B0000?style=for-the-badge" alt="License">
