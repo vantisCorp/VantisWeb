@@ -10,7 +10,82 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [Unreleased]
 
 ### Planowane
-- Performance Load Testing
+- Future enhancements
+
+---
+
+## [1.9.0] - 2026-03-11
+
+### Added ✨
+- **Performance Load Testing Module**
+  - Load testing with configurable scenarios
+  - Stress testing with breaking point detection
+  - Real-time performance monitoring
+  - CPU and memory profiling
+  - Benchmark suite runner
+
+- **Load Tester**
+  - Virtual user simulation
+  - Ramp-up scheduling
+  - Request distribution patterns (Uniform, Normal, Poisson)
+  - Think time simulation
+  - Timeline sampling
+  - Percentile calculations (P50, P90, P95, P99)
+
+- **Stress Tester**
+  - Progressive load increase
+  - Breaking point detection
+  - Step-by-step analysis
+  - Error rate threshold monitoring
+  - Max sustained load calculation
+
+- **Benchmark Runner**
+  - Micro-benchmark execution
+  - Warmup iterations
+  - Statistical analysis
+  - Throughput calculation
+  - Memory profiling integration
+  - Benchmark comparison
+
+- **Performance Monitor**
+  - Real-time metrics collection
+  - CPU usage tracking
+  - Memory usage tracking
+  - Network I/O monitoring
+  - Disk I/O monitoring
+  - Historical metrics storage
+  - Alert management
+
+- **Profiler**
+  - Async operation profiling
+  - CPU sampling
+  - Memory sampling
+  - Flame graph generation
+  - Profile comparison
+
+- **Report Generator**
+  - HTML report generation
+  - JSON report export
+  - Markdown report
+  - Summary statistics
+  - Test execution tracking
+
+### Performance Features
+- Load scenarios with up to 1000 virtual users
+- Configurable sampling intervals
+- Network condition simulation
+- Memory pressure detection
+- Alert thresholds
+
+### Files Added
+- `src/performance/mod.rs` - Module manager
+- `src/performance/models.rs` - Data models
+- `src/performance/load_tester.rs` - Load testing engine
+- `src/performance/stress_tester.rs` - Stress testing engine
+- `src/performance/benchmark.rs` - Benchmark runner
+- `src/performance/monitor.rs` - Performance monitor
+- `src/performance/profiler.rs` - Profiler
+- `src/performance/report.rs` - Report generator
 
 ---
 

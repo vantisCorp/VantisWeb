@@ -34,6 +34,7 @@ pub mod accessibility;
 pub mod health;
 pub mod dubbing;
 pub mod visual_regression;
+pub mod performance;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -56,6 +57,7 @@ pub use accessibility::{AccessibilityManager, AccessibilityConfig, Accessibility
 pub use health::{HealthModule, NutriScanner, IngredX, VisualCalorieCounter, BioSync};
 pub use dubbing::{LiveTranslator, VoiceCloner, LipSyncProcessor, VantisCluster};
 pub use visual_regression::{VisualRegressionManager, ScreenshotCapture, DiffEngine, BaselineManager};
+pub use performance::{PerformanceManager, LoadTester, StressTester, BenchmarkRunner, PerformanceMonitor};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
