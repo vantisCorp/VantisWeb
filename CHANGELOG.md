@@ -15,6 +15,74 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.7.0] - 2026-03-09
+
+### Added ✨
+- **Live Dubbing Module**
+  - Real-time video translation system
+  - 30 supported languages with quality scoring
+  - Neural Machine Translation (NMT) integration
+  - Voice cloning and synthesis
+  - Lip-sync processing with viseme generation
+  - Vantis Cluster for distributed computing
+
+- **Live Translator**
+  - Real-time text and audio translation
+  - Language detection from text patterns
+  - Emotion detection in translated content
+  - Word timing extraction for subtitles
+  - Audio transcription framework
+  - Support for RTL (Right-to-Left) languages
+
+- **Voice Cloning System**
+  - 12 default voice profiles
+  - Voice synthesis from text
+  - Voice cloning from audio samples
+  - Gender detection from pitch analysis
+  - Custom voice storage and management
+  - Emotion-aware voice modulation
+
+- **Lip-Sync Processor**
+  - Phoneme extraction from audio
+  - Viseme generation (Preston Blair 10-viseme set)
+  - Blend shape generation for animation
+  - Animation keyframe creation
+  - Multi-track audio support
+  - Frame timing and synchronization
+
+- **Vantis Cluster**
+  - Distributed computing for dubbing tasks
+  - Node registration and management
+  - Job queue and load balancing
+  - Task distribution across nodes
+  - Cluster statistics monitoring
+  - Automatic node discovery
+
+### Supported Languages
+- Arabic, Chinese, Dutch, English, French, German, Greek
+- Hebrew, Hindi, Indonesian, Italian, Japanese, Korean
+- Malay, Norwegian, Polish, Portuguese, Romanian, Russian
+- Spanish, Swedish, Thai, Turkish, Ukrainian, Vietnamese
+
+### Dubbing Module Features
+- Language detection with script recognition
+- Translation quality scoring (0.0-1.0)
+- Voice profile management
+- Real-time synthesis pipeline
+- Lip-sync with 10 viseme types
+- Distributed processing cluster
+
+### Files Added
+- `src/dubbing/mod.rs` - Dubbing module manager
+- `src/dubbing/models.rs` - Data models and types
+- `src/dubbing/languages.rs` - Language support and detection
+- `src/dubbing/translator.rs` - Live translation engine
+- `src/dubbing/voice_cloning.rs` - Voice synthesis and cloning
+- `src/dubbing/lip_sync.rs` - Lip-sync processor
+- `src/dubbing/cluster.rs` - Distributed computing cluster
+
+---
+
 ## [1.6.0] - 2026-03-08
 
 ### Added ✨

@@ -32,6 +32,7 @@ pub mod pdf;
 pub mod tabs;
 pub mod accessibility;
 pub mod health;
+pub mod dubbing;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -52,6 +53,7 @@ pub use devtools::{DevToolsManager, ElementsInspector, NetworkMonitor, JSConsole
 pub use analytics::{AnalyticsEngine, AnalyticsConfig, AnalyticsError, AnalyticsSnapshot};
 pub use accessibility::{AccessibilityManager, AccessibilityConfig, AccessibilityProfile, AccessibilityLevel};
 pub use health::{HealthModule, NutriScanner, IngredX, VisualCalorieCounter, BioSync};
+pub use dubbing::{LiveTranslator, VoiceCloner, LipSyncProcessor, VantisCluster};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
