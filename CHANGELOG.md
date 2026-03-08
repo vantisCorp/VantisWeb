@@ -15,6 +15,72 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.5.0] - 2026-03-07
+
+### Added ✨
+- **Eye & Head Tracking Module**
+  - Camera-based cursor control
+  - Gaze detection with confidence scoring
+  - Head gesture recognition (nod, shake, tilt)
+  - Dwell click activation
+  - Calibration system
+  - Position smoothing and filtering
+- **Voice God Mode Module**
+  - Complete voice control of browser
+  - 40+ built-in voice commands
+  - Natural language processing
+  - Wake word detection ("Vantis")
+  - Offline processing support
+  - Custom command registration
+  - Multi-language support
+- **AI Vision Describer Module**
+  - Screen reading with TTS
+  - Image description generation
+  - Video content analysis
+  - Element type detection
+  - Context understanding
+  - Reading session management
+  - Priority-based content ordering
+- **Senior Mode Module**
+  - Simplified UI layout
+  - Extra-large text and icons
+  - High contrast color schemes
+  - Voice assistance integration
+  - Action confirmation dialogs
+  - Quick access menu
+  - Reduced animations
+- **Tremor Guard Module**
+  - Cursor stabilization
+  - Tremor pattern detection
+  - Adaptive smoothing
+  - Dwell click support
+  - Movement prediction
+  - Accidental click prevention
+  - Scroll smoothing
+- **Accessibility Manager**
+  - Central configuration management
+  - Profile system with templates
+  - Feature toggle system
+  - Settings import/export
+  - Statistics tracking
+  - 8 predefined profile templates
+
+### Accessibility Profiles
+- Standard (basic features)
+- Visual Impairment (screen reading, voice control)
+- Motor Impairment (eye tracking, voice, tremor guard)
+- Hearing Impairment (visual alternatives)
+- Cognitive Assistance (simplified interface)
+- Senior Friendly (large text, simple navigation)
+- Tremor Assistance (maximum stabilization)
+- Full Suite (all features enabled)
+
+### Changed 🔄
+- Added accessibility module to main library exports
+- Expanded feature set for universal access
+
+---
+
 ## [1.4.0] - 2026-03-07
 
 ### Added ✨

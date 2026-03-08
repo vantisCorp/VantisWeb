@@ -1,7 +1,7 @@
 <!-- 
   ╔══════════════════════════════════════════════════════════════════════════════╗
   ║  VANTISWEB BROWSER - THE FUTURE OF WEB BROWSING                              ║
-  ║  Version: 1.4.0 | License: Dual (MIT/Commercial) | Rust 1.75+                ║
+  ║  Version: 1.5.0 | License: Dual (MIT/Commercial) | Rust 1.75+                ║
   ║  Built with ❤️ by Vantis Corp                                                 ║
   ╚══════════════════════════════════════════════════════════════════════════════╝
 -->

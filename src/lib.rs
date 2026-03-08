@@ -30,6 +30,7 @@ pub mod devtools;
 pub mod analytics;
 pub mod pdf;
 pub mod tabs;
+pub mod accessibility;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -48,6 +49,7 @@ pub use bookmarks::{BookmarkManager, BookmarkFolderManager, BookmarkSearchEngine
 pub use downloads::{DownloadManager, DownloadScheduler, DownloadAccelerator, DownloadOrganizer, DownloadHistory, BrowserIntegration};
 pub use devtools::{DevToolsManager, ElementsInspector, NetworkMonitor, JSConsole, PerformanceProfiler, StorageInspector};
 pub use analytics::{AnalyticsEngine, AnalyticsConfig, AnalyticsError, AnalyticsSnapshot};
+pub use accessibility::{AccessibilityManager, AccessibilityConfig, AccessibilityProfile, AccessibilityLevel};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
