@@ -6,9 +6,51 @@ To build the world's most advanced, secure, and user-friendly web browser with L
 
 ---
 
-## Current Release: v1.4.0 ✅
+## Current Release: v1.5.1 ✅
 
-### Completed Features
+### Latest Features (v1.5.1 - Windows Installer)
+- ✅ **Windows Installer System**
+  - ✅ NSIS-based professional installer
+  - ✅ Setup wizard with component selection
+  - ✅ File associations (.html, .htm, .pdf, .svg, .webp)
+  - ✅ Protocol handlers (http, https, ftp, mailto, magnet)
+  - ✅ Silent installation mode for enterprise
+  - ✅ Portable mode support
+  - ✅ Automatic updates integration
+  - ✅ CI/CD pipeline for automated builds
+
+### Completed Features (v1.5.0 - Universal Access)
+- ✅ **Eye & Head Tracking**
+  - ✅ Camera-based control
+  - ✅ Gaze detection
+  - ✅ Head gesture recognition
+  - ✅ Calibration system
+
+- ✅ **Voice God Mode**
+  - ✅ Full voice control
+  - ✅ Offline processing
+  - ✅ Natural language commands
+  - ✅ Multi-language support
+
+- ✅ **AI Vision Describer**
+  - ✅ Screen reading
+  - ✅ Image description
+  - ✅ Context understanding
+  - ✅ Audio feedback
+
+- ✅ **Senior Mode**
+  - ✅ Simplified UI
+  - ✅ Large icons
+  - ✅ High contrast
+  - ✅ Voice assistance
+
+- ✅ **Tremor Guard**
+  - ✅ Cursor stabilization
+  - ✅ Predictive movement
+  - ✅ Smart filtering
+  - ✅ Adaptive controls
+
+### Core Features
 - ✅ Liquid Core Architecture (Kernel, Scheduler, Storage)
 - ✅ Digital Immune System (Security, Crypto, Sandbox)
 - ✅ Modern UI Framework (VantisUI, ThemeManager, GPURenderer)
@@ -25,15 +67,15 @@ To build the world's most advanced, secure, and user-friendly web browser with L
 - ✅ Advanced Cloud Sync Providers
 - ✅ Enhanced Analytics Dashboard
 - ✅ Developer Tools and Debug Console
-- ✅ **AI Nexus Features** (NEW in v1.4.0)
+- ✅ **AI Nexus Features** (v1.4.0)
   - ✅ NPU Acceleration (CUDA, Metal, Vulkan, OpenCL, CPU backends)
   - ✅ Predictive Branching (Zero-latency navigation)
   - ✅ Neural Memory (Contextual browsing, associative search)
 
 ### Statistics
-- 110+ Rust files
-- 20,000+ lines of code
-- 120+ unit tests
+- 120+ Rust files
+- 25,000+ lines of code
+- 140+ unit tests
 - 100% documentation coverage
 
 ---
@@ -172,50 +214,82 @@ To build the world's most advanced, secure, and user-friendly web browser with L
 
 ---
 
-## 🚧 In Progress: v1.5.0 - Universal Access ♿
+## ✅ Completed: v1.5.0 - Universal Access ♿
 
-**Target**: Q3 2026
-**Priority**: High
-**Status**: Planned
+**Status**: Completed
 
 ### Accessibility Features
-- [ ] **Eye & Head Tracking**
-  - [ ] Camera-based control
-  - [ ] Gaze detection
-  - [ ] Head gesture recognition
-  - [ ] Calibration system
+- ✅ **Eye & Head Tracking**
+  - ✅ Camera-based control
+  - ✅ Gaze detection
+  - ✅ Head gesture recognition
+  - ✅ Calibration system
 
-- [ ] **Voice God Mode**
-  - [ ] Full voice control
-  - [ ] Offline processing
-  - [ ] Natural language
-  - [ ] Multi-language support
+- ✅ **Voice God Mode**
+  - ✅ Full voice control
+  - ✅ Offline processing
+  - ✅ Natural language
+  - ✅ Multi-language support
 
-- [ ] **AI Vision Describer**
-  - [ ] Screen reading
-  - [ ] Image description
-  - [ ] Context understanding
-  - [ ] Audio feedback
+- ✅ **AI Vision Describer**
+  - ✅ Screen reading
+  - ✅ Image description
+  - ✅ Context understanding
+  - ✅ Audio feedback
 
-- [ ] **Senior Mode**
-  - [ ] Simplified UI
-  - [ ] Large icons
-  - [ ] High contrast
-  - [ ] Voice assistance
+- ✅ **Senior Mode**
+  - ✅ Simplified UI
+  - ✅ Large icons
+  - ✅ High contrast
+  - ✅ Voice assistance
 
-- [ ] **Tremor Guard**
-  - [ ] Cursor stabilization
-  - [ ] Predictive movement
-  - [ ] Smart filtering
-  - [ ] Adaptive controls
+- ✅ **Tremor Guard**
+  - ✅ Cursor stabilization
+  - ✅ Predictive movement
+  - ✅ Smart filtering
+  - ✅ Adaptive controls
 
 ---
 
-## Future: v1.6.0 - Vantis Vitality 🥗
+## ✅ Completed: v1.5.1 - Windows Installer 📦
+
+**Status**: Completed
+
+### Installer Features
+- ✅ **NSIS-based Installer**
+  - ✅ Professional setup wizard
+  - ✅ Component selection
+  - ✅ License agreement
+  - ✅ Installation path selection
+
+- ✅ **File Associations**
+  - ✅ .html, .htm, .xhtml
+  - ✅ .pdf, .mhtml
+  - ✅ .svg, .webp
+
+- ✅ **Protocol Handlers**
+  - ✅ http, https
+  - ✅ ftp, mailto
+  - ✅ magnet, webcal
+
+- ✅ **Enterprise Features**
+  - ✅ Silent installation
+  - ✅ Portable mode
+  - ✅ Custom install directory
+  - ✅ Start Menu shortcuts
+
+- ✅ **CI/CD Integration**
+  - ✅ GitHub Actions workflow
+  - ✅ Automated builds on tags
+  - ✅ Code signing support
+
+---
+
+## 🚧 In Progress: v1.6.0 - Vantis Vitality 🥗
 
 **Target**: Q4 2026
 **Priority**: Medium
-**Status**: Planned
+**Status**: In Development
 
 ### Health & Wellness
 - [ ] **Nutri-Scanner AI**
@@ -276,7 +350,8 @@ To build the world's most advanced, secure, and user-friendly web browser with L
 - ✅ Full Web Engine
 - ✅ Post-quantum cryptography
 - ✅ AI Nexus features (v1.4.0)
-- [ ] Universal access (v1.5.0)
+- ✅ Universal access (v1.5.0)
+- ✅ Windows Installer (v1.5.1)
 - ✅ All specialized profiles
 - [ ] Vantis Vitality (v1.6.0)
 - [ ] Off-Grid capabilities
@@ -323,8 +398,8 @@ To build the world's most advanced, secure, and user-friendly web browser with L
 5. Submit a pull request
 
 ### Priority Areas
-1. **High Priority**: Accessibility, Performance, Live Dubbing
-2. **Medium Priority**: Profiles, Cloud Sync, Health Features
+1. **High Priority**: Health & Wellness, Performance, Live Dubbing
+2. **Medium Priority**: Profiles, Cloud Sync, Accessibility
 3. **Low Priority**: Specialized features, Experimental
 
 ### Development Standards

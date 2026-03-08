@@ -15,6 +15,72 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.6.0] - 2026-03-08
+
+### Added ✨
+- **Nutri-Scanner AI Module**
+  - Recipe analysis with nutritional calculation
+  - Calorie counting and tracking
+  - Nutritional information extraction
+  - Dietary recommendations engine
+  - Health rating calculation (0-100 score)
+  - TDEE (Total Daily Energy Expenditure) calculation
+  - Meal suggestions based on remaining calories
+  - Allergen detection in recipes
+  - Dietary compliance checking (Vegan, Vegetarian, Keto, etc.)
+
+- **Ingred-X Module (Food Additive Detection)**
+  - E-number extraction and analysis
+  - Safety ratings (Safe, Caution, Avoid, Banned)
+  - Comprehensive additive database (20+ common additives)
+  - Allergen warnings for sensitive individuals
+  - Dietary compliance checking
+  - Quick scan mode for fast ingredient analysis
+  - Barcode scanning support (framework)
+  - Category-based additive filtering
+
+- **Visual Calorie Counter Module**
+  - Photo-based food recognition (AI framework)
+  - Portion estimation
+  - Food logging with meal type inference
+  - Daily calorie tracking
+  - Macro breakdown (protein/carbs/fat)
+  - Weekly nutrition summary
+  - Food suggestions based on goals
+  - Recognition confidence scoring
+  - Food database integration
+
+- **Bio-Sync Module (Health Monitoring)**
+  - Blue light filter management
+  - Circadian rhythm synchronization
+  - Chronotype-based recommendations (Morning Lark, Night Owl)
+  - Break reminder system
+  - Screen time tracking
+  - Water intake logging
+  - Wellness score calculation
+  - Health trends analysis
+  - Optimal sleep/wake time suggestions
+
+### Health Module Features
+- Comprehensive food database with 12+ common foods
+- Support for 20+ food additives (E-numbers)
+- Safety ratings with color-coded warnings
+- Multi-language support for food names
+- Meal type detection (Breakfast, Lunch, Dinner, Snack)
+- Portion adjustment support
+- Recognition history tracking
+
+### Files Added
+- `src/health/mod.rs` - Health module manager
+- `src/health/models.rs` - Data models for health features
+- `src/health/database.rs` - Food and additive database
+- `src/health/nutri_scanner.rs` - Nutri-Scanner AI
+- `src/health/ingred_x.rs` - Food additive detector
+- `src/health/visual_calorie.rs` - Visual calorie counter
+- `src/health/bio_sync.rs` - Bio-Sync health monitor
+
+---
+
 ## [1.5.1] - 2026-03-07
 
 ### Added ✨
