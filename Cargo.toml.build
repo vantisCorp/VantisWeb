@@ -1,0 +1,50 @@
+# VantisWeb Build Configuration
+# Use this for creating Windows executable
+
+[package]
+name = "VantisWeb"
+version = "1.5.0"
+edition = "2021"
+authors = ["Vantis Corp <dev@vantis.ai>"]
+description = "Next-generation web browser with Liquid Core Architecture"
+license = "MIT"
+repository = "https://github.com/vantisCorp/VantisWeb"
+
+[build-metadata]
+# Windows executable metadata
+product-name = "VantisWeb Browser"
+file-description = "VantisWeb - Next-generation Web Browser"
+company-name = "Vantis Corp"
+copyright = "Copyright © 2024-2026 Vantis Corp. All rights reserved."
+original-filename = "VantisWeb.exe"
+internal-name = "VantisWeb"
+trademarks = "VantisWeb is a trademark of Vantis Corp"
+
+# Version info
+major-version = 1
+minor-version = 5
+build-number = 0
+revision-number = 0
+
+# Icons
+icon-path = "assets/icons/icon.ico"
+manifest-path = "installer/windows/app.manifest"
+
+[features]
+default = ["full"]
+full = ["accessibility", "ai", "vpn", "tor", "webrtc"]
+accessibility = []
+ai = []
+vpn = []
+tor = []
+webrtc = []
+portable = []
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
+[package.metadata.winres]
+OriginalFilename = "VantisWeb.exe"
+LegalCopyright = "Copyright © 2024-2026 Vantis Corp"
+ProductName = "VantisWeb Browser"
+FileDescription = "VantisWeb - Next-generation Web Browser"

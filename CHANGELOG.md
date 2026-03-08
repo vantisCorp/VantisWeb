@@ -15,6 +15,43 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.5.1] - 2026-03-07
+
+### Added ✨
+- **Windows Installer System**
+  - Professional NSIS-based installer script
+  - PowerShell build script for automated builds
+  - Setup wizard with component selection
+  - File associations management (.html, .htm, .xhtml, .pdf, etc.)
+  - Protocol handlers (http, https, ftp, mailto, magnet)
+  - Default browser registration
+  - Desktop and Start Menu shortcuts
+  - Taskbar pinning support
+  - Silent installation mode (/S)
+  - Portable mode support
+  - GitHub Actions workflow for automated builds
+  - Code signing support
+
+### Installer Features
+- Multi-language support (8 languages)
+- Windows 7/8/8.1/10/11 compatibility
+- DPI-aware manifest
+- Proper uninstaller
+- Custom installation path
+- Component selection (Core, Shortcuts, PDF Viewer, Ad Blocker, etc.)
+
+### Files Added
+- `installer/windows/installer.nsi` - NSIS installer script
+- `installer/windows/build-installer.ps1` - PowerShell build script
+- `installer/windows/setup_wizard.rs` - Setup wizard module
+- `installer/windows/file_associations.rs` - File associations
+- `installer/windows/portable.ini` - Portable mode config
+- `build.rs` - Rust build script with Windows resources
+- `build-installer.bat` - Simple batch build script
+- `.github/workflows/build-installer.yml` - CI/CD workflow
+
+---
+
 ## [1.5.0] - 2026-03-07
 
 ### Added ✨
