@@ -36,6 +36,7 @@ pub mod dubbing;
 pub mod visual_regression;
 pub mod performance;
 pub mod ai_enhanced;
+pub mod cloud_integration;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -60,6 +61,7 @@ pub use dubbing::{LiveTranslator, VoiceCloner, LipSyncProcessor, VantisCluster};
 pub use visual_regression::{VisualRegressionManager, ScreenshotCapture, DiffEngine, BaselineManager};
 pub use performance::{PerformanceManager, LoadTester, StressTester, BenchmarkRunner, PerformanceMonitor};
 pub use ai_enhanced::{AIEnhancedManager, AIAssistant, SmartSearch, ContentAnalyzer, PredictiveNavigator, BookmarkAI};
+pub use cloud_integration::{CloudManager, CloudConfig, sync::RealTimeSync, collaboration::SessionManager, backup::CloudBackup, cross_device::CrossDeviceManager};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

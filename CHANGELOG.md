@@ -14,6 +14,67 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [2.1.0] - 2026-03-11
+
+### Added ☁️
+- **Cloud Integration & Sync Module**
+  - Comprehensive cloud storage and synchronization system
+  - Multi-provider cloud storage support
+  - Real-time sync engine with conflict resolution
+  - Collaborative browsing sessions
+  - Cloud backup with scheduling
+  - Cross-device management
+
+- **Cloud Storage** (`cloud_integration/storage.rs`)
+  - CloudStorageProvider trait for extensible storage backends
+  - StorageManager with upload/download capabilities
+  - File metadata tracking and organization
+  - Storage usage monitoring and quotas
+  - Encryption and compression support
+  - Cache management for offline access
+  - Progress tracking for transfers
+
+- **Real-Time Sync** (`cloud_integration/sync.rs`)
+  - RealTimeSync engine with event broadcasting
+  - SyncEngine for coordinating sync operations
+  - ConflictResolver with multiple strategies (LatestWins, Merge, Manual)
+  - DeltaEngine for efficient incremental sync
+  - Sync queue with priority handling
+  - Automatic retry with exponential backoff
+  - Sync status tracking and notifications
+
+- **Collaborative Sessions** (`cloud_integration/collaboration.rs`)
+  - SessionManager for creating/joining sessions
+  - CollaborativeSession with shared tabs
+  - Real-time chat and messaging
+  - Annotation system for shared content
+  - Participant presence and cursors
+  - Permission-based access control
+  - Voice chat integration support
+  - Session history and playback
+
+- **Cloud Backup** (`cloud_integration/backup.rs`)
+  - CloudBackup with automatic scheduling
+  - BackupScheduler with configurable intervals
+  - RestoreManager for data recovery
+  - Backup manifest and versioning
+  - Incremental backup support
+  - Backup encryption and compression
+  - Retention policy management
+  - Cross-device backup sync
+
+- **Cross-Device Management** (`cloud_integration/cross_device.rs`)
+  - CrossDeviceManager for device registry
+  - Device pairing with secure codes
+  - SendTab functionality between devices
+  - Device activity tracking
+  - Push notifications across devices
+  - Device capability detection
+  - Selective sync per device
+  - Remote device management
+
+---
+
 ## [2.0.0] - 2026-03-11
 
 ### Added ✨
