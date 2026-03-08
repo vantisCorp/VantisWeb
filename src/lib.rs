@@ -38,6 +38,7 @@ pub mod performance;
 pub mod ai_enhanced;
 pub mod cloud_integration;
 pub mod mobile_integration;
+pub mod developer_tools;
 
 pub use core::kernel::VantisKernel;
 pub use security::SecurityManager;
@@ -64,6 +65,7 @@ pub use performance::{PerformanceManager, LoadTester, StressTester, BenchmarkRun
 pub use ai_enhanced::{AIEnhancedManager, AIAssistant, SmartSearch, ContentAnalyzer, PredictiveNavigator, BookmarkAI};
 pub use cloud_integration::{CloudManager, CloudConfig, sync::RealTimeSync, collaboration::SessionManager, backup::CloudBackup, cross_device::CrossDeviceManager};
 pub use mobile_integration::{MobileIntegration, MobileConfig, MobileDeviceManager, MobileSync, PushNotificationManager, RemoteControlManager};
+pub use developer_tools::{DeveloperTools, DevToolsConfig, DevToolsEvent, DevToolsSnapshot, DiagnosticsReport};
 
 // Version information
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

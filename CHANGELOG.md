@@ -14,6 +14,90 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [2.3.0] - 2025-03-08
+
+### Added 🛠️
+- **Developer Tools Enhancement Module**
+  - Comprehensive browser developer tools suite
+  - Full-featured DOM/CSS inspector
+  - Network request profiling and analysis
+  - Performance profiling with Core Web Vitals
+  - Memory analysis and leak detection
+  - Security vulnerability auditing
+  - Advanced code editor with syntax highlighting
+  - Enhanced console with rich output
+  - Built-in testing framework
+  - Source map support for debugging
+
+- **Advanced Inspector** (`developer_tools/inspector.rs`)
+  - DOM tree traversal and modification
+  - CSS style inspection and computed styles
+  - Element highlighting and box model visualization
+  - DOM search and node selection
+  - Attribute and style modification
+
+- **Network Profiler** (`developer_tools/network_profiler.rs`)
+  - Request/response capture and analysis
+  - Timing breakdown for each request
+  - Request filtering and search
+  - HAR export functionality
+  - Slow and large request identification
+
+- **Performance Profiler** (`developer_tools/performance_profiler.rs`)
+  - Performance timeline with tracks and events
+  - Navigation timing metrics
+  - Paint timing (FP, FCP, LCP)
+  - Long task detection
+  - Layout shift tracking (CLS)
+  - Core Web Vitals analysis
+
+- **Memory Analyzer** (`developer_tools/memory_analyzer.rs`)
+  - Heap snapshot capture and comparison
+  - Memory leak detection
+  - Object retention analysis
+  - Memory usage trends
+  - GC root tracking
+
+- **Security Auditor** (`developer_tools/security_auditor.rs`)
+  - Content Security Policy analysis
+  - Mixed content detection
+  - XSS vulnerability scanning
+  - Cookie security analysis
+  - CORS misconfiguration detection
+  - Security scoring
+
+- **Code Editor** (`developer_tools/code_editor.rs`)
+  - Syntax highlighting for JS, TS, HTML, CSS, JSON
+  - Code completion and IntelliSense
+  - Find and replace with regex
+  - Code formatting
+  - Folding ranges
+  - Diagnostic support
+
+- **Enhanced Console** (`developer_tools/console.rs`)
+  - Rich output formatting
+  - Console API implementation (log, warn, error, etc.)
+  - Timers and counters
+  - Grouped messages
+  - Command history
+  - Table and tree output
+
+- **Testing Framework** (`developer_tools/testing.rs`)
+  - Unit, integration, and E2E test support
+  - Assertion library
+  - Mock and spy functions
+  - Coverage reporting
+  - Multiple report formats (Text, JSON, HTML, JUnit)
+
+- **Source Map Manager** (`developer_tools/source_maps.rs`)
+  - Source map parsing (v3)
+  - Original position lookup
+  - Generated position lookup
+  - Source content retrieval
+  - VLQ encoding/decoding
+
+---
+
 ## [2.2.0] - 2026-03-11
 
 ### Added 📱
