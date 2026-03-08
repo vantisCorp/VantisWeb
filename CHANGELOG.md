@@ -14,6 +14,65 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [2.2.0] - 2026-03-11
+
+### Added 📱
+- **Mobile Companion App Integration Module**
+  - Comprehensive mobile device pairing and management
+  - Cross-platform sync for bookmarks, history, tabs, and settings
+  - Push notification support for iOS and Android
+  - Remote browser control from mobile devices
+  - QR code pairing for easy setup
+  - Biometric authentication support
+
+- **Device Manager** (`mobile_integration/device_manager.rs`)
+  - MobileDeviceManager for device pairing and lifecycle
+  - Device discovery and registration
+  - Device token management and validation
+  - Connection status tracking
+  - Per-device sync settings
+  - Device cleanup for inactive devices
+
+- **Mobile Sync** (`mobile_integration/sync.rs`)
+  - MobileSync engine for cross-platform data sync
+  - Incremental and delta sync support
+  - Conflict detection and resolution
+  - Sync history and statistics
+  - Per-device sync queues
+  - Background sync with scheduling
+
+- **Push Notifications** (`mobile_integration/notifications.rs`)
+  - PushNotificationManager for multi-platform support
+  - APNS (iOS) and FCM (Android) integration
+  - Notification batching and retry logic
+  - Delivery and open tracking
+  - Device token management
+
+- **Remote Control** (`mobile_integration/remote_control.rs`)
+  - RemoteControlManager for browser control
+  - Tab management commands (open, close, switch, refresh)
+  - Navigation commands (back, forward, bookmark)
+  - Form filling and script execution
+  - Live streaming of browser tabs
+  - Permission-based access control
+
+- **Mobile Authentication** (`mobile_integration/auth.rs`)
+  - MobileAuthManager for secure device auth
+  - Device token creation and validation
+  - Session management with permissions
+  - Pairing code generation
+  - Biometric authentication support
+  - Challenge-response authentication
+
+- **QR Bridge** (`mobile_integration/qr_bridge.rs`)
+  - QRCodeBridge for easy device pairing
+  - QR code generation with deep links
+  - Pairing code validation
+  - SVG QR code output
+  - Deep link URL support
+
+---
+
 ## [2.1.0] - 2026-03-11
 
 ### Added ☁️
