@@ -20,7 +20,7 @@ impl ProfileManager {
         }
     }
 
-    fn load_profile(&amp;mut self, name: &amp;str) -> Result<Profile, String> {
+    fn load_profile(&mut self, name: &str) -> Result<Profile, String> {
         // Simulate loading
         std::thread::sleep(std::time::Duration::from_micros(50));
         let profile = Profile {
@@ -31,7 +31,7 @@ impl ProfileManager {
         Ok(profile)
     }
 
-    fn create_test_profile(&amp;mut self, name: &amp;str, size: usize) -> Profile {
+    fn create_test_profile(&mut self, name: &str, size: usize) -> Profile {
         let mut settings = HashMap::new();
         for i in 0..size {
             settings.insert(format!("key{}", i), format!("value{}", i));
@@ -44,7 +44,7 @@ impl ProfileManager {
         profile
     }
 
-    fn sync_profile(&amp;self, _profile: &amp;Profile) -> Result<(), String> {
+    fn sync_profile(&self, _profile: &Profile) -> Result<(), String> {
         // Simulate sync
         std::thread::sleep(std::time::Duration::from_micros(200));
         Ok(())
@@ -70,21 +70,21 @@ impl TemplateManager {
         }
     }
 
-    fn get_template(&amp;mut self, name: &amp;str) -> Result<Template, String> {
+    fn get_template(&mut self, name: &str) -> Result<Template, String> {
         if !self.loaded {
             self.load_all_templates();
         }
         self.templates.get(name).cloned().ok_or_else(|| "Template not found".to_string())
     }
 
-    fn get_all_templates(&amp;mut self) -> Vec<Template> {
+    fn get_all_templates(&mut self) -> Vec<Template> {
         if !self.loaded {
             self.load_all_templates();
         }
         self.templates.values().cloned().collect()
     }
 
-    fn load_all_templates(&amp;mut self) {
+    fn load_all_templates(&mut self) {
         // Simulate loading templates
         std::thread::sleep(std::time::Duration::from_micros(100));
         
@@ -100,7 +100,7 @@ impl TemplateManager {
     }
 }
 
-fn bench_profile_loading(c: &amp;mut Criterion) {
+fn bench_profile_loading(c: &mut Criterion) {
     let mut group = c.benchmark_group("profile_loading");
     
     group.bench_function("single_profile", |b| {
@@ -114,11 +114,11 @@ fn bench_profile_loading(c: &amp;mut Criterion) {
         group.bench_with_input(
             BenchmarkId::from_parameter(profile_count),
             profile_count,
-            |b, &amp;profile_count| {
+            |b, &profile_count| {
                 let mut manager = ProfileManager::new(PathBuf::from("profiles"));
                 b.iter(|| {
                     for i in 0..profile_count {
-                        black_box(manager.load_profile(&amp;format!("profile{}", i)));
+                        black_box(manager.load_profile(&format!("profile{}", i)));
                     }
                 })
             }
@@ -128,7 +128,7 @@ fn bench_profile_loading(c: &amp;mut Criterion) {
     group.finish();
 }
 
-fn bench_template_loading(c: &amp;mut Criterion) {
+fn bench_template_loading(c: &mut Criterion) {
     let mut group = c.benchmark_group("template_loading");
     
     group.bench_function("single_template", |b| {
@@ -148,14 +148,14 @@ fn bench_template_loading(c: &amp;mut Criterion) {
     group.finish();
 }
 
-fn bench_profile_sync(c: &amp;mut Criterion) {
+fn bench_profile_sync(c: &mut Criterion) {
     let mut group = c.benchmark_group("profile_sync");
     
     group.bench_function("sync_small_profile", |b| {
         let mut manager = ProfileManager::new(PathBuf::from("profiles"));
         let profile = manager.create_test_profile("small", 100);
         b.iter(|| {
-            manager.sync_profile(black_box(&amp;profile))
+            manager.sync_profile(black_box(&profile))
         })
     });
     
@@ -163,7 +163,7 @@ fn bench_profile_sync(c: &amp;mut Criterion) {
         let mut manager = ProfileManager::new(PathBuf::from("profiles"));
         let profile = manager.create_test_profile("large", 10000);
         b.iter(|| {
-            manager.sync_profile(black_box(&amp;profile))
+            manager.sync_profile(black_box(&profile))
         })
     });
     

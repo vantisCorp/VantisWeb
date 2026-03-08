@@ -13,7 +13,7 @@ impl WebRenderer {
         }
     }
 
-    fn render(&amp;mut self, html: &amp;str) -> Result<String, String> {
+    fn render(&mut self, html: &str) -> Result<String, String> {
         // Simulate rendering with cache
         if let Some(cached) = self.cache.get(html) {
             return Ok(cached.clone());
@@ -40,7 +40,7 @@ impl JSRuntime {
         }
     }
 
-    fn execute(&amp;mut self, script: &amp;str) -> Result<String, String> {
+    fn execute(&mut self, script: &str) -> Result<String, String> {
         // Simulate execution with cache
         if let Some(cached) = self.cache.get(script) {
             return Ok(cached.clone());
@@ -67,7 +67,7 @@ impl WasmRuntime {
         }
     }
 
-    fn execute(&amp;mut self, wasm: &amp;[u8]) -> Result<String, String> {
+    fn execute(&mut self, wasm: &[u8]) -> Result<String, String> {
         // Simulate execution with cache
         if let Some(cached) = self.cache.get(wasm) {
             return Ok(cached.clone());
@@ -83,7 +83,7 @@ impl WasmRuntime {
     }
 }
 
-fn bench_page_rendering(c: &amp;mut Criterion) {
+fn bench_page_rendering(c: &mut Criterion) {
     let mut group = c.benchmark_group("page_rendering");
     
     group.bench_function("simple_page", |b| {
@@ -99,18 +99,18 @@ fn bench_page_rendering(c: &amp;mut Criterion) {
         // Generate a complex HTML document
         let mut html = String::from("<html><body>");
         for i in 0..1000 {
-            html.push_str(&amp;format!("<div>Content {}</div>", i));
+            html.push_str(&format!("<div>Content {}</div>", i));
         }
         html.push_str("</body></html>");
         b.iter(|| {
-            renderer.render(black_box(&amp;html))
+            renderer.render(black_box(&html))
         })
     });
     
     group.finish();
 }
 
-fn bench_js_execution(c: &amp;mut Criterion) {
+fn bench_js_execution(c: &mut Criterion) {
     let mut group = c.benchmark_group("js_execution");
     
     group.bench_function("simple_script", |b| {
@@ -126,25 +126,25 @@ fn bench_js_execution(c: &amp;mut Criterion) {
         // Generate a complex JavaScript
         let mut script = String::from("function test() {");
         for i in 0..1000 {
-            script.push_str(&amp;format!("let x{} = {};", i, i));
+            script.push_str(&format!("let x{} = {};", i, i));
         }
         script.push_str("}");
         b.iter(|| {
-            runtime.execute(black_box(&amp;script))
+            runtime.execute(black_box(&script))
         })
     });
     
     group.finish();
 }
 
-fn bench_wasm_execution(c: &amp;mut Criterion) {
+fn bench_wasm_execution(c: &mut Criterion) {
     let mut group = c.benchmark_group("wasm_execution");
     
     group.bench_function("simple_wasm", |b| {
         let mut runtime = WasmRuntime::new();
         let wasm = vec![0u8; 100]; // Mock WASM binary
         b.iter(|| {
-            runtime.execute(black_box(&amp;wasm))
+            runtime.execute(black_box(&wasm))
         })
     });
     
@@ -152,7 +152,7 @@ fn bench_wasm_execution(c: &amp;mut Criterion) {
         let mut runtime = WasmRuntime::new();
         let wasm = vec![0u8; 10000]; // Mock larger WASM binary
         b.iter(|| {
-            runtime.execute(black_box(&amp;wasm))
+            runtime.execute(black_box(&wasm))
         })
     });
     
