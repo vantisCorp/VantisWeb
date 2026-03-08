@@ -505,9 +505,6 @@ impl ProfileManagerUI {
 </div>
 "##)
     }
-}
-
-/// Render clone dialog
     fn render_clone_dialog(&self) -> String {
         let profile_name = self.clone_source_profile.as_ref()
             .and_then(|id| self.profiles.iter().find(|p| &p.id == id))
@@ -1261,4 +1258,4 @@ mod tests {
         let html = ui.render();
         assert!(html.contains("security-settings"));
     }
-}
+}}
