@@ -10,8 +10,74 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [Unreleased]
 
 ### Planowane
-- Visual Regression Testing
 - Performance Load Testing
+
+---
+
+## [1.8.0] - 2026-03-10
+
+### Added ✨
+- **Visual Regression Testing Module**
+  - Screenshot capture and baseline management
+  - Pixel-perfect diff detection
+  - Perceptual diff (pDiff) algorithms
+  - SSIM (Structural Similarity Index) calculation
+  - Multi-viewport testing (desktop, tablet, mobile)
+  - CI/CD integration support
+
+- **Screenshot Capture System**
+  - Full page screenshot capture
+  - Element-specific capture
+  - Region capture
+  - Multi-viewport capture
+  - Wait conditions (selector, timeout, network idle)
+  - Configurable capture delay
+
+- **Diff Comparison Engine**
+  - Pixel-by-pixel comparison
+  - Perceptual difference threshold
+  - SSIM-based similarity scoring
+  - Diff region detection
+  - Heatmap generation
+  - Anti-aliasing detection
+
+- **Baseline Management**
+  - Baseline storage and versioning
+  - Baseline approval workflow
+  - Baseline migration
+  - Hash-based comparison
+  - Metadata tracking
+
+- **Interactive Diff Viewer**
+  - Side-by-side comparison view
+  - Overlay slider comparison
+  - Diff highlighting
+  - Heatmap visualization
+  - HTML report generation
+  - Markdown and JSON reports
+
+- **Test Runner**
+  - Test suite management
+  - Parallel test execution
+  - Sequential test execution
+  - Configuration file support
+  - JUnit XML output for CI/CD
+
+### Visual Regression Features
+- 4 comparison methods (Pixel, Perceptual, SSIM, Feature)
+- Diff region bounding boxes
+- Ignore regions support
+- Custom viewport configurations
+- Webhook notifications for CI
+
+### Files Added
+- `src/visual_regression/mod.rs` - Module manager
+- `src/visual_regression/models.rs` - Data models
+- `src/visual_regression/capture.rs` - Screenshot capture
+- `src/visual_regression/comparison.rs` - Diff engine
+- `src/visual_regression/baseline.rs` - Baseline management
+- `src/visual_regression/diff_viewer.rs` - Interactive viewer
+- `src/visual_regression/test_runner.rs` - Test runner
 
 ---
 
