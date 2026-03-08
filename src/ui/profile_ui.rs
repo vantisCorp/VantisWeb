@@ -199,7 +199,7 @@ impl ProfileManagerUI {
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(5000);
 
-        html.push_str(r#"
+        html.push_str(r##"
 <div class="profile-manager">
     <div class="profile-manager-header">
         <h2>Profile Manager</h2>
@@ -209,7 +209,7 @@ impl ProfileManagerUI {
         </div>
     </div>
     <div class="profile-list">
-"#);
+"##);
 
         for profile in &self.profiles {
             let is_active = self.active_profile_id.as_ref().map_or(false, |id| id == &profile.id);
@@ -222,7 +222,7 @@ impl ProfileManagerUI {
             if is_drop_target { classes.push("drop-target"); }
             let class_str = classes.join(" ");
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
         <div class="profile-card {}" data-profile-id="{}" data-profile-order="{}" draggable="true">
             <div class="profile-drag-handle" title="Drag to reorder">⋮⋮</div>
             <div class="profile-icon" style="background-color: {};">
@@ -241,7 +241,7 @@ impl ProfileManagerUI {
                 <button class="button button-danger profile-delete-btn" data-profile-id="{}">Delete</button>
             </div>
         </div>
-"#,
+"##,
                 class_str,
                 profile.id,
                 profile.order,
@@ -250,7 +250,7 @@ impl ProfileManagerUI {
                 profile.name,
                 profile.profile_type,
                 format_timestamp(profile.last_used_at),
-                if is_active { r#"<span class="active-badge">Active</span>"# } else { r#"<button class="button button-success profile-activate-btn" data-profile-id="{}">Activate</button>"# },
+                if is_active { r##"<span class="active-badge">Active</span>"## } else { r##"<button class="button button-success profile-activate-btn" data-profile-id="{}">Activate</button>"## },
                 profile.id,
                 profile.id,
                 profile.id,
@@ -258,10 +258,10 @@ impl ProfileManagerUI {
             ));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
     </div>
 </div>
-"#);
+"##);
 
         // Render dialogs
         if self.show_create_dialog {
@@ -293,7 +293,7 @@ impl ProfileManagerUI {
 
     /// Render create profile dialog
     fn render_create_dialog(&self) -> String {
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="create-profile-modal">
     <div class="modal">
         <div class="modal-header">
@@ -334,7 +334,7 @@ impl ProfileManagerUI {
         </div>
     </div>
 </div>
-"#)
+"##)
     }
 
     /// Render delete profile dialog
@@ -344,7 +344,7 @@ impl ProfileManagerUI {
             .map(|p| p.name.clone())
             .unwrap_or_else(|| "Unknown".to_string());
 
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="delete-profile-modal">
     <div class="modal">
         <div class="modal-header">
@@ -361,12 +361,12 @@ impl ProfileManagerUI {
         </div>
     </div>
 </div>
-"#, profile_name)
+"##, profile_name)
     }
 
     /// Render template selection dialog
     fn render_template_dialog(&self) -> String {
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="template-modal">
     <div class="modal modal-large">
         <div class="modal-header">
@@ -403,7 +403,7 @@ impl ProfileManagerUI {
         </div>
     </div>
 </div>
-"#)
+"##)
     }
 
     /// Render export dialog
@@ -415,7 +415,7 @@ impl ProfileManagerUI {
             .map(|p| p.name.clone())
             .unwrap_or_else(|| "".to_string());
 
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="export-profile-modal">
     <div class="modal">
         <div class="modal-header">
@@ -456,12 +456,12 @@ impl ProfileManagerUI {
         </div>
     </div>
 </div>
-"#, export_title, profile_name)
+"##, export_title, profile_name)
     }
 
     /// Render import dialog
     fn render_import_dialog(&self) -> String {
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="import-profile-modal">
     <div class="modal">
         <div class="modal-header">
@@ -503,7 +503,7 @@ impl ProfileManagerUI {
         </div>
     </div>
 </div>
-"#)
+"##)
     }
 }
 
@@ -514,7 +514,7 @@ impl ProfileManagerUI {
             .map(|p| p.name.clone())
             .unwrap_or_else(|| "Profile".to_string());
 
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="clone-profile-modal">
     <div class="modal">
         <div class="modal-header">
@@ -548,7 +548,7 @@ impl ProfileManagerUI {
         </div>
     </div>
 </div>
-"#,
+"##,
                 profile_name,
                 self.clone_new_name,
                 if self.clone_include_bookmarks { "checked" } else { "" },
@@ -593,23 +593,23 @@ impl ProfileTemplateUI {
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(3000);
 
-        html.push_str(r#"
+        html.push_str(r##"
 <div class="template-selection">
     <h2>Choose a Profile Template</h2>
     <div class="template-grid">
-"#);
+"##);
 
         for template in &self.templates {
             let is_selected = self.selected_template.as_ref().map_or(false, |id| id == &template.id);
             let selected_class = if is_selected { "selected" } else { "" };
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
         <div class="template-card {}" data-template-id="{}">
             <div class="template-icon">{}</div>
             <h3>{}</h3>
             <p class="template-description">{}</p>
             <div class="template-features">
-"#,
+"##,
                 selected_class,
                 template.id,
                 template.icon,
@@ -618,22 +618,22 @@ impl ProfileTemplateUI {
             ));
 
             for feature in &template.features {
-                html.push_str(&format!(r#"
+                html.push_str(&format!(r##"
                 <span class="template-feature">{}</span>
-"#, feature));
+"##, feature));
             }
 
-            html.push_str(r#"
+            html.push_str(r##"
             </div>
             <div class="template-category">{:?}</div>
         </div>
-"#);
+"##);
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
     </div>
 </div>
-"#);
+"##);
 
         html
     }
@@ -676,12 +676,12 @@ impl ProfileSyncUI {
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(2000);
 
-        html.push_str(r#"
+        html.push_str(r##"
 <div class="sync-settings">
     <div class="sync-header">
         <h2>Profile Synchronization</h2>
         <div class="sync-status">
-"#);
+"##);
 
         if let Some(status) = &self.sync_status {
             let status_class = match status {
@@ -691,19 +691,19 @@ impl ProfileSyncUI {
                 SyncStatus::Offline => "offline",
             };
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
             <span class="sync-badge {}">{:?}</span>
-"#, status_class, status));
+"##, status_class, status));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
         </div>
     </div>
     <div class="sync-config">
         <div class="form-group">
             <label for="sync-provider">Sync Provider</label>
             <select id="sync-provider">
-"#);
+"##);
 
         for provider in &[SyncProvider::Local, SyncProvider::Custom] {
             let selected = if self.sync_config.provider == *provider {
@@ -712,12 +712,12 @@ impl ProfileSyncUI {
                 ""
             };
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
                 <option value="{:?}" {}>{:?}</option>
-"#, provider, selected, provider));
+"##, provider, selected, provider));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
             </select>
         </div>
         <div class="form-group">
@@ -744,7 +744,7 @@ impl ProfileSyncUI {
         <button id="restore-profile-btn" class="button button-secondary">Restore Profile</button>
     </div>
 </div>
-"#,
+"##,
             self.sync_config.sync_interval,
             if self.sync_config.auto_sync { "checked" } else { "" },
             if self.sync_config.sync_on_startup { "checked" } else { "" }
@@ -759,7 +759,7 @@ impl ProfileSyncUI {
 
     /// Render sync dialog
     fn render_sync_dialog(&self) -> String {
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="sync-modal">
     <div class="modal">
         <div class="modal-header">
@@ -779,7 +779,7 @@ impl ProfileSyncUI {
         </div>
     </div>
 </div>
-"#)
+"##)
     }
 }
 
@@ -820,7 +820,7 @@ impl ProfileAnalyticsUI {
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(4000);
 
-        html.push_str(r#"
+        html.push_str(r##"
 <div class="analytics-dashboard">
     <div class="analytics-header">
         <h2>Profile Analytics</h2>
@@ -831,7 +831,7 @@ impl ProfileAnalyticsUI {
             <button class="time-range-btn {}" data-range="90d">90 Days</button>
         </div>
     </div>
-"#,
+"##,
             if self.time_range == "1d" { "active" } else { "" },
             if self.time_range == "7d" { "active" } else { "" },
             if self.time_range == "30d" { "active" } else { "" },
@@ -839,7 +839,7 @@ impl ProfileAnalyticsUI {
         );
 
         if let Some(summary) = &self.usage_summary {
-            html.push_str(r#"
+            html.push_str(r##"
     <div class="analytics-summary">
         <div class="summary-card">
             <div class="summary-icon">⏱️</div>
@@ -870,7 +870,7 @@ impl ProfileAnalyticsUI {
             </div>
         </div>
     </div>
-"#,
+"##,
                 format_duration(summary.total_time),
                 summary.websites_visited,
                 summary.tabs_opened,
@@ -878,7 +878,7 @@ impl ProfileAnalyticsUI {
             );
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
     <div class="analytics-charts">
         <div class="chart-container">
             <h3>Daily Usage</h3>
@@ -897,10 +897,10 @@ impl ProfileAnalyticsUI {
                     <th>Metric</th>
                     <th>Value</th>
                 </tr>
-"#);
+"##);
 
         if let Some(analytics) = &self.analytics {
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
                 <tr>
                     <td>Total Tabs Opened</td>
                     <td>{}</td>
@@ -913,14 +913,14 @@ impl ProfileAnalyticsUI {
                     <td>Maximum Tabs Open</td>
                     <td>{}</td>
                 </tr>
-"#,
+"##,
                 analytics.tab_stats.total_opened,
                 analytics.tab_stats.average_tabs,
                 analytics.tab_stats.max_tabs
             ));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
             </table>
         </div>
         <div class="details-section">
@@ -930,10 +930,10 @@ impl ProfileAnalyticsUI {
                     <th>Metric</th>
                     <th>Value</th>
                 </tr>
-"#);
+"##);
 
         if let Some(analytics) = &self.analytics {
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
                 <tr>
                     <td>Average Page Load Time</td>
                     <td>{:.2}s</td>
@@ -950,7 +950,7 @@ impl ProfileAnalyticsUI {
                     <td>Average CPU Usage</td>
                     <td>{:.1}%</td>
                 </tr>
-"#,
+"##,
                 analytics.performance.avg_page_load_time,
                 analytics.performance.crashes,
                 analytics.performance.avg_memory_usage,
@@ -958,12 +958,12 @@ impl ProfileAnalyticsUI {
             ));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
             </table>
         </div>
     </div>
 </div>
-"#);
+"##);
 
         html
     }
@@ -1016,12 +1016,12 @@ impl ProfileSecurityUI {
     pub fn render(&self) -> String {
         let mut html = String::with_capacity(3000);
 
-        html.push_str(r#"
+        html.push_str(r##"
 <div class="security-settings">
     <div class="security-header">
         <h2>Profile Security</h2>
         <div class="security-status">
-"#);
+"##);
 
         if let Some(security) = &self.security {
             let status_class = match security.security_level {
@@ -1031,47 +1031,47 @@ impl ProfileSecurityUI {
                 SecurityLevel::High => "high",
             };
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
             <span class="security-badge {}">{:?}</span>
-"#, status_class, security.security_level));
+"##, status_class, security.security_level));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
         </div>
     </div>
     <div class="security-config">
         <div class="form-group">
             <label for="security-level">Security Level</label>
             <select id="security-level">
-"#);
+"##);
 
         for level in &[SecurityLevel::None, SecurityLevel::Low, SecurityLevel::Medium, SecurityLevel::High] {
             let selected = self.security.as_ref()
                 .map_or(false, |s| s.security_level == *level);
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
                 <option value="{:?}" {}>{:?}</option>
-"#, level, if selected { "selected" } else { "" }, level));
+"##, level, if selected { "selected" } else { "" }, level));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
             </select>
         </div>
         <div class="form-group">
             <label for="auth-method">Authentication Method</label>
             <select id="auth-method">
-"#);
+"##);
 
         for method in &[AuthMethod::None, AuthMethod::Password, AuthMethod::Biometric, AuthMethod::TwoFactor] {
             let selected = self.security.as_ref()
                 .map_or(false, |s| s.auth_method == *method);
 
-            html.push_str(&format!(r#"
+            html.push_str(&format!(r##"
                 <option value="{:?}" {}>{:?}</option>
-"#, method, if selected { "selected" } else { "" }, method));
+"##, method, if selected { "selected" } else { "" }, method));
         }
 
-        html.push_str(r#"
+        html.push_str(r##"
             </select>
         </div>
         <div class="form-group">
@@ -1097,7 +1097,7 @@ impl ProfileSecurityUI {
         <button id="view-attempts-btn" class="button button-secondary">View Failed Attempts</button>
     </div>
 </div>
-"#,
+"##,
             self.security.as_ref().map_or(false, |s| s.auto_lock),
             self.security.as_ref().map_or(5, |s| s.lock_timeout),
             self.security.as_ref().map_or(false, |s| s.encrypt_data)
@@ -1116,7 +1116,7 @@ impl ProfileSecurityUI {
 
     /// Render password change dialog
     fn render_password_dialog(&self) -> String {
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="password-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1149,12 +1149,12 @@ impl ProfileSecurityUI {
         </div>
     </div>
 </div>
-"#)
+"##)
     }
 
     /// Render biometric setup dialog
     fn render_biometric_dialog(&self) -> String {
-        format!(r#"
+        format!(r##"
 <div class="modal-overlay" id="biometric-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1190,7 +1190,7 @@ impl ProfileSecurityUI {
         </div>
     </div>
 </div>
-"#)
+"##)
     }
 }
 
