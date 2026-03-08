@@ -14,6 +14,71 @@ i ten projekt przestrzega [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [2.0.0] - 2026-03-11
+
+### Added ✨
+- **AI Integration Enhancement Module**
+  - Major version release with comprehensive AI capabilities
+  - AI Assistant for natural language interaction
+  - Smart Search with semantic understanding
+  - Content Analyzer for intelligent content analysis
+  - Predictive Navigation with URL prediction
+  - Bookmark AI for intelligent bookmark management
+
+- **AI Assistant** (`ai_enhanced/assistant.rs`)
+  - Natural language conversation interface
+  - Intent detection and entity extraction
+  - Task execution capabilities
+  - Context-aware responses
+  - Conversation memory management
+  - Multi-turn dialogue support
+  - Sentiment analysis integration
+  - Suggested actions for users
+
+- **Smart Search** (`ai_enhanced/smart_search.rs`)
+  - Semantic search using embeddings
+  - Query intent detection (Informational, Navigational, Transactional)
+  - Result ranking with multiple signals
+  - Personalized search results
+  - Query expansion and spell correction
+  - Faceted search support
+  - Search history tracking
+  - Content type classification
+
+- **Content Analyzer** (`ai_enhanced/content_analyzer.rs`)
+  - Sentiment analysis with emotion detection
+  - Named entity recognition (NER)
+  - Content summarization (extractive)
+  - Automatic categorization
+  - Key phrase extraction
+  - Readability metrics (Flesch-Kincaid, Gunning Fog, etc.)
+  - Language detection
+  - Content quality scoring
+
+- **Predictive Navigation** (`ai_enhanced/predictive_nav.rs`)
+  - URL prediction based on history
+  - Markov chain sequence prediction
+  - Pattern-based navigation suggestions
+  - Temporal pattern recognition
+  - Content prefetching
+  - Navigation context tracking
+  - Cross-session learning
+
+- **Bookmark AI** (`ai_enhanced/bookmark_ai.rs`)
+  - Automatic bookmark categorization
+  - Smart organization and tagging
+  - Duplicate detection and merging
+  - URL normalization
+  - Content-based recommendations
+  - Smart folders with dynamic queries
+  - Visit tracking and analytics
+
+### Changed 🔄
+- Updated to version 2.0.0 (major version bump)
+- Enhanced AI capabilities across all modules
+
+---
+
 ## [1.9.0] - 2026-03-11
 
 ### Added ✨
