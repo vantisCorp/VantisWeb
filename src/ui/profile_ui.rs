@@ -1258,4 +1258,4 @@ mod tests {
         let html = ui.render();
         assert!(html.contains("security-settings"));
     }
-}}
+}
