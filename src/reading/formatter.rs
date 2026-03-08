@@ -278,7 +278,7 @@ document.addEventListener('keydown', (e) => {{
     }
 
     fn escape_html(&self, text: &str) -> String {
-        text.replace('&', "&amp;")
+        text.replace('&', "&")
             .replace('<', "&lt;")
             .replace('>', "&gt;")
             .replace('"', "&quot;")
@@ -808,7 +808,7 @@ mod tests {
     fn test_escape_html() {
         let formatter = ArticleFormatter::new();
         assert_eq!(formatter.escape_html("<script>"), "&lt;script&gt;");
-        assert_eq!(formatter.escape_html("A & B"), "A &amp; B");
+        assert_eq!(formatter.escape_html("A & B"), "A & B");
     }
 
     #[test]

@@ -35,9 +35,9 @@ impl SecurityManager {
 
     /// Validate extension permissions
     pub async fn validate_permissions(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        manifest: &amp;serde_json::Value,
+        manifest: &serde_json::Value,
     ) -> Result<PermissionValidationResult, SecurityError> {
         let mut validator = self.permission_validator.write().await;
         let result = validator.validate(manifest)?;
@@ -54,9 +54,9 @@ impl SecurityManager {
 
     /// Check if permission is granted for extension
     pub async fn has_permission(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        permission: &amp;str,
+        permission: &str,
     ) -> bool {
         let blocked = self.blocked_permissions.read().await;
         if blocked.contains(permission) {
@@ -64,7 +64,7 @@ impl SecurityManager {
         }
         
         let policies = self.security_policies.read().await;
-        if let Some(policy) = policies.get(&amp;extension_id) {
+        if let Some(policy) = policies.get(&extension_id) {
             policy.granted_permissions.contains(permission)
         } else {
             false
@@ -73,9 +73,9 @@ impl SecurityManager {
 
     /// Grant permission to extension
     pub async fn grant_permission(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        permission: &amp;str,
+        permission: &str,
     ) -> Result<(), SecurityError> {
         let mut policies = self.security_policies.write().await;
         let policy = policies.entry(extension_id)
@@ -94,12 +94,12 @@ impl SecurityManager {
 
     /// Revoke permission from extension
     pub async fn revoke_permission(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        permission: &amp;str,
+        permission: &str,
     ) -> Result<(), SecurityError> {
         let mut policies = self.security_policies.write().await;
-        if let Some(policy) = policies.get_mut(&amp;extension_id) {
+        if let Some(policy) = policies.get_mut(&extension_id) {
             policy.granted_permissions.remove(permission);
             self.log_audit(extension_id, AuditAction::PermissionRevoke, true).await;
         }
@@ -108,9 +108,9 @@ impl SecurityManager {
 
     /// Detect threats in extension code
     pub async fn detect_threats(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        code: &amp;str,
+        code: &str,
     ) -> Result<ThreatDetectionResult, SecurityError> {
         let mut detector = self.threat_detector.write().await;
         let result = detector.analyze(code)?;
@@ -126,9 +126,9 @@ impl SecurityManager {
 
     /// Generate CSP for extension
     pub async fn generate_csp(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        manifest: &amp;serde_json::Value,
+        manifest: &serde_json::Value,
     ) -> Result<String, SecurityError> {
         let manager = self.csp_manager.read().await;
         let csp = manager.generate(manifest)?;
@@ -139,19 +139,19 @@ impl SecurityManager {
 
     /// Validate URL access
     pub async fn validate_url_access(
-        &amp;self,
+        &self,
         extension_id: Uuid,
-        url: &amp;str,
+        url: &str,
         access_type: UrlAccessType,
     ) -> Result<bool, SecurityError> {
         let policies = self.security_policies.read().await;
         
-        if let Some(policy) = policies.get(&amp;extension_id) {
+        if let Some(policy) = policies.get(&extension_id) {
             let parsed_url = Url::parse(url)?;
             
             // Check host permissions
-            for host_permission in &amp;policy.host_permissions {
-                if Self::url_matches_permission(&amp;parsed_url, host_permission) {
+            for host_permission in &policy.host_permissions {
+                if Self::url_matches_permission(&parsed_url, host_permission) {
                     self.log_audit(
                         extension_id,
                         AuditAction::UrlAccess,
@@ -162,8 +162,8 @@ impl SecurityManager {
             }
             
             // Check if URL is blocked
-            for blocked in &amp;policy.blocked_urls {
-                if Self::url_matches_permission(&amp;parsed_url, blocked) {
+            for blocked in &policy.blocked_urls {
+                if Self::url_matches_permission(&parsed_url, blocked) {
                     self.log_audit(
                         extension_id,
                         AuditAction::UrlAccess,
@@ -178,7 +178,7 @@ impl SecurityManager {
     }
 
     /// Check if URL matches permission pattern
-    fn url_matches_permission(url: &amp;Url, pattern: &amp;str) -> bool {
+    fn url_matches_permission(url: &Url, pattern: &str) -> bool {
         if pattern == "<all_urls>" {
             return true;
         }
@@ -190,7 +190,7 @@ impl SecurityManager {
                 .replace("*://", "")
                 .replace("/*", "");
             
-            if host == pattern_host || host.ends_with(&amp;format!(".{}", pattern_host)) {
+            if host == pattern_host || host.ends_with(&format!(".{}", pattern_host)) {
                 return true;
             }
         }
@@ -199,7 +199,7 @@ impl SecurityManager {
     }
 
     /// Log security audit entry
-    async fn log_audit(&amp;self, extension_id: Uuid, action: AuditAction, success: bool) {
+    async fn log_audit(&self, extension_id: Uuid, action: AuditAction, success: bool) {
         let mut log = self.audit_log.write().await;
         log.push(SecurityAuditEntry {
             id: Uuid::new_v4(),
@@ -217,7 +217,7 @@ impl SecurityManager {
     }
 
     /// Get audit log for extension
-    pub async fn get_audit_log(&amp;self, extension_id: Uuid) -> Vec<SecurityAuditEntry> {
+    pub async fn get_audit_log(&self, extension_id: Uuid) -> Vec<SecurityAuditEntry> {
         let log = self.audit_log.read().await;
         log.iter()
             .filter(|entry| entry.extension_id == extension_id)
@@ -226,26 +226,26 @@ impl SecurityManager {
     }
 
     /// Block a permission globally
-    pub async fn block_permission(&amp;self, permission: &amp;str) {
+    pub async fn block_permission(&self, permission: &str) {
         let mut blocked = self.blocked_permissions.write().await;
         blocked.insert(permission.to_string());
     }
 
     /// Unblock a permission
-    pub async fn unblock_permission(&amp;self, permission: &amp;str) {
+    pub async fn unblock_permission(&self, permission: &str) {
         let mut blocked = self.blocked_permissions.write().await;
         blocked.remove(permission);
     }
 
     /// Get security policy for extension
-    pub async fn get_security_policy(&amp;self, extension_id: Uuid) -> Option<ExtensionSecurityPolicy> {
+    pub async fn get_security_policy(&self, extension_id: Uuid) -> Option<ExtensionSecurityPolicy> {
         let policies = self.security_policies.read().await;
-        policies.get(&amp;extension_id).cloned()
+        policies.get(&extension_id).cloned()
     }
 
     /// Set security policy for extension
     pub async fn set_security_policy(
-        &amp;self,
+        &self,
         extension_id: Uuid,
         policy: ExtensionSecurityPolicy,
     ) {
@@ -254,15 +254,15 @@ impl SecurityManager {
     }
 
     /// Check if extension is trusted
-    pub async fn is_trusted(&amp;self, extension_id: Uuid) -> bool {
+    pub async fn is_trusted(&self, extension_id: Uuid) -> bool {
         let policies = self.security_policies.read().await;
-        policies.get(&amp;extension_id)
+        policies.get(&extension_id)
             .map(|p| p.trust_level >= TrustLevel::Trusted)
             .unwrap_or(false)
     }
 
     /// Set extension trust level
-    pub async fn set_trust_level(&amp;self, extension_id: Uuid, level: TrustLevel) {
+    pub async fn set_trust_level(&self, extension_id: Uuid, level: TrustLevel) {
         let mut policies = self.security_policies.write().await;
         let policy = policies.entry(extension_id)
             .or_insert_with(ExtensionSecurityPolicy::new);
@@ -392,7 +392,7 @@ impl PermissionValidator {
         }
     }
 
-    fn validate(&amp;mut self, manifest: &amp;serde_json::Value) -> Result<PermissionValidationResult, SecurityError> {
+    fn validate(&mut self, manifest: &serde_json::Value) -> Result<PermissionValidationResult, SecurityError> {
         let mut result = PermissionValidationResult {
             is_valid: true,
             unknown_permissions: Vec::new(),
@@ -500,19 +500,19 @@ impl ThreatDetector {
         Self { patterns }
     }
 
-    fn analyze(&amp;mut self, code: &amp;str) -> Result<ThreatDetectionResult, SecurityError> {
+    fn analyze(&mut self, code: &str) -> Result<ThreatDetectionResult, SecurityError> {
         let mut threats = Vec::new();
         let mut risk_score = 0;
 
-        for pattern in &amp;self.patterns {
-            if let Ok(re) = regex::Regex::new(&amp;pattern.pattern) {
+        for pattern in &self.patterns {
+            if let Ok(re) = regex::Regex::new(&pattern.pattern) {
                 if re.is_match(code) {
                     threats.push(DetectedThreat {
                         pattern_id: pattern.id.to_string(),
                         name: pattern.name.to_string(),
                         severity: pattern.severity,
                         description: pattern.description.to_string(),
-                        matched_code: Self::extract_match(code, &amp;re),
+                        matched_code: Self::extract_match(code, &re),
                     });
 
                     risk_score += pattern.severity.score();
@@ -527,7 +527,7 @@ impl ThreatDetector {
         })
     }
 
-    fn extract_match(code: &amp;str, re: &amp;regex::Regex) -> String {
+    fn extract_match(code: &str, re: &regex::Regex) -> String {
         if let Some(m) = re.find(code) {
             let start = m.start().saturating_sub(20);
             let end = (m.end() + 20).min(code.len());
@@ -582,7 +582,7 @@ impl ContentSecurityPolicyManager {
         Self { default_directives }
     }
 
-    fn generate(&amp;self, manifest: &amp;serde_json::Value) -> Result<String, SecurityError> {
+    fn generate(&self, manifest: &serde_json::Value) -> Result<String, SecurityError> {
         let mut directives = self.default_directives.clone();
 
         // Check for CSP in manifest
@@ -592,7 +592,7 @@ impl ContentSecurityPolicyManager {
             .and_then(|v| v.as_str())
         {
             // Parse and merge with default CSP
-            Self::parse_and_merge_csp(manifest_csp, &amp;mut directives);
+            Self::parse_and_merge_csp(manifest_csp, &mut directives);
         }
 
         // Generate CSP string
@@ -604,11 +604,11 @@ impl ContentSecurityPolicyManager {
         Ok(csp_parts.join("; "))
     }
 
-    fn parse_and_merge_csp(csp: &amp;str, directives: &amp;mut HashMap<String, Vec<String>>) {
+    fn parse_and_merge_csp(csp: &str, directives: &mut HashMap<String, Vec<String>>) {
         for part in csp.split(';') {
             let part = part.trim();
             if let Some(space_pos) = part.find(' ') {
-                let directive = &amp;part[..space_pos];
+                let directive = &part[..space_pos];
                 let sources: Vec<String> = part[space_pos + 1..]
                     .split_whitespace()
                     .map(|s| s.to_string())
@@ -677,7 +677,7 @@ pub enum ThreatSeverity {
 }
 
 impl ThreatSeverity {
-    pub fn score(&amp;self) -> u32 {
+    pub fn score(&self) -> u32 {
         match self {
             Self::Low => 10,
             Self::Medium => 25,
@@ -689,11 +689,11 @@ impl ThreatSeverity {
 
 /// Threat pattern
 pub struct ThreatPattern {
-    pub id: &amp;'static str,
-    pub name: &amp;'static str,
-    pub pattern: &amp;'static str,
+    pub id: &'static str,
+    pub name: &'static str,
+    pub pattern: &'static str,
     pub severity: ThreatSeverity,
-    pub description: &amp;'static str,
+    pub description: &'static str,
 }
 
 /// Extension security policy
@@ -802,12 +802,12 @@ mod tests {
             "permissions": ["tabs", "storage", "bookmarks"]
         });
         
-        let result = manager.validate_permissions(extension_id, &amp;manifest).await;
+        let result = manager.validate_permissions(extension_id, &manifest).await;
         assert!(result.is_ok());
         
         let validation = result.unwrap();
         assert!(validation.is_valid);
-        assert!(validation.dangerous_permissions.contains(&amp;"tabs".to_string()));
+        assert!(validation.dangerous_permissions.contains(&"tabs".to_string()));
     }
 
     #[tokio::test]
@@ -850,7 +850,7 @@ mod tests {
             "version": "1.0"
         });
         
-        let csp = manager.generate_csp(Uuid::new_v4(), &amp;manifest).await;
+        let csp = manager.generate_csp(Uuid::new_v4(), &manifest).await;
         assert!(csp.is_ok());
         
         let csp_str = csp.unwrap();

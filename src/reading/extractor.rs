@@ -296,7 +296,7 @@ impl ArticleExtractor {
 
         // Decode HTML entities
         let text = text
-            .replace("&amp;", "&")
+            .replace("&", "&")
             .replace("&lt;", "<")
             .replace("&gt;", ">")
             .replace("&quot;", "&quot;")

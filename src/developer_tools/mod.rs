@@ -167,7 +167,7 @@ impl DeveloperTools {
     }
 
     /// Initialize all enabled tools
-    pub async fn initialize(&amp;self) {
+    pub async fn initialize(&self) {
         if self.config.enable_inspector {
             let mut inspector = self.inspector.write().await;
             *inspector = Some(AdvancedInspector::new(Default::default()));
@@ -217,55 +217,55 @@ impl DeveloperTools {
     }
 
     /// Get inspector
-    pub async fn inspector(&amp;self) -> Option<AdvancedInspector> {
+    pub async fn inspector(&self) -> Option<AdvancedInspector> {
         let inspector = self.inspector.read().await;
         inspector.clone()
     }
 
     /// Get performance profiler
-    pub async fn performance_profiler(&amp;self) -> Option<PerformanceProfiler> {
+    pub async fn performance_profiler(&self) -> Option<PerformanceProfiler> {
         let perf = self.performance_profiler.read().await;
         perf.clone()
     }
 
     /// Get memory analyzer
-    pub async fn memory_analyzer(&amp;self) -> Option<MemoryAnalyzer> {
+    pub async fn memory_analyzer(&self) -> Option<MemoryAnalyzer> {
         let memory = self.memory_analyzer.read().await;
         memory.clone()
     }
 
     /// Get security auditor
-    pub async fn security_auditor(&amp;self) -> Option<SecurityAuditor> {
+    pub async fn security_auditor(&self) -> Option<SecurityAuditor> {
         let security = self.security_auditor.read().await;
         security.clone()
     }
 
     /// Get code editor
-    pub async fn code_editor(&amp;self) -> Option<CodeEditor> {
+    pub async fn code_editor(&self) -> Option<CodeEditor> {
         let editor = self.code_editor.read().await;
         editor.clone()
     }
 
     /// Get console
-    pub async fn console(&amp;self) -> Option<Console> {
+    pub async fn console(&self) -> Option<Console> {
         let console = self.console.read().await;
         console.clone()
     }
 
     /// Get testing framework
-    pub async fn testing(&amp;self) -> Option<TestFramework> {
+    pub async fn testing(&self) -> Option<TestFramework> {
         let testing = self.testing.read().await;
         testing.clone()
     }
 
     /// Get source map manager
-    pub async fn source_maps(&amp;self) -> Option<SourceMapManager> {
+    pub async fn source_maps(&self) -> Option<SourceMapManager> {
         let maps = self.source_maps.read().await;
         maps.clone()
     }
 
     /// Capture a diagnostic snapshot
-    pub async fn capture_snapshot(&amp;self) -> DevToolsSnapshot {
+    pub async fn capture_snapshot(&self) -> DevToolsSnapshot {
         let mut snapshot = DevToolsSnapshot {
             timestamp: Utc::now(),
             network_requests: vec![],
@@ -304,7 +304,7 @@ impl DeveloperTools {
     }
 
     /// Run diagnostics on the page
-    pub async fn run_diagnostics(&amp;self) -> DiagnosticsReport {
+    pub async fn run_diagnostics(&self) -> DiagnosticsReport {
         let mut report = DiagnosticsReport {
             timestamp: Utc::now(),
             issues: vec![],
@@ -369,12 +369,12 @@ impl DeveloperTools {
     }
 
     /// Subscribe to events
-    pub fn subscribe(&amp;self) -> broadcast::Receiver<DevToolsEvent> {
+    pub fn subscribe(&self) -> broadcast::Receiver<DevToolsEvent> {
         self.events.subscribe()
     }
 
     /// Shutdown all tools
-    pub async fn shutdown(&amp;self) {
+    pub async fn shutdown(&self) {
         *self.inspector.write().await = None;
         *self.network_profiler.write().await = None;
         *self.performance_profiler.write().await = None;
