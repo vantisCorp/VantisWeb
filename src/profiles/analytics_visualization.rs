@@ -783,10 +783,6 @@ mod tests {
 
     #[test]
     fn test_visualization_manager_creation() {
-    use super::*;
-
-    #[test]
-    fn test_visualization_manager_creation() {
         let manager = VisualizationManager::new();
         assert!(!manager.category_mappings.is_empty());
     }
