@@ -19,7 +19,7 @@ fn main() {
     };
     
     // Embed Windows manifest for proper DPI awareness and admin rights
-    let manifest_content = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    let manifest_content = r##"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <assemblyIdentity
     version="1.5.0.0"
@@ -58,7 +58,7 @@ fn main() {
       </requestedPrivileges>
     </security>
   </trustInfo>
-</assembly>"#;
+</assembly>"##;
     
     let manifest_path = Path::new(&out_dir).join("vantisweb.manifest");
     fs::write(&manifest_path, manifest_content).unwrap();

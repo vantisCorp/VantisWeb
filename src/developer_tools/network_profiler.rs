@@ -562,7 +562,7 @@ mod tests {
             200,
             "OK",
             vec![HTTPHeader { name: "Content-Type".to_string(), value: "application/json".to_string() }],
-            Some(br#"{"status":"ok"}"#.to_vec()),
+            Some(br##"{"status":"ok"}"##.to_vec()),
         ).await.unwrap();
         
         let requests = profiler.get_requests().await.unwrap();

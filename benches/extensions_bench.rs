@@ -1,4 +1,4 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -14,18 +14,18 @@ impl ExtensionManager {
         }
     }
 
-    fn get_extension_storage(&amp;self, ext_id: &amp;str, key: &amp;str) -> Option<&amp;String> {
+    fn get_extension_storage(&self, ext_id: &str, key: &str) -> Option<&String> {
         self.storage.get(ext_id)?.get(key)
     }
 
-    fn set_extension_storage(&amp;mut self, ext_id: &amp;str, key: &amp;str, value: &amp;str) {
+    fn set_extension_storage(&mut self, ext_id: &str, key: &str, value: &str) {
         self.storage
             .entry(ext_id.to_string())
             .or_insert_with(HashMap::new)
             .insert(key.to_string(), value.to_string());
     }
 
-    fn send_message(&amp;self, _from: &amp;str, _to: &amp;str, _msg: &amp;str) -> Result<(), String> {
+    fn send_message(&self, _from: &str, _to: &str, _msg: &str) -> Result<(), String> {
         // Simulate message sending
         std::thread::sleep(std::time::Duration::from_micros(5));
         Ok(())
@@ -43,7 +43,7 @@ impl ExtensionLoader {
         }
     }
 
-    fn load_extension(&amp;mut self, path: &amp;PathBuf) -> Result<String, String> {
+    fn load_extension(&mut self, path: &PathBuf) -> Result<String, String> {
         // Simulate loading with cache
         if let Some(cached) = self.cache.get(path) {
             return Ok(cached.clone());
@@ -57,14 +57,14 @@ impl ExtensionLoader {
     }
 }
 
-fn bench_extension_loading(c: &amp;mut Criterion) {
+fn bench_extension_loading(c: &mut Criterion) {
     let mut group = c.benchmark_group("extension_loading");
     
     group.bench_function("single_extension", |b| {
         let mut loader = ExtensionLoader::new();
         let path = PathBuf::from("extensions/example-extension");
         b.iter(|| {
-            loader.load_extension(black_box(&amp;path))
+            loader.load_extension(black_box(&path))
         })
     });
     
@@ -72,13 +72,13 @@ fn bench_extension_loading(c: &amp;mut Criterion) {
         group.bench_with_input(
             BenchmarkId::from_parameter(ext_count),
             ext_count,
-            |b, &amp;ext_count| {
+            |b, &ext_count| {
                 let mut loader = ExtensionLoader::new();
                 let paths: Vec<_> = (0..ext_count)
                     .map(|i| PathBuf::from(format!("extensions/ext{}", i)))
                     .collect();
                 b.iter(|| {
-                    for path in &amp;paths {
+                    for path in &paths {
                         black_box(loader.load_extension(path));
                     }
                 })
@@ -89,7 +89,7 @@ fn bench_extension_loading(c: &amp;mut Criterion) {
     group.finish();
 }
 
-fn bench_extension_api_calls(c: &amp;mut Criterion) {
+fn bench_extension_api_calls(c: &mut Criterion) {
     let mut group = c.benchmark_group("extension_api");
     
     group.bench_function("storage_get", |b| {

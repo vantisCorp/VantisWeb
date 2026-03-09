@@ -175,7 +175,7 @@ impl OpenVPNClient {
         };
 
         format!(
-            r#"
+            r##"
 client
 dev tun
 proto {}-client
@@ -188,7 +188,7 @@ remote-cert-tls server
 cipher {}
 auth {}
 verb 3
-"#,
+"##,
             protocol_str,
             server.hostname,
             server.port,

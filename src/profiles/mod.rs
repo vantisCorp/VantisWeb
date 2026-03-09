@@ -566,29 +566,31 @@ impl ProfileManager {
         info!("Profile cloned successfully as {}", cloned_id);
         Ok(cloned_id)
     }
+}
 
-    /// Clone options structure
-    #[derive(Debug, Clone)]
-    pub struct CloneOptions {
-        pub new_name: Option<String>,
-        pub include_bookmarks: bool,
-        pub include_history: bool,
-        pub clone_settings: bool,
-        pub clone_theme: bool,
-    }
+/// Clone options structure
+#[derive(Debug, Clone)]
+pub struct CloneOptions {
+    pub new_name: Option<String>,
+    pub include_bookmarks: bool,
+    pub include_history: bool,
+    pub clone_settings: bool,
+    pub clone_theme: bool,
+}
 
-    impl Default for CloneOptions {
-        fn default() -> Self {
-            Self {
-                new_name: None,
-                include_bookmarks: true,
-                include_history: false,
-                clone_settings: true,
-                clone_theme: true,
-            }
+impl Default for CloneOptions {
+    fn default() -> Self {
+        Self {
+            new_name: None,
+            include_bookmarks: true,
+            include_history: false,
+            clone_settings: true,
+            clone_theme: true,
         }
     }
+}
 
+impl ProfileManager {
     /// Clone a profile with detailed options
     pub async fn clone_profile_with_options(&self, profile_id: &str, options: &CloneOptions) -> Result<String> {
         info!("Cloning profile {} with detailed options: {:?}", profile_id, options);

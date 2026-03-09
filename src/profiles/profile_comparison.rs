@@ -658,7 +658,7 @@ impl ProfileComparisonManager {
     /// Export comparison report to HTML
     pub fn export_report_html(report: &ComparisonReport) -> String {
         format!(
-            r#"<!DOCTYPE html>
+            r##"<!DOCTYPE html>
 <html>
 <head>
     <title>{title}</title>
@@ -707,7 +707,7 @@ impl ProfileComparisonManager {
         {detail_sections}
     </div>
 </body>
-</html>"#,
+</html>"##,
             title = report.title,
             timestamp = chrono::DateTime::from_timestamp_millis(report.timestamp)
                 .map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string())
@@ -716,11 +716,11 @@ impl ProfileComparisonManager {
             profile_a = report.profile_a_name,
             profile_b = report.profile_b_name,
             summary_cards = report.summary.iter().map(|s| format!(
-                r#"<div class="summary-card"><h3>{}</h3><p>{}</p></div>"#,
+                r##"<div class="summary-card"><h3>{}</h3><p>{}</p></div>"##,
                 s.title, s.content
             )).collect::<Vec<_>>().join("\n"),
             detail_sections = report.details.iter().map(|d| format!(
-                r#"<div class="detail"><h3>{}</h3><ul>{}</ul></div>"#,
+                r##"<div class="detail"><h3>{}</h3><ul>{}</ul></div>"##,
                 d.category,
                 d.items.iter().map(|i| format!("<li>{}</li>", i)).collect::<Vec<_>>().join("\n")
             )).collect::<Vec<_>>().join("\n"),

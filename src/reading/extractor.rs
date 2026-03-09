@@ -296,7 +296,7 @@ impl ArticleExtractor {
 
         // Decode HTML entities
         let text = text
-            .replace("&amp;", "&")
+            .replace("&", "&")
             .replace("&lt;", "<")
             .replace("&gt;", ">")
             .replace("&quot;", "&quot;")
@@ -309,7 +309,7 @@ impl ArticleExtractor {
     }
 
     fn extract_images(&self, html: &str) -> Vec<ArticleImage> {
-        let img_regex = Regex::new(r#"<img[^>]+src=["']([^"']+)["'][^>]*>"#).unwrap();
+        let img_regex = Regex::new(r##"<img[^>]+src=["']([^"']+)["'][^>]*>"##).unwrap();
         let mut images = Vec::new();
 
         for cap in img_regex.captures_iter(html) {
@@ -340,7 +340,7 @@ impl ArticleExtractor {
     }
 
     fn extract_links(&self, html: &str) -> Vec<ArticleLink> {
-        let link_regex = Regex::new(r#"<a[^>]+href=["']([^"']+)["'][^>]*>(.*?)</a>"#).unwrap();
+        let link_regex = Regex::new(r##"<a[^>]+href=["']([^"']+)["'][^>]*>(.*?)</a>"##).unwrap();
         let mut links = Vec::new();
 
         for cap in link_regex.captures_iter(html) {
@@ -363,7 +363,7 @@ impl ArticleExtractor {
         let mut videos = Vec::new();
 
         // YouTube videos
-        let youtube_regex = Regex::new(r#"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]+)"#).unwrap();
+        let youtube_regex = Regex::new(r##"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]+)"##).unwrap();
         for cap in youtube_regex.captures_iter(html) {
             let video_id = cap.get(1).unwrap().as_str();
             videos.push(ArticleVideo {
@@ -375,7 +375,7 @@ impl ArticleExtractor {
         }
 
         // HTML5 video tags
-        let video_regex = Regex::new(r#"<video[^>]+src=["']([^"']+)["'][^>]*>"#).unwrap();
+        let video_regex = Regex::new(r##"<video[^>]+src=["']([^"']+)["'][^>]*>"##).unwrap();
         for cap in video_regex.captures_iter(html) {
             videos.push(ArticleVideo {
                 url: cap.get(1).unwrap().as_str().to_string(),
@@ -428,7 +428,7 @@ impl ArticleExtractor {
     }
 
     fn extract_attribute(&self, element: &str, attr: &str) -> Option<&str> {
-        let pattern = format!(r#"{}=["']([^"']*)["']"#, attr);
+        let pattern = format!(r##"{}=["']([^"']*)["']"##, attr);
         let regex = Regex::new(&pattern).ok()?;
         
         regex.captures(element)?.get(1).map(|m| m.as_str())
@@ -453,7 +453,7 @@ mod tests {
     #[tokio::test]
     async fn test_extract_title() {
         let extractor = ArticleExtractor::new();
-        let html = r#"<html><head><title>Test Article</title></head><body></body></html>"#;
+        let html = r##"<html><head><title>Test Article</title></head><body></body></html>"##;
         let metadata = extractor.extract_metadata("https://example.com/article", html).await;
         assert!(metadata.is_ok());
         assert_eq!(metadata.unwrap().title, "Test Article");

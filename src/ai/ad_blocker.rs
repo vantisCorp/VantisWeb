@@ -170,7 +170,7 @@ impl AdBlocker {
         ].into_iter().collect()
     }
 
-    pub async fn check_request(&amp;self, url: &amp;str) -> Result<BlockDecision> {
+    pub async fn check_request(&self, url: &str) -> Result<BlockDecision> {
         let mut stats = self.stats.write().await;
         stats.total_requests += 1;
 
@@ -186,7 +186,7 @@ impl AdBlocker {
 
         // Check whitelist
         let block_lists = self.block_lists.read().await;
-        if Self::is_whitelisted(url, &amp;block_lists.whitelist) {
+        if Self::is_whitelisted(url, &block_lists.whitelist) {
             let decision = BlockDecision {
                 should_block: false,
                 reason: BlockReason::NotBlocked,
@@ -198,7 +198,7 @@ impl AdBlocker {
 
         // Check block lists
         if self.config.enable_patterns {
-            if let Some(reason) = self.check_block_lists(url, &amp;block_lists).await {
+            if let Some(reason) = self.check_block_lists(url, &block_lists).await {
                 stats.total_blocks += 1;
                 let decision = BlockDecision {
                     should_block: true,
@@ -234,9 +234,9 @@ impl AdBlocker {
         Ok(decision)
     }
 
-    async fn check_block_lists(&amp;self, url: &amp;str, block_lists: &amp;BlockLists) -> Option<BlockReason> {
+    async fn check_block_lists(&self, url: &str, block_lists: &BlockLists) -> Option<BlockReason> {
         // Check ad networks
-        for network in &amp;block_lists.ad_networks {
+        for network in &block_lists.ad_networks {
             if url.contains(network) {
                 return Some(BlockReason::AdNetwork(network.clone()));
             }
@@ -244,7 +244,7 @@ impl AdBlocker {
 
         // Check trackers
         if self.config.block_trackers {
-            for tracker in &amp;block_lists.trackers {
+            for tracker in &block_lists.trackers {
                 if url.contains(tracker) {
                     return Some(BlockReason::Tracker(tracker.clone()));
                 }
@@ -254,10 +254,10 @@ impl AdBlocker {
         None
     }
 
-    async fn check_ml(&amp;self, url: &amp;str) -> Option<BlockReason> {
+    async fn check_ml(&self, url: &str) -> Option<BlockReason> {
         let model = self.ml_model.read().await;
         
-        for pattern in &amp;model.patterns {
+        for pattern in &model.patterns {
             if let Ok(regex) = Regex::new(pattern) {
                 if regex.is_match(url) {
                     return Some(BlockReason::PatternMatch(pattern.clone()));
@@ -268,17 +268,17 @@ impl AdBlocker {
         None
     }
 
-    fn is_whitelisted(url: &amp;str, whitelist: &amp;HashSet<String>) -> bool {
+    fn is_whitelisted(url: &str, whitelist: &HashSet<String>) -> bool {
         whitelist.iter().any(|domain| url.contains(domain))
     }
 
-    pub async fn add_custom_rule(&amp;self, rule: CustomRule) -> Result<()> {
+    pub async fn add_custom_rule(&self, rule: CustomRule) -> Result<()> {
         let mut block_lists = self.block_lists.write().await;
         block_lists.custom_rules.push(rule);
         Ok(())
     }
 
-    pub async fn get_stats(&amp;self) -> BlockerStats {
+    pub async fn get_stats(&self) -> BlockerStats {
         self.stats.read().await.clone()
     }
 }

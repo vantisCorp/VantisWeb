@@ -632,7 +632,7 @@ mod tests {
     async fn test_parse_user_script() {
         let manager = ContentScriptManager::new();
         
-        let user_script = r#"
+        let user_script = r##"
 // ==UserScript==
 // @name         Test Script
 // @namespace    http://tampermonkey.net/
@@ -647,7 +647,7 @@ mod tests {
     'use strict';
     console.log('Hello from user script!');
 })();
-"#;
+"##;
 
         let result = manager.parse_user_script(user_script).await;
         assert!(result.is_ok());

@@ -105,14 +105,14 @@ pub struct WebRTCManager {
 ///
 /// let config = RTCConfiguration {
 ///     ice_servers: vec![
-//!         ICEServer {
-//!             urls: vec!["stun:stun.l.google.com:19302".to_string()],
-//!             username: None,
-//!             credential: None,
-//!         }
-//!     ],
-//!     ..Default::default()
-//! };
+///         ICEServer {
+///             urls: vec!["stun:stun.l.google.com:19302".to_string()],
+///             username: None,
+///             credential: None,
+///         }
+///     ],
+///     ..Default::default()
+/// };
 /// ```
 #[derive(Debug, Clone)]
 pub struct RTCConfiguration {

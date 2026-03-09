@@ -72,7 +72,7 @@ impl Button {
 impl UIComponent for Button {
     fn render(&self) -> String {
         format!(
-            r#"<button id="{}" class="button button-{:?}" {}>{}</button>"#,
+            r##"<button id="{}" class="button button-{:?}" {}>{}</button>"##,
             self.id,
             self.style,
             if self.enabled { "" } else { "disabled" },
@@ -146,7 +146,7 @@ impl Input {
 impl UIComponent for Input {
     fn render(&self) -> String {
         format!(
-            r#"<input id="{}" type="{:?}" placeholder="{}" value="{}" {}>"#,
+            r##"<input id="{}" type="{:?}" placeholder="{}" value="{}" {}>"##,
             self.id,
             self.input_type,
             self.placeholder,

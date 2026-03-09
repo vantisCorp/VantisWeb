@@ -121,49 +121,49 @@ impl ThemeManager {
     pub fn to_css_variables(&self) -> String {
         let mut css = String::with_capacity(500);
         
-        css.push_str(r#"
+        css.push_str(r##"
 :root {
-    --color-background: "#);
+    --color-background: "##);
         css.push_str(&self.current_theme.colors.background);
-        css.push_str(r#";
-    --color-foreground: "#);
+        css.push_str(r##";
+    --color-foreground: "##);
         css.push_str(&self.current_theme.colors.foreground);
-        css.push_str(r#";
-    --color-primary: "#);
+        css.push_str(r##";
+    --color-primary: "##);
         css.push_str(&self.current_theme.colors.primary);
-        css.push_str(r#";
-    --color-secondary: "#);
+        css.push_str(r##";
+    --color-secondary: "##);
         css.push_str(&self.current_theme.colors.secondary);
-        css.push_str(r#";
-    --color-accent: "#);
+        css.push_str(r##";
+    --color-accent: "##);
         css.push_str(&self.current_theme.colors.accent);
-        css.push_str(r#";
-    --color-surface: "#);
+        css.push_str(r##";
+    --color-surface: "##);
         css.push_str(&self.current_theme.colors.surface);
-        css.push_str(r#";
-    --color-error: "#);
+        css.push_str(r##";
+    --color-error: "##);
         css.push_str(&self.current_theme.colors.error);
-        css.push_str(r#";
-    --color-warning: "#);
+        css.push_str(r##";
+    --color-warning: "##);
         css.push_str(&self.current_theme.colors.warning);
-        css.push_str(r#";
-    --color-success: "#);
+        css.push_str(r##";
+    --color-success: "##);
         css.push_str(&self.current_theme.colors.success);
-        css.push_str(r#";
-    --font-primary: "#);
+        css.push_str(r##";
+    --font-primary: "##);
         css.push_str(&self.current_theme.fonts.primary);
-        css.push_str(r#";
-    --font-monospace: "#);
+        css.push_str(r##";
+    --font-monospace: "##);
         css.push_str(&self.current_theme.fonts.monospace);
-        css.push_str(r#";
-    --font-size-base: "#);
+        css.push_str(r##";
+    --font-size-base: "##);
         css.push_str(&self.current_theme.fonts.size_base.to_string());
-        css.push_str(r#"px;
-    --font-size-heading: "#);
+        css.push_str(r##"px;
+    --font-size-heading: "##);
         css.push_str(&self.current_theme.fonts.size_heading.to_string());
-        css.push_str(r#"px;
+        css.push_str(r##"px;
 }
-"#);
+"##);
         
         css
     }

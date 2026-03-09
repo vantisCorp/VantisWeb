@@ -493,7 +493,7 @@ impl BrowserIntegration {
         let mut urls = Vec::new();
         
         // Simple regex-based extraction (in production, use proper HTML parser)
-        let re = regex::Regex::new(r#"src=["']([^"']+\.(?:jpg|jpeg|png|gif|webp|svg|bmp|ico))["']"#).unwrap();
+        let re = regex::Regex::new(r##"src=["']([^"']+\.(?:jpg|jpeg|png|gif|webp|svg|bmp|ico))["']"##).unwrap();
         for (index, cap) in re.captures_iter(html).enumerate() {
             if let Some(url) = cap.get(1) {
                 urls.push((index, url.as_str().to_string()));
@@ -508,7 +508,7 @@ impl BrowserIntegration {
         let mut urls = Vec::new();
         
         // Extract from video tags
-        let re = regex::Regex::new(r#"src=["']([^"']+\.(?:mp4|webm|ogg|avi|mkv|mov))["']"#).unwrap();
+        let re = regex::Regex::new(r##"src=["']([^"']+\.(?:mp4|webm|ogg|avi|mkv|mov))["']"##).unwrap();
         for (index, cap) in re.captures_iter(html).enumerate() {
             if let Some(url) = cap.get(1) {
                 urls.push((index, url.as_str().to_string()));
@@ -516,7 +516,7 @@ impl BrowserIntegration {
         }
         
         // Extract from iframe/embed (YouTube, etc.)
-        let iframe_re = regex::Regex::new(r#"src=["']([^"']*(?:youtube|vimeo|dailymotion)[^"']*)["']"#).unwrap();
+        let iframe_re = regex::Regex::new(r##"src=["']([^"']*(?:youtube|vimeo|dailymotion)[^"']*)["']"##).unwrap();
         for (index, cap) in iframe_re.captures_iter(html).enumerate() {
             if let Some(url) = cap.get(1) {
                 urls.push((index, url.as_str().to_string()));
@@ -530,7 +530,7 @@ impl BrowserIntegration {
     fn extract_audio_urls(&self, html: &str) -> Vec<(usize, String)> {
         let mut urls = Vec::new();
         
-        let re = regex::Regex::new(r#"src=["']([^"']+\.(?:mp3|wav|ogg|flac|aac|m4a))["']"#).unwrap();
+        let re = regex::Regex::new(r##"src=["']([^"']+\.(?:mp3|wav|ogg|flac|aac|m4a))["']"##).unwrap();
         for (index, cap) in re.captures_iter(html).enumerate() {
             if let Some(url) = cap.get(1) {
                 urls.push((index, url.as_str().to_string()));
@@ -735,14 +735,14 @@ mod tests {
     #[tokio::test]
     async fn test_detect_resources() {
         let integration = BrowserIntegration::new();
-        let html = r#"
+        let html = r##"
             <html>
                 <img src="https://example.com/image1.jpg" />
                 <img src="https://example.com/image2.png" />
                 <video src="https://example.com/video1.mp4" />
                 <audio src="https://example.com/audio1.mp3" />
             </html>
-        "#;
+        "##;
         
         let resources = integration.detect_resources("https://example.com", html).await;
         assert!(!resources.is_empty());

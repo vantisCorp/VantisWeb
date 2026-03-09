@@ -99,7 +99,7 @@ impl DiffViewer {
         screenshot: &Screenshot,
         diff: &DiffResult,
     ) -> Result<String, VRError> {
-        let html = format!(r#"<!DOCTYPE html>
+        let html = format!(r##"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -399,7 +399,7 @@ impl DiffViewer {
         }}
     </script>
 </body>
-</html>"#,
+</html>"##,
             baseline.name,
             baseline.viewport,
             self.config.background_color,
@@ -433,12 +433,12 @@ impl DiffViewer {
         
         let results_html: String = results.iter().map(|r| {
             format!(
-                r#"<tr class="{}">
+                r##"<tr class="{}">
                     <td>{}</td>
                     <td>{}</td>
                     <td>{:.2}%</td>
                     <td>{}</td>
-                </tr>"#,
+                </tr>"##,
                 if r.passed { "passed" } else { "failed" },
                 r.test_name,
                 r.viewport,
@@ -447,7 +447,7 @@ impl DiffViewer {
             )
         }).collect();
         
-        let html = format!(r#"<!DOCTYPE html>
+        let html = format!(r##"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -538,7 +538,7 @@ impl DiffViewer {
         </tbody>
     </table>
 </body>
-</html>"#,
+</html>"##,
             total,
             passed,
             failed,
@@ -592,7 +592,7 @@ impl DiffViewer {
         let failed = total - passed;
         
         let mut md = format!(
-            r#"# Visual Regression Test Report
+            r##"# Visual Regression Test Report
 
 ## Summary
 
@@ -607,7 +607,7 @@ impl DiffViewer {
 
 | Test | Viewport | Diff % | Status |
 |------|----------|--------|--------|
-"#,
+"##,
             total, passed, failed,
             if total > 0 { (passed as f32 / total as f32) * 100.0 } else { 0.0 }
         );

@@ -115,7 +115,7 @@ impl ThemeManager {
     /// Get theme as CSS variables
     pub fn to_css_variables(&self) -> String {
         format!(
-            r#"
+            r##"
 :root {{
     --color-background: {};
     --color-foreground: {};
@@ -131,7 +131,7 @@ impl ThemeManager {
     --font-size-base: {}px;
     --font-size-heading: {}px;
 }}
-"#,
+"##,
             self.current_theme.colors.background,
             self.current_theme.colors.foreground,
             self.current_theme.colors.primary,

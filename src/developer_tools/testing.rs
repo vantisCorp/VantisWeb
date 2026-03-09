@@ -713,23 +713,23 @@ impl TestFramework {
 
     async fn generate_html_report(&self, result: &TestRunResult) -> String {
         format!(
-            r#"<!DOCTYPE html>
+            r##"<!DOCTYPE html>
 <html>
 <head><title>Test Report</title></head>
 <body>
 <h1>Test Report</h1>
 <p>Total: {} | Passed: {} | Failed: {} | Skipped: {}</p>
 </body>
-</html>"#,
+</html>"##,
             result.total, result.passed, result.failed, result.skipped
         )
     }
 
     async fn generate_junit_report(&self, result: &TestRunResult) -> String {
         format!(
-            r#"<?xml version="1.0" encoding="UTF-8"?>
+            r##"<?xml version="1.0" encoding="UTF-8"?>
 <testsuites tests="{}" failures="{}" skipped="{}" time="{:.3}">
-</testsuites>"#,
+</testsuites>"##,
             result.total, result.failed, result.skipped, result.duration_ms / 1000.0
         )
     }

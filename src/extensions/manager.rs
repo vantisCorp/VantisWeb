@@ -215,14 +215,14 @@ mod tests {
         let extension_dir = temp_dir.join(name);
         fs::create_dir(&extension_dir)?;
 
-        let manifest_json = r#"{
+        let manifest_json = r##"{
             "name": "NAME",
             "version": "VERSION",
             "description": "A test extension",
             "author": "Test Author",
             "manifest_version": 2,
             "permissions": ["storage"]
-        }"#.replace("NAME", name).replace("VERSION", version);
+        }"##.replace("NAME", name).replace("VERSION", version);
 
         let manifest_path = extension_dir.join("manifest.json");
         let mut file = fs::File::create(&manifest_path)?;
