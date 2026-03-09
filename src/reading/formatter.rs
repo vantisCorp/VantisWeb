@@ -197,7 +197,7 @@ impl ArticleFormatter {
     }
 
     fn enhance_images(&self, html: &str) -> String {
-        let img_regex = regex::Regex::new(r#"<img([^>]+)>"#).unwrap();
+        let img_regex = regex::Regex::new(r##"<img([^>]+)>"##).unwrap();
         
         img_regex.replace_all(html, |caps: &regex::Captures| {
             let attrs = caps.get(1).unwrap().as_str();
@@ -213,20 +213,20 @@ impl ArticleFormatter {
 
     fn process_videos(&self, html: &str) -> String {
         let youtube_regex = regex::Regex::new(
-            r#"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]+)"#
+            r##"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]+)"##
         ).unwrap();
 
         youtube_regex.replace_all(html, |caps: &regex::Captures| {
             let video_id = caps.get(1).unwrap().as_str();
             format!(
-                r#"<div class="video-container"><iframe src="https://www.youtube.com/embed/{}" frameborder="0" allowfullscreen></iframe></div>"#,
+                r##"<div class="video-container"><iframe src="https://www.youtube.com/embed/{}" frameborder="0" allowfullscreen></iframe></div>"##,
                 video_id
             )
         }).to_string()
     }
 
     fn remove_videos(&self, html: &str) -> String {
-        let video_regex = regex::Regex::new(r#"<iframe[^>]*src=["']https?://(?:www\.)?youtube\.com/embed/[^"']+["'][^>]*>.*?</iframe>"#).unwrap();
+        let video_regex = regex::Regex::new(r##"<iframe[^>]*src=["']https?://(?:www\.)?youtube\.com/embed/[^"']+["'][^>]*>.*?</iframe>"##).unwrap();
         video_regex.replace_all(html, "").to_string()
     }
 
@@ -242,7 +242,7 @@ impl ArticleFormatter {
 
     fn generate_auto_scroll_script(&self, config: &ReadingModeConfig) -> String {
         format!(
-            r#"
+            r##"
 let scrollSpeed = {};
 let autoScrollEnabled = {};
 let lastScrollY = window.scrollY;
@@ -271,7 +271,7 @@ document.addEventListener('keydown', (e) => {{
         }}
     }}
 }});
-"#,
+"##,
             config.auto_scroll_speed,
             config.auto_scroll_enabled
         )
@@ -304,7 +304,7 @@ document.addEventListener('keydown', (e) => {{
     }
 
     fn light_theme_css() -> String {
-        r#"
+        r##"
 * {
     margin: 0;
     padding: 0;
@@ -415,11 +415,11 @@ body {
     background-color: #007bff;
     transition: width 0.3s ease;
 }
-"#.to_string()
+"##.to_string()
     }
 
     fn dark_theme_css() -> String {
-        r#"
+        r##"
 * {
     margin: 0;
     padding: 0;
@@ -537,11 +537,11 @@ body {
     background-color: #5c9aff;
     transition: width 0.3s ease;
 }
-"#.to_string()
+"##.to_string()
     }
 
     fn sepia_theme_css() -> String {
-        r#"
+        r##"
 * {
     margin: 0;
     padding: 0;
@@ -659,11 +659,11 @@ body {
     background-color: #8b4513;
     transition: width 0.3s ease;
 }
-"#.to_string()
+"##.to_string()
     }
 
     fn high_contrast_theme_css() -> String {
-        r#"
+        r##"
 * {
     margin: 0;
     padding: 0;
@@ -790,7 +790,7 @@ body {
     background-color: #000;
     transition: width 0.3s ease;
 }
-"#.to_string()
+"##.to_string()
     }
 }
 

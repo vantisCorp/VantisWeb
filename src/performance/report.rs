@@ -93,7 +93,7 @@ impl ReportGenerator {
     
     /// Render HTML report
     fn render_html(&self, report: &PerformanceReport) -> String {
-        format!(r#"<!DOCTYPE html>
+        format!(r##"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -302,7 +302,7 @@ impl ReportGenerator {
         </table>
     </div>
 </body>
-</html>"#,
+</html>"##,
             title = report.title,
             timestamp = report.generated_at.format("%Y-%m-%d %H:%M:%S UTC"),
             total_tests = report.summary.total_tests,
@@ -318,14 +318,14 @@ impl ReportGenerator {
     fn render_load_test_rows(&self, tests: &[TestExecution]) -> String {
         tests.iter().map(|t| {
             format!(
-                r#"<tr>
+                r##"<tr>
                     <td>{}</td>
                     <td class="status-{}">{}</td>
                     <td>{}ms</td>
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
-                </tr>"#,
+                </tr>"##,
                 t.test_id,
                 if t.status == super::TestStatus::Completed { "passed" } else { "failed" },
                 if t.status == super::TestStatus::Completed { "✓ Pass" } else { "✗ Fail" },
@@ -337,12 +337,12 @@ impl ReportGenerator {
     fn render_stress_test_rows(&self, tests: &[TestExecution]) -> String {
         tests.iter().map(|t| {
             format!(
-                r#"<tr>
+                r##"<tr>
                     <td>{}</td>
                     <td>-</td>
                     <td>-</td>
                     <td class="status-{}">{}</td>
-                </tr>"#,
+                </tr>"##,
                 t.test_id,
                 if t.status == super::TestStatus::Completed { "passed" } else { "failed" },
                 if t.status == super::TestStatus::Completed { "✓ Pass" } else { "✗ Fail" }
@@ -353,12 +353,12 @@ impl ReportGenerator {
     fn render_benchmark_rows(&self, tests: &[TestExecution]) -> String {
         tests.iter().map(|t| {
             format!(
-                r#"<tr>
+                r##"<tr>
                     <td>{}</td>
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
-                </tr>"#,
+                </tr>"##,
                 t.test_id
             )
         }).collect::<Vec<_>>().join("\n")
@@ -367,7 +367,7 @@ impl ReportGenerator {
     /// Render Markdown report
     fn render_markdown(&self, report: &PerformanceReport) -> String {
         format!(
-            r#"# {title}
+            r##"# {title}
 
 Generated: {timestamp}
 
@@ -397,7 +397,7 @@ Generated: {timestamp}
 | Benchmark | Status |
 |-----------|--------|
 {benchmarks}
-"#,
+"##,
             title = report.title,
             timestamp = report.generated_at.format("%Y-%m-%d %H:%M:%S UTC"),
             total_tests = report.summary.total_tests,

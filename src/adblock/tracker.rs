@@ -611,11 +611,11 @@ mod tests {
     #[tokio::test]
     async fn test_detect_canvas_fingerprinting() {
         let detector = TrackerDetector::new();
-        let script = r#"
+        let script = r##"
             var canvas = document.createElement('canvas');
             var ctx = canvas.getContext('2d');
             var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        "#;
+        "##;
         let tracker = detector.check_script(script, "https://example.com/script.js", "https://example.com").await;
         
         assert!(tracker.is_some());

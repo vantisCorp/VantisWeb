@@ -297,14 +297,14 @@ mod tests {
         let extension_dir = temp_dir.path().join("test-extension");
         fs::create_dir(&extension_dir).unwrap();
 
-        let manifest_json = r#"{
+        let manifest_json = r##"{
                 "name": "Test Extension",
                 "version": "1.0.0",
                 "description": "A test extension",
                 "author": "Test Author",
                 "manifest_version": 2,
                 "permissions": ["storage"]
-            }"#;
+            }"##;
 
         let manifest_path = extension_dir.join("manifest.json");
         let mut file = fs::File::create(&manifest_path).unwrap();

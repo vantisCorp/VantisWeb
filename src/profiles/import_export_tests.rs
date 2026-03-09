@@ -180,7 +180,7 @@ mod tests {
         let content = fs::read_to_string(temp_file.path()).unwrap();
         assert!(content.contains("Test Profile 1"), "Should contain profile name");
         // Bookmarks should be empty
-        assert!(content.contains(r#""bookmarks":[]"#), "Bookmarks should be empty");
+        assert!(content.contains(r##""bookmarks":[]"##), "Bookmarks should be empty");
     }
 
     #[test]
@@ -255,7 +255,7 @@ mod tests {
 
         let content = fs::read_to_string(temp_file.path()).unwrap();
         // In placeholder mode, encryption flag is set but data is base64 encoded
-        assert!(content.contains(r#""encrypted":true"#), "Should be marked as encrypted");
+        assert!(content.contains(r##""encrypted":true"##), "Should be marked as encrypted");
 
         // Import should work with the same password
         let import_options = ImportOptions {

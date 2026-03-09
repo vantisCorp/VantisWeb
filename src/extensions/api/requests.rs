@@ -258,7 +258,7 @@ mod tests {
 
     #[test]
     fn test_response_json() {
-        let body = r#"{"key": "value"}"#;
+        let body = r##"{"key": "value"}"##;
         let response = Response {
             status: 200,
             status_text: "OK".to_string(),

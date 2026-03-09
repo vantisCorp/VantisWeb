@@ -235,7 +235,7 @@ impl InstallerBuilder {
 
     /// Generate NSIS installer script for Windows
     fn generate_nsis_script(&self) -> Result<String> {
-        Ok(format!(r#"
+        Ok(format!(r##"
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
@@ -280,7 +280,7 @@ Section "Uninstall"
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{}"
     DeleteRegKey HKLM "Software\{}"
 SectionEnd
-"#,
+"##,
             self.config.app_name,
             self.config.output_dir,
             self.config.app_name.to_lowercase().replace(' ', "_"),
@@ -321,7 +321,7 @@ SectionEnd
 
     /// Generate DEB control file
     fn generate_deb_control(&self) -> Result<String> {
-        Ok(format!(r#"Package: {}
+        Ok(format!(r##"Package: {}
 Version: {}
 Section: web
 Priority: optional
@@ -330,7 +330,7 @@ Maintainer: VantisWeb Team <team@vantisweb.com>
 Description: {}
  Next-generation web browser with Liquid Core Architecture
 Homepage: https://vantisweb.com
-"#,
+"##,
             self.config.app_name.to_lowercase().replace(' ', "-"),
             self.config.app_version,
             match self.config.architecture {
@@ -344,7 +344,7 @@ Homepage: https://vantisweb.com
 
     /// Generate RPM spec file
     fn generate_rpm_spec(&self) -> Result<String> {
-        Ok(format!(r#"Name: {}
+        Ok(format!(r##"Name: {}
 Version: {}
 Release: 1
 Summary: Next-generation web browser
@@ -368,7 +368,7 @@ ln -sf /usr/share/{}/{} /usr/bin/{}
 
 %postun
 rm -f /usr/bin/{}
-"#,
+"##,
             self.config.app_name.to_lowercase(),
             self.config.app_version,
             self.config.app_name.to_lowercase(),
@@ -384,11 +384,11 @@ rm -f /usr/bin/{}
 
     /// Generate AppImage configuration
     fn generate_appimage_config(&self) -> Result<String> {
-        Ok(format!(r#"#!/bin/bash
+        Ok(format!(r##"#!/bin/bash
 APPDIR="$(dirname "$(readlink -f "$0")")"
 export APPIMAGE_EXTRACT_AND_RUN=1
 exec "$APPDIR/usr/bin/{}" "$@"
-"#, self.config.app_name.to_lowercase()))
+"##, self.config.app_name.to_lowercase()))
     }
 
     /// Build the actual package

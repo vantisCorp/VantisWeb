@@ -433,7 +433,7 @@ impl ThemeManager {
     /// Generate CSS for a theme
     pub fn generate_css(&self, theme: &ThemeConfig) -> String {
         format!(
-            r#"
+            r##"
 :root {{
     --bg-color: {};
     --text-color: {};
@@ -451,7 +451,7 @@ impl ThemeManager {
     --margin-width: {}px;
     --paragraph-spacing: {}px;
 }}
-"#,
+"##,
             theme.colors.background,
             theme.colors.text,
             theme.colors.text_secondary,

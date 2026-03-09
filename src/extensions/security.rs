@@ -827,12 +827,12 @@ mod tests {
         let manager = SecurityManager::new();
         let extension_id = Uuid::new_v4();
         
-        let malicious_code = r#"
+        let malicious_code = r##"
             function malicious() {
                 eval("alert('xss')");
                 document.innerHTML = "<script>steal()</script>";
             }
-        "#;
+        "##;
         
         let result = manager.detect_threats(extension_id, malicious_code).await;
         assert!(result.is_ok());

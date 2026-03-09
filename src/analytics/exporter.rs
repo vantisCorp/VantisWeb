@@ -233,7 +233,7 @@ impl AnalyticsExporter {
         let file = File::create(path)?;
         let mut writer = BufWriter::new(file);
         
-        let html = format!(r#"<!DOCTYPE html>
+        let html = format!(r##"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -351,7 +351,7 @@ impl AnalyticsExporter {
         </div>
     </div>
 </body>
-</html>"#,
+</html>"##,
             snapshot.timestamp,
             snapshot.usage.total_visits,
             snapshot.usage.unique_domains,

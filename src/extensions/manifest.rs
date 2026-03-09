@@ -208,7 +208,7 @@ mod tests {
 
     #[test]
     fn test_parse_valid_manifest() {
-        let manifest_json = r#"{
+        let manifest_json = r##"{
             "name": "Test Extension",
             "version": "1.0.0",
             "description": "A test extension",
@@ -235,7 +235,7 @@ mod tests {
                 "48": "icon48.png",
                 "128": "icon128.png"
             }
-        }"#;
+        }"##;
 
         let mut temp_file = NamedTempFile::new().unwrap();
         temp_file.write_all(manifest_json.as_bytes()).unwrap();
@@ -270,13 +270,13 @@ mod tests {
 
     #[test]
     fn test_parse_invalid_manifest() {
-        let manifest_json = r#"{
+        let manifest_json = r##"{
             "name": "",
             "version": "1.0.0",
             "description": "A test extension",
             "author": "Test Author",
             "manifest_version": 2
-        }"#;
+        }"##;
 
         let mut temp_file = NamedTempFile::new().unwrap();
         temp_file.write_all(manifest_json.as_bytes()).unwrap();

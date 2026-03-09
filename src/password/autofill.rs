@@ -340,7 +340,7 @@ mod tests {
     #[tokio::test]
     async fn test_detect_forms() {
         let manager = AutofillManager::new();
-        let html = r#"<input type="password" name="password"><input type="text" name="username">"#;
+        let html = r##"<input type="password" name="password"><input type="text" name="username">"##;
         
         let forms = manager.detect_forms("https://example.com", html).await;
         assert!(!forms.is_empty());

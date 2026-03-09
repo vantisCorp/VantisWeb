@@ -631,7 +631,7 @@ mod tests {
     #[tokio::test]
     async fn test_unsafe_inline_detection() {
         let auditor = SecurityAuditor::new(SecurityAuditorConfig::default());
-        let html = r#"<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">"#;
+        let html = r##"<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">"##;
         let issues = auditor.analyze_csp(html).await;
         
         assert!(issues.iter().any(|i| i.id == "CSP-002"));

@@ -449,7 +449,7 @@ impl BookmarkExporter {
         let start = std::time::Instant::now();
         
         let mut html = String::from(
-            r#"<!DOCTYPE NETSCAPE-Bookmark-file-1>
+            r##"<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <!-- This is an automatically generated file.
      It will be read and overwritten.
      DO NOT EDIT! -->
@@ -470,7 +470,7 @@ impl BookmarkExporter {
             };
             
             html.push_str(&format!(
-                r#"    <DT><A HREF="{}" ADD_DATE="{}" {} TAGS="{}">{}</A>"#,
+                r##"    <DT><A HREF="{}" ADD_DATE="{}" {} TAGS="{}">{}</A>"##,
                 bookmark.url, add_date, desc_attr, tags_csv, bookmark.title
             ));
         }
@@ -532,7 +532,7 @@ mod tests {
     async fn test_import_from_json() {
         let importer = BookmarkImporter::new(DuplicateMode::ExactUrl);
         
-        let json = r#"[{
+        let json = r##"[{
             "id": "550e8400-e29b-41d4-a716-446655440000",
             "url": "https://example.com",
             "title": "Example",
@@ -546,7 +546,7 @@ mod tests {
             "last_accessed": null,
             "created_at": "2024-01-01T00:00:00Z",
             "updated_at": "2024-01-01T00:00:00Z"
-        }]"#;
+        }]"##;
         
         let result = importer.import_from_json(json).await;
         assert_eq!(result.total_processed, 1);

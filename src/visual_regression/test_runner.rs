@@ -436,18 +436,18 @@ impl CIIntegration {
         let failures = results.iter().filter(|r| !r.passed).count();
         
         let mut xml = format!(
-            r#"<?xml version="1.0" encoding="UTF-8"?>
+            r##"<?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="visual-regression" tests="{}" failures="{}">
-"#,
+"##,
             total, failures
         );
         
         for result in results {
             xml.push_str(&format!(
-                r#"  <testcase name="{}_{}" classname="visual-regression">
+                r##"  <testcase name="{}_{}" classname="visual-regression">
 {},
     </testcase>
-"#,
+"##,
                 result.test_name,
                 result.viewport,
                 if result.passed {

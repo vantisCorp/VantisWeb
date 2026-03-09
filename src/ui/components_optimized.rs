@@ -78,17 +78,17 @@ impl UIComponent for Button {
     fn render(&self) -> String {
         let mut html = String::with_capacity(100);
         
-        html.push_str(r#"<button id=""#);
+        html.push_str(r##"<button id=""##);
         html.push_str(&self.id);
-        html.push_str(r#"" class="button button-"#);
+        html.push_str(r##"" class="button button-"##);
         html.push_str(&format!("{:?}", self.style).to_lowercase());
-        html.push_str(r#"" "#);
+        html.push_str(r##"" "##);
         if !self.enabled {
-            html.push_str(r#"disabled"#);
+            html.push_str(r##"disabled"##);
         }
-        html.push_str(r#">"#);
+        html.push_str(r##">"##);
         html.push_str(&self.text);
-        html.push_str(r#"</button>"#);
+        html.push_str(r##"</button>"##);
         
         html
     }
@@ -160,19 +160,19 @@ impl UIComponent for Input {
     fn render(&self) -> String {
         let mut html = String::with_capacity(150);
         
-        html.push_str(r#"<input id=""#);
+        html.push_str(r##"<input id=""##);
         html.push_str(&self.id);
-        html.push_str(r#"" type=""#);
+        html.push_str(r##"" type=""##);
         html.push_str(&format!("{:?}", self.input_type).to_lowercase());
-        html.push_str(r#"" placeholder=""#);
+        html.push_str(r##"" placeholder=""##);
         html.push_str(&self.placeholder);
-        html.push_str(r#"" value=""#);
+        html.push_str(r##"" value=""##);
         html.push_str(&self.value);
-        html.push_str(r#""" "#);
+        html.push_str(r##""" "##);
         if self.readonly {
-            html.push_str(r#"readonly"#);
+            html.push_str(r##"readonly"##);
         }
-        html.push_str(r#">"#);
+        html.push_str(r##">"##);
         
         html
     }
@@ -206,7 +206,7 @@ mod tests {
         
         let html = button.render();
         
-        assert!(html.contains(r#"id="test-btn""#));
+        assert!(html.contains(r##"id="test-btn""##));
         assert!(html.contains("Click Me"));
     }
 
@@ -233,7 +233,7 @@ mod tests {
         
         let html = input.render();
         
-        assert!(html.contains(r#"id="test-input""#));
+        assert!(html.contains(r##"id="test-input""##));
         assert!(html.contains("Enter text"));
     }
 
